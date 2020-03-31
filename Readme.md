@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
-* Студент: [Kate M](https://up.htmlacademy.ru/ecmascript/11/user/70920).
-* Наставник: `Неизвестно`.
+* Студент: [Миниянова Екатерина](https://up.htmlacademy.ru/ecmascript/11/user/70920).
+* Наставник: Михеев Алексей.
 
 ---
 
