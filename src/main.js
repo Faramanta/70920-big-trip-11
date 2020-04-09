@@ -8,8 +8,9 @@ import {createTripDayListTemplate} from "./components/trip-day-list.js";
 import {createTripDayItemTemplate} from "./components/trip-day-item.js";
 import {createTripDateInformationTemplate} from "./components/trip-date.js";
 import {createTripEventsListTemplate} from "./components/trip-event-list.js";
-import {createFormEditTripEventTemplate} from "./components/form-edit.js";
 import {createTripEventTemplate} from "./components/trip-event.js";
+import {createTripEventEditTemplate} from "./components/trip-event-edit.js";
+import {generateTripEvents} from "./mock/trip-event.js";
 
 const EVENT_COUNT = 3;
 
@@ -38,6 +39,10 @@ render(siteMenuElement, createSiteFiltersTemplate()); // отрисовка фи
 
 const siteEventContainerElement = siteContentElement.querySelector(`.trip-events`);
 
+
+const events = generateTripEvents(EVENT_COUNT);
+
+
 render(siteEventContainerElement, createSiteSortTemplate()); // отрисовка сортировки
 render(siteEventContainerElement, createTripDayListTemplate()); // отрисовка контейнера-списка для дней
 
@@ -52,8 +57,8 @@ render(siteTripDateInformationElement, createTripEventsListTemplate()); // сп�
 
 const siteTripEventListElement = siteTripDateInformationElement.querySelector(`.trip-events__list`);
 
-render(siteTripEventListElement, createFormEditTripEventTemplate()); // форма создания/редактирования
+render(siteTripEventListElement, createTripEventEditTemplate(events[0])); // форма создания/редактирования
 
-for (let i = 1; i <= EVENT_COUNT; i++) {
-  render(siteTripEventListElement, createTripEventTemplate()); // точка маршрута
+for (let i = 1; i <= events.length; i++) {
+  render(siteTripEventListElement, createTripEventTemplate(events[i])); // точка маршрута
 }
