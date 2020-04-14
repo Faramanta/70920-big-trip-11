@@ -1,5 +1,5 @@
-import {eventTime} from "../utils.js";
 import {getRandomIntegerNumber} from "../mock/trip-event.js";
+import {eventTime} from "../utils.js";
 
 // Точка маршрута
 
@@ -19,14 +19,14 @@ const createOffersMarkup = (offers) => {
 };
 
 export const createTripEventTemplate = (event) => {
-  const {eventType, eventCity, timestamp, offers, randomOffers} = event;
+  const {eventType, eventCity, timestamp, randomOffers} = event;
 
   const newTimestamp = timestamp + getRandomIntegerNumber(1800000, 3000000); // рандомное число для расчета времени финиша точки маршрута
   const eventTimeStart = eventTime(timestamp); // время старта
   const eventTimeEnd = eventTime(newTimestamp); // время финиша
   const eventTimeDur = new Date(newTimestamp - timestamp).getMinutes(); // разница времени старта и финиша
 
-  const isOffersShowing = !!offers; // есть ли offers
+  const isOffersShowing = !!randomOffers; // есть ли offers
   const offersMarkup = isOffersShowing ? createOffersMarkup(randomOffers) : ``;
 
   return (
@@ -49,12 +49,12 @@ export const createTripEventTemplate = (event) => {
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">20</span>
         </p>
-
+        
 ${isOffersShowing ?
       `<h4 class="visually-hidden">Offers:</h4>
-        <ul class="event__selected-offers">
-          ${offersMarkup}
-        </ul>`
+      <ul class="event__selected-offers">
+    ${offersMarkup}
+    </ul>`
       : ``
     }
   

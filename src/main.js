@@ -39,9 +39,7 @@ render(siteMenuElement, createSiteFiltersTemplate()); // отрисовка фи
 
 const siteEventContainerElement = siteContentElement.querySelector(`.trip-events`);
 
-
 const events = generateTripEvents(EVENT_COUNT);
-
 
 render(siteEventContainerElement, createSiteSortTemplate()); // отрисовка сортировки
 render(siteEventContainerElement, createTripDayListTemplate()); // отрисовка контейнера-списка для дней
@@ -59,6 +57,5 @@ const siteTripEventListElement = siteTripDateInformationElement.querySelector(`.
 
 render(siteTripEventListElement, createTripEventEditTemplate(events[0])); // форма создания/редактирования
 
-for (let i = 1; i <= events.length; i++) {
-  render(siteTripEventListElement, createTripEventTemplate(events[i])); // точка маршрута
-}
+events.slice(1, events.length)
+  .forEach((event) => render(siteTripEventListElement, createTripEventTemplate(event)));

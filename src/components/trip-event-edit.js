@@ -1,4 +1,4 @@
-import {EVENT_TYPES} from "../const.js";
+import {EventTypes} from "../const.js";
 
 // Форма создания/редактирования
 const createEventTypesMarkup = (eventTypes) => {
@@ -6,15 +6,15 @@ const createEventTypesMarkup = (eventTypes) => {
     .map((eventType) => {
       return (
         `<div class="event__type-item">
-          <input 
-            id="event-type-${eventType}-1" 
-            class="event__type-input  visually-hidden" 
-            type="radio" 
-            name="event-type" 
-            value="${eventType}">
-          <label 
-            class="event__type-label  event__type-label--${eventType}" 
-            for="event-type-${eventType}-1">
+          <input
+            id="event-type-${eventType.toLowerCase()}-1"
+            class="event__type-input  visually-hidden"
+            type="radio"
+            name="event-type"
+            value="${eventType.toLowerCase()}">
+          <label
+            class="event__type-label  event__type-label--${eventType.toLowerCase()}"
+            for="event-type-${eventType.toLowerCase()}-1">
               ${eventType}
           </label>
         </div>`
@@ -23,6 +23,7 @@ const createEventTypesMarkup = (eventTypes) => {
     .join(`\n`);
 };
 
+// полученные офферы
 const createOffersSelectorMarkup = (offerSelectors) => {
   return offerSelectors
     .map((offerSelector) => {
@@ -52,13 +53,12 @@ const createOffersSelectorMarkup = (offerSelectors) => {
 };
 
 export const createTripEventEditTemplate = (event) => {
-  const {offers, randomOffers} = event;
+  const {eventType, offersAll} = event;
+  const eventTypesTransferMarkup = createEventTypesMarkup(EventTypes.slice(0, 7));
+  const eventTypesActivityMarkup = createEventTypesMarkup(EventTypes.slice(7, 10));
 
-  const eventTypesTransferMarkup = createEventTypesMarkup(EVENT_TYPES.slice(0, 7));
-  const eventTypesActivityMarkup = createEventTypesMarkup(EVENT_TYPES.slice(7, 10));
-
-  const isOffersShowing = !!offers; // есть ли offers
-  const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(randomOffers) : ``;
+  const isOffersShowing = offersAll.length > 0; // есть ли offers
+  const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersAll) : ``;
 
   return (
     `<li class="trip-events__item">
@@ -67,21 +67,21 @@ export const createTripEventEditTemplate = (event) => {
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/flight.png" alt="Event type icon">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${eventType}.png" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
   
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Transfer</legend>
-  
-               ${eventTypesTransferMarkup}  
-              
+                
+                ${eventTypesTransferMarkup}
+                
               </fieldset>
   
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Activity</legend>
-  
+                
                 ${eventTypesActivityMarkup}
                 
               </fieldset>
@@ -90,7 +90,7 @@ export const createTripEventEditTemplate = (event) => {
   
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-1">
-              Flight to
+              ${eventType} to
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Chamonix" list="destination-list-1">
             <datalist id="destination-list-1">
@@ -143,7 +143,7 @@ export const createTripEventEditTemplate = (event) => {
   
             <div class="event__available-offers">
             
-              ${offersSelectorMarkup}
+             ${offersSelectorMarkup}
              
             </div>
           </section>

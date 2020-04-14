@@ -1,46 +1,45 @@
-import {EVENT_TYPES} from "../const.js";
-import {CITY} from "../const.js";
+import {EventType, EventTypes, CITY} from "../const.js";
 
-const DefaultOffers = [{
-  type: `meal`,
+export const DefaultOffers = [{
+  type: EventType.FLIGHT,
   title: `Add meal`,
-  price: `50`,
+  price: 50,
 }, {
-  type: `breakfast`,
+  type: EventType.CHECKIN,
   title: `Add breakfast`,
-  price: `50`,
+  price: 50,
 }, {
-  type: `luggage`,
+  type: EventType.FLIGHT,
   title: `Add luggage`,
-  price: `50`,
+  price: 50,
 }, {
-  type: `tickets`,
+  type: EventType.SIGHTSEEING,
   title: `Book tickets`,
-  price: `40`,
+  price: 40,
 }, {
-  type: `lunch`,
+  type: EventType.SIGHTSEEING,
   title: `Lunch in city`,
-  price: `30`,
+  price: 30,
 }, {
-  type: `taxi`,
+  type: EventType.TAXI,
   title: `Order Uber`,
-  price: `20`,
+  price: 20,
 }, {
-  type: `car`,
+  type: EventType.DRIVE,
   title: `Rent a car`,
-  price: `200`,
+  price: 200,
 }, {
-  type: `comfort`,
+  type: EventType.FLIGHT,
   title: `Switch to comfort`,
-  price: `80`,
+  price: 80,
 }, {
-  type: `seats`,
+  type: EventType.FLIGHT,
   title: `Choose seats`,
-  price: `5`,
+  price: 5,
 }, {
-  type: `train`,
+  type: EventType.FLIGHT,
   title: `Travel by train`,
-  price: `40`,
+  price: 40,
 }];
 
 // случайный элемент массива
@@ -55,9 +54,14 @@ const getRandomIntegerNumber = (min, max) => {
   return min + Math.floor(Math.random() * (max - min));
 };
 
-// получение списка рандомных offers в количестве от 1 до 5
+// выбрать все офферы одного типа
+const getTypeOffers = (offersObj, typeName) => {
+  return offersObj.filter((offer) => offer.type === typeName);
+};
+
+// получение списка рандомных offers в количестве от 1 до длины массива
 const getRandomOffers = (offers) => {
-  const countOffers = getRandomIntegerNumber(1, 5);
+  const countOffers = getRandomIntegerNumber(1, offers.length);
   const randomOffers = [];
   for (let i = 0; i < countOffers; i++) {
     randomOffers.push(getRandomArrayItem(offers));
@@ -66,14 +70,15 @@ const getRandomOffers = (offers) => {
 };
 
 const generateTripEvent = () => {
-  const offers = Math.random() > 0.5 ? null : true;
+  const type = getRandomArrayItem(EventTypes);
+  const offersSelected = getTypeOffers(DefaultOffers, type);
 
   return {
-    eventType: getRandomArrayItem(EVENT_TYPES),
+    eventType: type,
     eventCity: getRandomArrayItem(CITY),
     timestamp: new Date().getTime(),
-    offers,
-    randomOffers: offers ? getRandomOffers(DefaultOffers) : `` // рандомно выбранный offer
+    offersAll: offersSelected,
+    randomOffers: offersSelected ? getRandomOffers(offersSelected) : ``
   };
 };
 
@@ -83,4 +88,4 @@ const generateTripEvents = (count) => {
     .map(generateTripEvent);
 };
 
-export {getRandomIntegerNumber, getRandomOffers, generateTripEvent, generateTripEvents};
+export {getRandomIntegerNumber, generateTripEvent, generateTripEvents};
