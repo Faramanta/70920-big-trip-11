@@ -1,4 +1,4 @@
-import {EventType, EventTypes, CITY} from "../const.js";
+import {EventType, EVENT_TYPES, CITY} from "../const.js";
 
 export const DefaultOffers = [{
   type: EventType.FLIGHT,
@@ -69,14 +69,20 @@ const getRandomOffers = (offers) => {
   return randomOffers;
 };
 
+
 const generateTripEvent = () => {
-  const type = getRandomArrayItem(EventTypes);
+  const type = getRandomArrayItem(EVENT_TYPES);
   const offersSelected = getTypeOffers(DefaultOffers, type);
+  const timestamp = new Date().getTime();
+  const startTimestamp = timestamp + getRandomIntegerNumber(0, 86400000);
+  const endTimestamp = startTimestamp + getRandomIntegerNumber(0, 86400000);
 
   return {
     eventType: type,
     eventCity: getRandomArrayItem(CITY),
-    timestamp: new Date().getTime(),
+    timestamp,
+    startTimestamp,
+    endTimestamp,
     offersAll: offersSelected,
     randomOffers: offersSelected ? getRandomOffers(offersSelected) : ``
   };
@@ -87,5 +93,6 @@ const generateTripEvents = (count) => {
     .fill(``)
     .map(generateTripEvent);
 };
+
 
 export {getRandomIntegerNumber, generateTripEvent, generateTripEvents};

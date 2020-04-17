@@ -11,7 +11,7 @@ export const EventType = {
   RESTAURANT: `Restaurant`,
 };
 
-export const EventTypes = [
+export const EVENT_TYPES = [
   EventType.TAXI,
   EventType.BUS,
   EventType.TRAIN,

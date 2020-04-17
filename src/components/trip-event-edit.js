@@ -1,20 +1,23 @@
-import {EventTypes} from "../const.js";
+import {EVENT_TYPES} from "../const.js";
 
 // Форма создания/редактирования
 const createEventTypesMarkup = (eventTypes) => {
   return eventTypes
     .map((eventType) => {
+
+      const eventTypeValue = eventType.toLowerCase();
+
       return (
         `<div class="event__type-item">
           <input
-            id="event-type-${eventType.toLowerCase()}-1"
+            id="event-type-${eventTypeValue}-1"
             class="event__type-input  visually-hidden"
             type="radio"
             name="event-type"
-            value="${eventType.toLowerCase()}">
+            value="${eventTypeValue}">
           <label
-            class="event__type-label  event__type-label--${eventType.toLowerCase()}"
-            for="event-type-${eventType.toLowerCase()}-1">
+            class="event__type-label  event__type-label--${eventTypeValue}"
+            for="event-type-${eventTypeValue}-1">
               ${eventType}
           </label>
         </div>`
@@ -54,8 +57,8 @@ const createOffersSelectorMarkup = (offerSelectors) => {
 
 export const createTripEventEditTemplate = (event) => {
   const {eventType, offersAll} = event;
-  const eventTypesTransferMarkup = createEventTypesMarkup(EventTypes.slice(0, 7));
-  const eventTypesActivityMarkup = createEventTypesMarkup(EventTypes.slice(7, 10));
+  const eventTypesTransferMarkup = createEventTypesMarkup(EVENT_TYPES.slice(0, 7));
+  const eventTypesActivityMarkup = createEventTypesMarkup(EVENT_TYPES.slice(7, 10));
 
   const isOffersShowing = offersAll.length > 0; // есть ли offers
   const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersAll) : ``;

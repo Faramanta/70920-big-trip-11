@@ -6,7 +6,6 @@ import {createSiteFiltersTemplate} from "./components/filter.js";
 import {createSiteSortTemplate} from "./components/sorting.js";
 import {createTripDayListTemplate} from "./components/trip-day-list.js";
 import {createTripDayItemTemplate} from "./components/trip-day-item.js";
-import {createTripDateInformationTemplate} from "./components/trip-date.js";
 import {createTripEventsListTemplate} from "./components/trip-event-list.js";
 import {createTripEventTemplate} from "./components/trip-event.js";
 import {createTripEventEditTemplate} from "./components/trip-event-edit.js";
@@ -50,7 +49,7 @@ render(siteTripDayListElement, createTripDayItemTemplate()); // элемент �
 
 const siteTripDateInformationElement = siteTripDayListElement.querySelector(`.trip-days__item`);
 
-render(siteTripDateInformationElement, createTripDateInformationTemplate()); // дата
+// render(siteTripDateInformationElement, createTripDateInformationTemplate()); // дата
 render(siteTripDateInformationElement, createTripEventsListTemplate()); // список точек маршрута
 
 const siteTripEventListElement = siteTripDateInformationElement.querySelector(`.trip-events__list`);
@@ -59,3 +58,20 @@ render(siteTripEventListElement, createTripEventEditTemplate(events[0])); // ф�
 
 events.slice(1, events.length)
   .forEach((event) => render(siteTripEventListElement, createTripEventTemplate(event)));
+
+const eventsGroup = new Map();
+
+events.forEach((event) => {
+  const startEventDate = new Date(event.startTimestamp);
+
+  const startTimestampDay = new Date(startEventDate.getFullYear(), startEventDate.getMonth(), startEventDate.getDate(), 0, 0, 0, 0);
+  const endTimestampDay = new Date(startEventDate.getFullYear(), startEventDate.getMonth(), startEventDate.getDate(), 23, 59, 59, 999);
+
+  if (!eventsGroup.has(startTimestampDay)) {
+    const dayEvents = events.filter((event1) => {
+      return startTimestampDay <= event1.startTimestamp && event1.endTimestamp <= endTimestampDay;
+    });
+
+    eventsGroup.set(startTimestampDay, dayEvents);
+  }
+});

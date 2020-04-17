@@ -1,5 +1,4 @@
-import {getRandomIntegerNumber} from "../mock/trip-event.js";
-import {eventTime} from "../utils.js";
+import {eventTime, eventDuration} from "../utils.js";
 
 // Точка маршрута
 
@@ -19,12 +18,11 @@ const createOffersMarkup = (offers) => {
 };
 
 export const createTripEventTemplate = (event) => {
-  const {eventType, eventCity, timestamp, randomOffers} = event;
+  const {eventType, eventCity, startTimestamp, endTimestamp, randomOffers} = event;
 
-  const newTimestamp = timestamp + getRandomIntegerNumber(1800000, 3000000); // рандомное число для расчета времени финиша точки маршрута
-  const eventTimeStart = eventTime(timestamp); // время старта
-  const eventTimeEnd = eventTime(newTimestamp); // время финиша
-  const eventTimeDur = new Date(newTimestamp - timestamp).getMinutes(); // разница времени старта и финиша
+  const eventStart = eventTime(startTimestamp); // время старта
+  const eventEnd = eventTime(endTimestamp); // время финиша
+  const eventDur = eventDuration(startTimestamp, endTimestamp);
 
   const isOffersShowing = !!randomOffers; // есть ли offers
   const offersMarkup = isOffersShowing ? createOffersMarkup(randomOffers) : ``;
@@ -39,11 +37,11 @@ export const createTripEventTemplate = (event) => {
   
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="2019-03-18T10:30">${eventTimeStart}</time>
+            <time class="event__start-time" datetime="2019-03-18T10:30">${eventStart}</time>
             &mdash;
-            <time class="event__end-time" datetime="2019-03-18T11:00">${eventTimeEnd}</time>
+            <time class="event__end-time" datetime="2019-03-18T11:00">${eventEnd}</time>
           </p>
-          <p class="event__duration">${eventTimeDur}M</p>
+          <p class="event__duration">${eventDur}M</p>
         </div>
   
         <p class="event__price">
