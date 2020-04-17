@@ -63,13 +63,16 @@ const eventsGroup = new Map();
 
 events.forEach((event) => {
   const startEventDate = new Date(event.startTimestamp);
+  const endEventDate = new Date(event.endTimestamp);
 
   const startTimestampDay = new Date(startEventDate.getFullYear(), startEventDate.getMonth(), startEventDate.getDate(), 0, 0, 0, 0);
   const endTimestampDay = new Date(startEventDate.getFullYear(), startEventDate.getMonth(), startEventDate.getDate(), 23, 59, 59, 999);
 
   if (!eventsGroup.has(startTimestampDay)) {
     const dayEvents = events.filter((event1) => {
-      return startTimestampDay <= event1.startTimestamp && event1.endTimestamp <= endTimestampDay;
+
+      return startTimestampDay <= event1.startTimestamp && event1.startTimestamp <= endTimestampDay;
+
     });
 
     eventsGroup.set(startTimestampDay, dayEvents);
