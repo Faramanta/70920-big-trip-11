@@ -42,7 +42,7 @@ render(siteEventContainerElement, createSortTemplate()); // отрисовка �
 
 const events = generateTripEvents(EVENT_COUNT);
 
-const eventsGroup = new Map();
+const eventsGroups = new Map();
 events.forEach((event) => {
   const startEventDate = new Date(event.startTimestamp);
 
@@ -52,14 +52,14 @@ events.forEach((event) => {
   const startTimestampDay = startDay.getTime();
   const endTimestampDay = endDay.getTime();
 
-  if (!eventsGroup.has(startTimestampDay)) {
+  if (!eventsGroups.has(startTimestampDay)) {
     const dayEvents = events.filter((event1) => {
 
       return startTimestampDay <= event1.startTimestamp && event1.startTimestamp <= endTimestampDay;
 
     });
 
-    eventsGroup.set(startTimestampDay, dayEvents);
+    eventsGroups.set(startTimestampDay, dayEvents);
   }
 });
 
@@ -67,17 +67,20 @@ render(siteEventContainerElement, createTripDayListTemplate()); // отрисо�
 
 const siteTripDayListElement = siteContentElement.querySelector(`.trip-days`);
 
-eventsGroup.forEach((dateEvents, dateNum) => {
-  render(siteTripDayListElement, createTripDayItemTemplate(dateNum)); // элемент списка дней, один день trip-days__item
+Array.from(eventsGroups.entries())
+  .forEach((eventGroup, index) => {
+    const dateNum = eventGroup[0];
+    const dateEvents = eventGroup[1];
 
-  const siteTripDateElement = siteTripDayListElement.querySelector(`.trip-days__item`);
+    render(siteTripDayListElement, createTripDayItemTemplate(dateNum, index)); // элемент списка дней, один день trip-days__item
 
-  render(siteTripDateElement, createTripEventsListTemplate(dateEvents)); // список точек маршрута trip-events__list
+    const siteTripDateElement = (siteTripDayListElement.querySelectorAll(`.trip-days__item`)[index]);
 
-  const siteTripEventListElement = siteTripDateElement.querySelector(`.trip-events__list`);
+    render(siteTripDateElement, createTripEventsListTemplate(dateEvents)); // список точек маршрута trip-events__list
 
-  render(siteTripEventListElement, createTripEventEditTemplate(dateEvents[0])); // форма создания/редактирования
+    const siteTripEventListElement = siteTripDateElement.querySelector(`.trip-events__list`);
 
-  dateEvents.forEach((dateEvent) => render(siteTripEventListElement, createTripEventTemplate(dateEvent)));
+    render(siteTripEventListElement, createTripEventEditTemplate(dateEvents[0])); // форма создания/редактирования
 
-});
+    dateEvents.forEach((dateEvent) => render(siteTripEventListElement, createTripEventTemplate(dateEvent)));
+  });
