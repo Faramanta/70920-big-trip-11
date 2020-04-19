@@ -1,3 +1,5 @@
+export const EVENT_COUNT = 5;
+
 export const EventType = {
   TAXI: `Taxi`,
   BUS: `Bus`,
@@ -35,3 +37,22 @@ export const FILTERS = [
   `Future`,
   `Past`
 ];
+
+export const MONTH = [
+  `Jan`,
+  `Feb`,
+  `Mar`,
+  `Apr`,
+  `May`,
+  `Jun`,
+  `Jul`,
+  `Aug`,
+  `Sep`,
+  `Oct`,
+  `Nov`,
+  `Dec`,
+];
+
+export const ONE_MINUTE = 1000 * 60;
+export const ONE_HOUR = ONE_MINUTE * 60;
+export const ONE_DAY = ONE_HOUR * 24;

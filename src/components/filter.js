@@ -14,7 +14,7 @@ export const createFiltersMarkup = (filters) => {
 };
 
 // фильтры
-export const createSiteFiltersTemplate = () => {
+export const createFiltersTemplate = () => {
   const filterMarkup = createFiltersMarkup(FILTERS);
   return (
     `<form class="trip-filters" action="#" method="get">

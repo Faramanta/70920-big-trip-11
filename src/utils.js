@@ -1,3 +1,5 @@
+import {ONE_DAY, ONE_HOUR} from "./const.js";
+
 const castTimeFormat = (value) => {
   return value < 10 ? `0${value}` : Number(value);
 };
@@ -12,9 +14,9 @@ export const eventTime = (timestamp) => {
 export const eventDuration = (start, end) => {
   const duration = (end - start); // разница времени старта и финиша
 
-  const eventDurDay = Math.floor(duration / 1000 / 60 / 60 / 24); // количество дней
-  const eventDurHour = Math.floor((duration - (eventDurDay * 1000 * 60 * 60)) / 60 / 60 / 1000); // количество часов
-  const eventDurMin = Math.floor((duration - (eventDurDay * 24 * 60 * 60 * 1000) - (eventDurHour * 60 * 60 * 1000)) / 1000 / 60);
+  const eventDurDay = Math.floor(duration / ONE_DAY); // количество дней
+  const eventDurHour = Math.floor((duration - (eventDurDay * ONE_HOUR)) / 60 / 60 / 1000); // количество часов
+  const eventDurMin = Math.floor((duration - (eventDurDay * ONE_DAY) - (eventDurHour * ONE_HOUR)) / 1000 / 60);
 
   const days = eventDurDay > 0 ? castTimeFormat(eventDurDay) + `D` : ``;
   const hours = eventDurHour > 0 ? castTimeFormat(eventDurHour) + `H` : `00H`;
