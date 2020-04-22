@@ -1,5 +1,7 @@
+import {createElement} from "../utils.js";
+
 // маршрут
-export const createRouteInformationTemplate = () => {
+const createRouteInformationTemplate = () => {
   return (
     `<div class="trip-info__main">
       <h1 class="trip-info__title">Amsterdam &mdash; Chamonix &mdash; Geneva</h1>
@@ -8,3 +10,25 @@ export const createRouteInformationTemplate = () => {
     </div>`
   );
 };
+
+export default class Route {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createRouteInformationTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
