@@ -2,8 +2,8 @@ import {MONTH} from "../const.js";
 import {createElement} from "../utils.js";
 
 // Элемент списка дней (один день)
-const createTripDayItemTemplate = (dateNum, index) => {
-  const date = new Date(dateNum[0]);
+const createTripDayItemTemplate = (timestamp, index) => {
+  const date = new Date(timestamp);
   const month = (date.getMonth() - 1);
   const monthName = MONTH[month];
   const dayNum = date.getDate();
@@ -20,14 +20,14 @@ const createTripDayItemTemplate = (dateNum, index) => {
 };
 
 export default class Day {
-  constructor(dateNum, index) {
-    this._dateNum = dateNum;
+  constructor(timestamp, index) {
+    this._timestamp = timestamp;
     this._index = index;
     this._element = null;
   }
 
   getTemplate() {
-    return createTripDayItemTemplate(this._dateNum, this._index);
+    return createTripDayItemTemplate(this._timestamp, this._index);
   }
 
   getElement() {

@@ -1,4 +1,6 @@
 import {ONE_DAY, ONE_HOUR, ONE_MINUTE} from "./const.js";
+import {generateTripEvents} from "./mock/trip-event.js";
+import {EVENT_COUNT} from "./const.js";
 
 export const RenderPosition = {
   AFTERBEGIN: `afterbegin`,
@@ -47,3 +49,37 @@ export const render = (container, element, place) => {
       break;
   }
 };
+
+const events = generateTripEvents(EVENT_COUNT);
+
+events.sort((first, second) => {
+  if (first.startTimestamp > second.startTimestamp) {
+    return 1;
+  }
+  if (first.startTimestamp < second.startTimestamp) {
+    return -1;
+  }
+
+  return 0;
+});
+
+export const eventsGroups = new Map();
+events.forEach((event) => {
+  const startEventDate = new Date(event.startTimestamp);
+
+  const startDay = new Date(startEventDate.getFullYear(), startEventDate.getMonth(), startEventDate.getDate(), 0, 0, 0, 0);
+  const endDay = new Date(startEventDate.getFullYear(), startEventDate.getMonth(), startEventDate.getDate(), 23, 59, 59, 999);
+
+  const startTimestampDay = startDay.getTime();
+  const endTimestampDay = endDay.getTime();
+
+  if (!eventsGroups.has(startTimestampDay)) {
+    const dayEvents = events.filter((event1) => {
+
+      return startTimestampDay <= event1.startTimestamp && event1.startTimestamp <= endTimestampDay;
+
+    });
+
+    eventsGroups.set(startTimestampDay, dayEvents);
+  }
+});

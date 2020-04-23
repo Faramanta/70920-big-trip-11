@@ -9,32 +9,27 @@ import DayComponent from "./components/trip-day-item.js";
 import EventsComponent from "./components/trip-event-list.js";
 import EventComponent from "./components/trip-event.js";
 import EventEditComponent from "./components/trip-event-edit.js";
-import {generateTripEvents} from "./mock/trip-event.js";
-import {render, RenderPosition} from "./utils.js";
-import {EVENT_COUNT} from "./const.js";
+import {render, RenderPosition, eventsGroups} from "./utils.js";
 
-const events = generateTripEvents(EVENT_COUNT);
+const renderDays = () => {
+  Array.from(eventsGroups.entries()).forEach((eventsGroup, index) => {
+    const [timestamp, points] = eventsGroup;
+    renderDay(index, timestamp, points);
+  });
+};
 
-const eventsGroups = new Map();
-events.forEach((event) => {
-  const startEventDate = new Date(event.startTimestamp);
+const renderDay = (index, timestamp, points) => { // один день маршрута
 
-  const startDay = new Date(startEventDate.getFullYear(), startEventDate.getMonth(), startEventDate.getDate(), 0, 0, 0, 0);
-  const endDay = new Date(startEventDate.getFullYear(), startEventDate.getMonth(), startEventDate.getDate(), 23, 59, 59, 999);
+  const siteTripDayElement = new DayComponent(timestamp, index).getElement();
 
-  const startTimestampDay = startDay.getTime();
-  const endTimestampDay = endDay.getTime();
+  render(siteTripDayListElement, siteTripDayElement, RenderPosition.BEFOREEND); // отрисовка trip-days__item
 
-  if (!eventsGroups.has(startTimestampDay)) {
-    const dayEvents = events.filter((event1) => {
+  const siteTripEventListElement = new EventsComponent().getElement();
 
-      return startTimestampDay <= event1.startTimestamp && event1.startTimestamp <= endTimestampDay;
+  render(siteTripDayElement, siteTripEventListElement, RenderPosition.BEFOREEND); // отрисовка trip-events__list
 
-    });
-
-    eventsGroups.set(startTimestampDay, dayEvents);
-  }
-});
+  points.forEach((dateEvent) => renderEvent(siteTripEventListElement, dateEvent));
+};
 
 const renderEvent = (eventListElement, event) => {
 
@@ -54,23 +49,6 @@ const renderEvent = (eventListElement, event) => {
   editForm.addEventListener(`click`, onEditFormSubmitClick);
 
   render(eventListElement, eventComponent.getElement(), RenderPosition.BEFOREEND);
-};
-
-const renderDay = () => { // один день маршрута
-  Array.from(eventsGroups.entries())
-    .forEach((eventGroup, index) => {
-      const [, dateEvents] = eventGroup;
-
-      render(siteTripDayListElement, new DayComponent(eventGroup, index).getElement(), RenderPosition.BEFOREEND); // отрисовка trip-days__item
-
-      const siteTripDayElement = (siteTripDayListElement.querySelectorAll(`.trip-days__item`)[index]);
-
-      render(siteTripDayElement, new EventsComponent().getElement(), RenderPosition.BEFOREEND); // отрисовка trip-events__list
-
-      const siteTripEventListElement = siteTripDayElement.querySelector(`.trip-events__list`);
-
-      dateEvents.forEach((dateEvent) => renderEvent(siteTripEventListElement, dateEvent));
-    });
 };
 
 const siteMainElement = document.querySelector(`.page-body`);
@@ -97,5 +75,4 @@ render(siteEventContainerElement, new DaysComponent().getElement(), RenderPositi
 
 const siteTripDayListElement = siteContentElement.querySelector(`.trip-days`);
 
-const dayComponent = new DayComponent();
-renderDay(dayComponent, events);
+renderDays();
