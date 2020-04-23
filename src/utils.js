@@ -1,5 +1,10 @@
 import {ONE_DAY, ONE_HOUR, ONE_MINUTE} from "./const.js";
 
+export const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`
+};
+
 const castTimeFormat = (value) => {
   return value < 10 ? `0${value}` : Number(value);
 };
@@ -23,4 +28,47 @@ export const eventDuration = (start, end) => {
   const minutes = eventDurMin > 0 ? castTimeFormat(eventDurMin) + `M` : `00M`;
 
   return `${days} ${hours} ${minutes}`;
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+};
+
+export const render = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+  }
+};
+
+export const getGroupedEvents = (events) => {
+  const eventsGroups = new Map();
+  events.forEach((event) => {
+    const startEventDate = new Date(event.startTimestamp);
+
+    const startDay = new Date(startEventDate.getFullYear(), startEventDate.getMonth(), startEventDate.getDate(), 0, 0, 0, 0);
+    const endDay = new Date(startEventDate.getFullYear(), startEventDate.getMonth(), startEventDate.getDate(), 23, 59, 59, 999);
+
+    const startTimestampDay = startDay.getTime();
+    const endTimestampDay = endDay.getTime();
+
+    if (!eventsGroups.has(startTimestampDay)) {
+      const dayEvents = events.filter((event1) => {
+
+        return startTimestampDay <= event1.startTimestamp && event1.startTimestamp <= endTimestampDay;
+
+      });
+
+      eventsGroups.set(startTimestampDay, dayEvents);
+    }
+  });
+
+  return eventsGroups;
 };

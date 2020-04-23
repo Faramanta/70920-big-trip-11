@@ -1,6 +1,7 @@
 import {FILTERS} from "../const.js";
+import {createElement} from "../utils.js";
 
-export const createFiltersMarkup = (filters) => {
+const createFiltersMarkup = (filters) => {
   return filters
     .map((filter) => {
       return (
@@ -14,7 +15,7 @@ export const createFiltersMarkup = (filters) => {
 };
 
 // фильтры
-export const createFiltersTemplate = () => {
+const createFiltersTemplate = () => {
   const filterMarkup = createFiltersMarkup(FILTERS);
   return (
     `<form class="trip-filters" action="#" method="get">
@@ -23,3 +24,25 @@ export const createFiltersTemplate = () => {
     </form>`
   );
 };
+
+export default class Filter {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFiltersTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

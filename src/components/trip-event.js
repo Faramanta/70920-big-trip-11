@@ -1,4 +1,4 @@
-import {eventTime, eventDuration} from "../utils.js";
+import {createElement, eventTime, eventDuration} from "../utils.js";
 
 // Точка маршрута
 
@@ -17,7 +17,7 @@ const createOffersMarkup = (offers) => {
     .join(`\n`);
 };
 
-export const createTripEventTemplate = (event) => {
+const createTripEventTemplate = (event) => {
   const {eventType, eventCity, startTimestamp, endTimestamp, randomOffers} = event;
 
   const eventStart = eventTime(startTimestamp); // время старта
@@ -63,3 +63,26 @@ ${isOffersShowing ?
     </li>`
   );
 };
+
+export default class Event {
+  constructor(event) {
+    this._event = event;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripEventTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

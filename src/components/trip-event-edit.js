@@ -1,4 +1,5 @@
 import {EVENT_TYPES} from "../const.js";
+import {createElement} from "../utils.js";
 
 // Форма создания/редактирования
 const createEventTypesMarkup = (eventTypes) => {
@@ -55,7 +56,7 @@ const createOffersSelectorMarkup = (offerSelectors) => {
     .join(`\n`);
 };
 
-export const createTripEventEditTemplate = (event) => {
+const createTripEventEditTemplate = (event) => {
   const {eventType, offersAll} = event;
   const eventTypesTransferMarkup = createEventTypesMarkup(EVENT_TYPES.slice(0, 7));
   const eventTypesActivityMarkup = createEventTypesMarkup(EVENT_TYPES.slice(7, 10));
@@ -157,3 +158,26 @@ export const createTripEventEditTemplate = (event) => {
     </li>`
   );
 };
+
+export default class EventEdit {
+  constructor(event) {
+    this._event = event;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripEventEditTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
