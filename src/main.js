@@ -9,7 +9,9 @@ import DayComponent from "./components/trip-day-item.js";
 import EventsComponent from "./components/trip-event-list.js";
 import EventComponent from "./components/trip-event.js";
 import EventEditComponent from "./components/trip-event-edit.js";
-import {render, RenderPosition, eventsGroups} from "./utils.js";
+import {render, RenderPosition, getGroupedEvents} from "./utils.js";
+import {generateTripEvents} from "./mock/trip-event.js";
+import {EVENT_COUNT} from "./const.js";
 
 const renderDays = () => {
   Array.from(eventsGroups.entries()).forEach((eventsGroup, index) => {
@@ -74,5 +76,20 @@ render(siteEventContainerElement, new SortComponent().getElement(), RenderPositi
 render(siteEventContainerElement, new DaysComponent().getElement(), RenderPosition.BEFOREEND); // отрисовка контейнера .trip-days
 
 const siteTripDayListElement = siteContentElement.querySelector(`.trip-days`);
+
+const events = generateTripEvents(EVENT_COUNT);
+
+events.sort((first, second) => {
+  if (first.startTimestamp > second.startTimestamp) {
+    return 1;
+  }
+  if (first.startTimestamp < second.startTimestamp) {
+    return -1;
+  }
+
+  return 0;
+});
+
+const eventsGroups = getGroupedEvents(events);
 
 renderDays();
