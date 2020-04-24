@@ -14,15 +14,11 @@ import {render, RenderPosition, getGroupedEvents} from "./utils.js";
 import {generateTripEvents} from "./mock/trip-event.js";
 import {EVENT_COUNT, KeyCode} from "./const.js";
 
-const renderDays = (eventsGroups) => {
-
-  if (eventsGroups.size < 1) {
-    render(siteEventContainerElement, new NoEventsComponent().getElement(), RenderPosition.BEFOREEND); // отрисовка сообщения о точках
-    return;
-  }
+const renderDays = (siteEventContainerElement, eventsGroups) => {
 
   render(siteRouteElement, new RouteComponent().getElement(), RenderPosition.AFTERBEGIN); // отрисовка информации о маршруте
   render(siteEventContainerElement, new SortComponent().getElement(), RenderPosition.AFTERBEGIN); // отрисовка сортировки
+  render(siteEventContainerElement, new DaysComponent().getElement(), RenderPosition.BEFOREEND); // отрисовка контейнера .trip-days
 
   Array.from(eventsGroups.entries()).forEach((eventsGroup, index) => {
     const [timestamp, points] = eventsGroup;
@@ -33,6 +29,8 @@ const renderDays = (eventsGroups) => {
 const renderDay = (index, timestamp, points) => { // один день маршрута
 
   const siteTripDayElement = new DayComponent(timestamp, index).getElement();
+
+  const siteTripDayListElement = siteContentElement.querySelector(`.trip-days`);
 
   render(siteTripDayListElement, siteTripDayElement, RenderPosition.BEFOREEND); // отрисовка trip-days__item
 
@@ -112,9 +110,12 @@ render(siteMenuElement, new FilterComponent().getElement(), RenderPosition.BEFOR
 
 const siteEventContainerElement = siteContentElement.querySelector(`.trip-events`);
 
-render(siteEventContainerElement, new DaysComponent().getElement(), RenderPosition.BEFOREEND); // отрисовка контейнера .trip-days
-
-const siteTripDayListElement = siteContentElement.querySelector(`.trip-days`);
-
 const eventsGroups = getGroupedEvents(events);
-renderDays(eventsGroups);
+
+if (eventsGroups.size !== 0) {
+  renderDays(siteEventContainerElement, eventsGroups);
+} else {
+  render(siteEventContainerElement, new NoEventsComponent().getElement(), RenderPosition.BEFOREEND); // отрисовка сообщения о точках
+}
+
+// renderDays(eventsGroups);
