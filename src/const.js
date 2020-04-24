@@ -1,4 +1,4 @@
-export const EVENT_COUNT = 5;
+export const EVENT_COUNT = 0;
 
 export const EventType = {
   TAXI: `Taxi`,
@@ -56,3 +56,8 @@ export const MONTH = [
 export const ONE_MINUTE = 1000 * 60;
 export const ONE_HOUR = ONE_MINUTE * 60; // 1000 * 60 * 60
 export const ONE_DAY = ONE_HOUR * 24; // 1000 * 60 * 60 * 24
+
+export const KeyCode = {
+  ESC: `Esc`,
+  ESCAPE: `Escape`
+};
