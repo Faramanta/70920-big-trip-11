@@ -1,5 +1,5 @@
+import AbstractComponent from "./abstract-components";
 import {EVENT_TYPES} from "../const.js";
-import {createElement} from "../utils.js";
 
 // Форма создания/редактирования
 const createEventTypesMarkup = (eventTypes) => {
@@ -159,25 +159,19 @@ const createTripEventEditTemplate = (event) => {
   );
 };
 
-export default class EventEdit {
+export default class EventEdit extends AbstractComponent {
   constructor(event) {
+    super();
+
     this._event = event;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripEventEditTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setSubmitHandler(handler) {
+    this.getElement().querySelector(`form`)
+      .addEventListener(`submit`, handler);
   }
 }

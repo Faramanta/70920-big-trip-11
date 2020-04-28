@@ -1,4 +1,4 @@
-import {createElement} from "../utils.js";
+import AbstractComponent from "./abstract-components";
 
 // маршрут
 const createRouteInformationTemplate = () => {
@@ -11,24 +11,8 @@ const createRouteInformationTemplate = () => {
   );
 };
 
-export default class Route {
-  constructor() {
-    this._element = null;
-  }
-
+export default class Route extends AbstractComponent {
   getTemplate() {
     return createRouteInformationTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
