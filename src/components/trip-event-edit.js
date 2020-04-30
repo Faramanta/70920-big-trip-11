@@ -1,5 +1,5 @@
 import AbstractComponent from "./abstract-components";
-import {EVENT_TYPES} from "../const.js";
+import {EVENT_TYPES, CITY} from "../const.js";
 
 // Форма создания/редактирования
 const createEventTypesMarkup = (eventTypes) => {
@@ -22,6 +22,17 @@ const createEventTypesMarkup = (eventTypes) => {
               ${eventType}
           </label>
         </div>`
+      );
+    })
+    .join(`\n`);
+};
+
+// список городов в форме редактирования
+const createCityMarkup = (cities) => {
+  return cities
+    .map((city) => {
+      return (
+        `<option value="${city}"></option>`
       );
     })
     .join(`\n`);
@@ -57,10 +68,10 @@ const createOffersSelectorMarkup = (offerSelectors) => {
 };
 
 const createTripEventEditTemplate = (event) => {
-  const {eventType, offersAll} = event;
+  const {eventType, offersAll, eventCity} = event;
   const eventTypesTransferMarkup = createEventTypesMarkup(EVENT_TYPES.slice(0, 7));
   const eventTypesActivityMarkup = createEventTypesMarkup(EVENT_TYPES.slice(7, 10));
-
+  const eventCityMarkup = createCityMarkup(CITY);
   const isOffersShowing = offersAll.length > 0; // есть ли offers
   const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersAll) : ``;
 
@@ -96,11 +107,9 @@ const createTripEventEditTemplate = (event) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${eventType} to
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Chamonix" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${eventCity}" list="destination-list-1">
             <datalist id="destination-list-1">
-              <option value="Amsterdam"></option>
-              <option value="Geneva"></option>
-              <option value="Chamonix"></option>
+              ${eventCityMarkup}
             </datalist>
           </div>
   
@@ -156,7 +165,7 @@ const createTripEventEditTemplate = (event) => {
     }
       </form>
     </li>`
-  );
+  )
 };
 
 export default class EventEdit extends AbstractComponent {

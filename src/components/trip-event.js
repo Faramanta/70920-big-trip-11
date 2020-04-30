@@ -1,5 +1,5 @@
 import AbstractComponent from "./abstract-components";
-import {eventTime, eventDuration} from "../utils.js";
+import {eventTime, eventDuration} from "../utils/common.js";
 
 // Точка маршрута
 

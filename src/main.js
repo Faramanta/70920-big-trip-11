@@ -5,7 +5,7 @@ import CostComponent from "./components/cost-information.js";
 import MenuComponent from "./components/menu.js";
 import FilterComponent from "./components/filter.js";
 import NoEventsComponent from "./components/no-events.js";
-import {getGroupedEvents} from "./utils.js";
+import {getGroupedEvents} from "./utils/common.js";
 import {render, RenderPosition} from "./utils/render.js";
 import {generateTripEvents} from "./mock/trip-event.js";
 import {EVENT_COUNT} from "./const.js";
@@ -41,12 +41,9 @@ render(siteMenuElement, new FilterComponent(), RenderPosition.BEFOREEND); // о�
 const siteEventContainerElement = siteContentElement.querySelector(`.trip-events`);
 
 const eventsGroups = getGroupedEvents(events);
-
 const tripController = new TripController(siteEventContainerElement);
 
 if (eventsGroups.size !== 0) {
   render(tripInfo.getElement(), new RouteComponent(), RenderPosition.AFTERBEGIN); // отрисовка информации о маршруте
-  tripController.render(eventsGroups);
-} else {
-  render(siteEventContainerElement, new NoEventsComponent(), RenderPosition.BEFOREEND); // отрисовка сообщения о точках
 }
+tripController.render(eventsGroups);
