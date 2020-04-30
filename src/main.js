@@ -4,7 +4,6 @@ import RouteComponent from "./components/route-information.js";
 import CostComponent from "./components/cost-information.js";
 import MenuComponent from "./components/menu.js";
 import FilterComponent from "./components/filter.js";
-import NoEventsComponent from "./components/no-events.js";
 import {getGroupedEvents} from "./utils/common.js";
 import {render, RenderPosition} from "./utils/render.js";
 import {generateTripEvents} from "./mock/trip-event.js";

@@ -165,7 +165,7 @@ const createTripEventEditTemplate = (event) => {
     }
       </form>
     </li>`
-  )
+  );
 };
 
 export default class EventEdit extends AbstractComponent {
