@@ -1,4 +1,4 @@
-export const EVENT_COUNT = 10;
+export const EVENT_COUNT = 3;
 
 export const EventType = {
   TAXI: `Taxi`,

@@ -46,4 +46,4 @@ if (eventsGroups.size !== 0) {
   render(tripInfo.getElement(), new RouteComponent(), RenderPosition.AFTERBEGIN); // отрисовка информации о маршруте
 }
 
-tripController.render(eventsGroups, DefaultOffers, CITIES);
+tripController.render(eventsGroups, DefaultOffers, CITIES, events);

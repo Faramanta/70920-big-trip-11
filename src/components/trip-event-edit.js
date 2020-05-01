@@ -72,7 +72,7 @@ const createOffersSelectorMarkup = (offersTypeAll, eventOffers) => {
 };
 
 const createTripEventEditTemplate = (event, offersTypeAll, cities) => {
-  const {eventType, eventCity, eventOffers} = event;
+  const {eventType, eventCity, price, eventOffers} = event;
 
   const eventTypesTransferMarkup = createEventTypesMarkup(EVENT_TYPES.slice(0, 7));
   const eventTypesActivityMarkup = createEventTypesMarkup(EVENT_TYPES.slice(7, 10));
@@ -135,7 +135,7 @@ const createTripEventEditTemplate = (event, offersTypeAll, cities) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="160">
+            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
           </div>
   
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>

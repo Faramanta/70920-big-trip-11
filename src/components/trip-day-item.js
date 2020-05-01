@@ -12,8 +12,8 @@ const createTripDayItemTemplate = (timestamp, index) => {
   return (
     `<li class="trip-days__item  day">
       <div class="day__info">
-        <span class="day__counter">${dayIndex}</span>
-        <time class="day__date" datetime="2019-03-18">${monthName} ${dayNum}</time>
+        <span class="day__counter">${dayIndex ? dayIndex : ``}</span>
+        <time class="day__date" datetime="2019-03-18">${monthName ? monthName : ``} ${dayNum ? dayNum : ``}</time>
       </div>
     </li>`
   );
