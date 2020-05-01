@@ -1,5 +1,5 @@
 import AbstractComponent from "./abstract-components";
-import {EVENT_TYPES, CITIES} from "../const.js";
+import {EVENT_TYPES} from "../const.js";
 
 // Форма создания/редактирования
 const createEventTypesMarkup = (eventTypes) => {
