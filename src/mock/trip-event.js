@@ -69,22 +69,24 @@ const getRandomOffers = (offers) => {
   return randomOffers;
 };
 
+let globalIndex = 0;
 
 const generateTripEvent = () => {
   const type = getRandomArrayItem(EVENT_TYPES);
-  const offersSelected = getTypeOffers(DefaultOffers, type);
+  const offersSelected = getTypeOffers(DefaultOffers, type); // Все офферы нужного типа
   const timestamp = new Date().getTime();
   const startTimestamp = timestamp + getRandomIntegerNumber(0, 86400000);
   const endTimestamp = startTimestamp + getRandomIntegerNumber(0, 86400000);
 
   return {
+    id: ++globalIndex,
     eventType: type,
     eventCity: getRandomArrayItem(CITY),
     timestamp,
     startTimestamp,
     endTimestamp,
-    offersAll: offersSelected,
-    randomOffers: offersSelected ? getRandomOffers(offersSelected) : ``
+    offersTypeAll: offersSelected, // Все офферы нужного типа
+    eventOffers: offersSelected ? getRandomOffers(offersSelected) : `` // чекнутые офферы
   };
 };
 

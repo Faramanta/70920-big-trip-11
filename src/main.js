@@ -6,8 +6,8 @@ import MenuComponent from "./components/menu.js";
 import FilterComponent from "./components/filter.js";
 import {getGroupedEvents} from "./utils/common.js";
 import {render, RenderPosition} from "./utils/render.js";
-import {generateTripEvents} from "./mock/trip-event.js";
-import {EVENT_COUNT} from "./const.js";
+import {generateTripEvents, DefaultOffers} from "./mock/trip-event.js";
+import {EVENT_COUNT, CITY} from "./const.js";
 
 const events = generateTripEvents(EVENT_COUNT);
 
@@ -45,4 +45,4 @@ const tripController = new TripController(siteEventContainerElement);
 if (eventsGroups.size !== 0) {
   render(tripInfo.getElement(), new RouteComponent(), RenderPosition.AFTERBEGIN); // отрисовка информации о маршруте
 }
-tripController.render(eventsGroups);
+tripController.render(eventsGroups, DefaultOffers, CITY);

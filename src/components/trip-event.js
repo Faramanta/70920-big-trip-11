@@ -19,14 +19,14 @@ const createOffersMarkup = (offers) => {
 };
 
 const createTripEventTemplate = (event) => {
-  const {eventType, eventCity, startTimestamp, endTimestamp, randomOffers} = event;
+  const {eventType, eventCity, startTimestamp, endTimestamp, eventOffers} = event;
 
   const eventStart = eventTime(startTimestamp); // время старта
   const eventEnd = eventTime(endTimestamp); // время финиша
   const eventDur = eventDuration(startTimestamp, endTimestamp);
 
-  const isOffersShowing = !!randomOffers; // есть ли offers
-  const offersMarkup = isOffersShowing ? createOffersMarkup(randomOffers) : ``;
+  const isOffersShowing = !!eventOffers; // есть ли выбранные offers
+  const offersMarkup = isOffersShowing ? createOffersMarkup(eventOffers) : ``;
 
   return (
     `<li class="trip-events__item">

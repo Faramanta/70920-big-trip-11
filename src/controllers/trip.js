@@ -8,7 +8,7 @@ import NoEventsComponent from "../components/no-events.js";
 import {render, replace, RenderPosition} from "../utils/render.js";
 import {KeyCode} from "../const.js";
 
-const renderDay = (siteTripDayListElement, index, timestamp, points) => { // один день маршрута
+const renderDay = (siteTripDayListElement, index, timestamp, points, offers, cities) => { // один день маршрута
 
   const siteTripDayElement = new DayComponent(timestamp, index);
 
@@ -18,7 +18,7 @@ const renderDay = (siteTripDayListElement, index, timestamp, points) => { // о�
 
   render(siteTripDayElement.getElement(), siteTripEventListElement, RenderPosition.BEFOREEND); // отрисовка trip-events__list
 
-  points.forEach((dateEvent) => renderEvent(siteTripEventListElement, dateEvent));
+  points.forEach((dateEvent) => renderEvent(siteTripEventListElement, dateEvent, offers, cities));
 };
 
 const renderEvent = (eventListElement, event) => {
@@ -67,7 +67,7 @@ export default class TripController {
     this._daysComponent = new DaysComponent();
   }
 
-  render(eventsGroups) {
+  render(eventsGroups, offers, cities) {
 
     if (eventsGroups.size === 0) {
       render(this._container, this._noEventsComponent, RenderPosition.BEFOREEND); // отрисовка сообщения о точках
@@ -79,7 +79,7 @@ export default class TripController {
 
     Array.from(eventsGroups.entries()).forEach((eventsGroup, index) => {
       const [timestamp, points] = eventsGroup;
-      renderDay(this._daysComponent, index, timestamp, points);
+      renderDay(this._daysComponent, index, timestamp, points, offers, cities);
     });
   }
 }
