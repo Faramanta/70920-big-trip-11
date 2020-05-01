@@ -1,4 +1,4 @@
-import {createElement} from "../utils.js";
+import AbstractComponent from "./abstract-components";
 
 // стоимость
 const createCostInformationTemplate = () => {
@@ -9,24 +9,8 @@ const createCostInformationTemplate = () => {
   );
 };
 
-export default class Cost {
-  constructor() {
-    this._element = null;
-  }
-
+export default class Cost extends AbstractComponent {
   getTemplate() {
     return createCostInformationTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-
   }
 }

@@ -1,4 +1,4 @@
-import {EventType, EVENT_TYPES, CITY} from "../const.js";
+import {EventType, EVENT_TYPES, CITIES} from "../const.js";
 
 export const DefaultOffers = [{
   type: EventType.FLIGHT,
@@ -55,12 +55,12 @@ const getRandomIntegerNumber = (min, max) => {
 };
 
 // выбрать все офферы одного типа
-const getTypeOffers = (offersObj, typeName) => {
+export const getTypeOffers = (offersObj, typeName) => {
   return offersObj.filter((offer) => offer.type === typeName);
 };
 
 // получение списка рандомных offers в количестве от 1 до длины массива
-const getRandomOffers = (offers) => {
+export const getRandomOffers = (offers) => {
   const countOffers = getRandomIntegerNumber(1, offers.length);
   const randomOffers = [];
   for (let i = 0; i < countOffers; i++) {
@@ -69,22 +69,24 @@ const getRandomOffers = (offers) => {
   return randomOffers;
 };
 
+let globalIndex = 0;
 
 const generateTripEvent = () => {
+
   const type = getRandomArrayItem(EVENT_TYPES);
-  const offersSelected = getTypeOffers(DefaultOffers, type);
+  const offersSelected = getTypeOffers(DefaultOffers, type); // Все офферы нужного типа для генерации чекнутых офферов, которые потом будут приходить с сервера
   const timestamp = new Date().getTime();
   const startTimestamp = timestamp + getRandomIntegerNumber(0, 86400000);
   const endTimestamp = startTimestamp + getRandomIntegerNumber(0, 86400000);
 
   return {
+    id: ++globalIndex,
     eventType: type,
-    eventCity: getRandomArrayItem(CITY),
+    eventCity: getRandomArrayItem(CITIES),
     timestamp,
     startTimestamp,
     endTimestamp,
-    offersAll: offersSelected,
-    randomOffers: offersSelected ? getRandomOffers(offersSelected) : ``
+    eventOffers: offersSelected ? getRandomOffers(offersSelected) : `` // чекнутые офферы
   };
 };
 

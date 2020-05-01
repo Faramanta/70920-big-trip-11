@@ -1,5 +1,5 @@
+import AbstractComponent from "./abstract-components";
 import {EVENT_TYPES} from "../const.js";
-import {createElement} from "../utils.js";
 
 // Форма создания/редактирования
 const createEventTypesMarkup = (eventTypes) => {
@@ -27,28 +27,43 @@ const createEventTypesMarkup = (eventTypes) => {
     .join(`\n`);
 };
 
-// полученные офферы
-const createOffersSelectorMarkup = (offerSelectors) => {
-  return offerSelectors
-    .map((offerSelector) => {
-      const isChecked = Math.random() > 0.5 ? true : ``;
+// список городов в форме редактирования
+const createCityMarkup = (cities) => {
+  return cities
+    .map((city) => {
+      return (
+        `<option value="${city}"></option>`
+      );
+    })
+    .join(`\n`);
+};
+
+// полученные офферы, сравниваем всеь список офферов типа с офферами точки маршрута, совпавшие - чекнутые
+const createOffersSelectorMarkup = (offersTypeAll, eventOffers) => {
+
+  return offersTypeAll
+    .map((offerTypeAll) => {
+
+      const isOfferExist = eventOffers.some((offer) => offerTypeAll === offer);
+
+      const isChecked = isOfferExist ? true : ``;
 
       return (
         `<div class="event__offer-selector">
           <input 
             class="event__offer-checkbox  visually-hidden" 
-            id="event-offer-${offerSelector.type}-1" 
+            id="event-offer-${offerTypeAll.type}-1" 
             type="checkbox" 
-            name="event-offer-${offerSelector.type}"
+            name="event-offer-${offerTypeAll.type}"
             ${isChecked ? `checked` : ``} 
             />
           <label 
             class="event__offer-label" 
-            for="event-offer-${offerSelector.type}-1"
+            for="event-offer-${offerTypeAll.type}-1"
           >
-            <span class="event__offer-title">${offerSelector.title}</span>
+            <span class="event__offer-title">${offerTypeAll.title}</span>
             &plus;
-            &euro;&nbsp;<span class="event__offer-price">${offerSelector.price}</span>
+            &euro;&nbsp;<span class="event__offer-price">${offerTypeAll.price}</span>
           </label>
         </div>`
       );
@@ -56,13 +71,14 @@ const createOffersSelectorMarkup = (offerSelectors) => {
     .join(`\n`);
 };
 
-const createTripEventEditTemplate = (event) => {
-  const {eventType, offersAll} = event;
+const createTripEventEditTemplate = (event, offersTypeAll, cities) => {
+  const {eventType, eventCity, eventOffers} = event;
+
   const eventTypesTransferMarkup = createEventTypesMarkup(EVENT_TYPES.slice(0, 7));
   const eventTypesActivityMarkup = createEventTypesMarkup(EVENT_TYPES.slice(7, 10));
-
-  const isOffersShowing = offersAll.length > 0; // есть ли offers
-  const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersAll) : ``;
+  const eventCityMarkup = createCityMarkup(cities);
+  const isOffersShowing = offersTypeAll.length > 0; // есть лиs offers
+  const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersTypeAll, eventOffers) : ``;
 
   return (
     `<li class="trip-events__item">
@@ -96,11 +112,9 @@ const createTripEventEditTemplate = (event) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${eventType} to
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Chamonix" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${eventCity}" list="destination-list-1">
             <datalist id="destination-list-1">
-              <option value="Amsterdam"></option>
-              <option value="Geneva"></option>
-              <option value="Chamonix"></option>
+              ${eventCityMarkup}
             </datalist>
           </div>
   
@@ -159,25 +173,21 @@ const createTripEventEditTemplate = (event) => {
   );
 };
 
-export default class EventEdit {
-  constructor(event) {
+export default class EventEdit extends AbstractComponent {
+  constructor(event, eventOffers, cities) {
+    super();
+
     this._event = event;
-    this._element = null;
+    this._eventOffers = eventOffers;
+    this._cities = cities;
   }
 
   getTemplate() {
-    return createTripEventEditTemplate(this._event);
+    return createTripEventEditTemplate(this._event, this._eventOffers, this._cities);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setSubmitHandler(handler) {
+    this.getElement().querySelector(`form`)
+      .addEventListener(`submit`, handler);
   }
 }

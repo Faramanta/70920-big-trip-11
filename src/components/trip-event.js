@@ -1,4 +1,5 @@
-import {createElement, eventTime, eventDuration} from "../utils.js";
+import AbstractComponent from "./abstract-components";
+import {eventTime, eventDuration} from "../utils/common.js";
 
 // Точка маршрута
 
@@ -18,14 +19,14 @@ const createOffersMarkup = (offers) => {
 };
 
 const createTripEventTemplate = (event) => {
-  const {eventType, eventCity, startTimestamp, endTimestamp, randomOffers} = event;
 
+  const {eventType, eventCity, startTimestamp, endTimestamp, eventOffers} = event;
   const eventStart = eventTime(startTimestamp); // время старта
   const eventEnd = eventTime(endTimestamp); // время финиша
   const eventDur = eventDuration(startTimestamp, endTimestamp);
 
-  const isOffersShowing = !!randomOffers; // есть ли offers
-  const offersMarkup = isOffersShowing ? createOffersMarkup(randomOffers) : ``;
+  const isOffersShowing = !!eventOffers; // есть ли выбранные offers
+  const offersMarkup = isOffersShowing ? createOffersMarkup(eventOffers) : ``;
 
   return (
     `<li class="trip-events__item">
@@ -64,25 +65,20 @@ ${isOffersShowing ?
   );
 };
 
-export default class Event {
-  constructor(event) {
+export default class Event extends AbstractComponent {
+  constructor(event, offersChecked) {
+    super();
+
     this._event = event;
-    this._element = null;
+    this._offersChecked = offersChecked;
   }
 
   getTemplate() {
-    return createTripEventTemplate(this._event);
+    return createTripEventTemplate(this._event, this._offersChecked);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setEditButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, handler);
   }
 }
