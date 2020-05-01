@@ -1,11 +1,11 @@
 import AbstractComponent from "./abstract-components";
-import {MONTH} from "../const.js";
+import {MONTHS} from "../const.js";
 
 // Элемент списка дней (один день)
 const createTripDayItemTemplate = (timestamp, index) => {
   const date = new Date(timestamp);
   const month = (date.getMonth() - 1);
-  const monthName = MONTH[month];
+  const monthName = MONTHS[month];
   const dayNum = date.getDate();
   const dayIndex = index + 1;
 

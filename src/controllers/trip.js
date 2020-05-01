@@ -5,6 +5,7 @@ import EventsComponent from "../components/trip-event-list.js";
 import EventComponent from "../components/trip-event.js";
 import EventEditComponent from "../components/trip-event-edit.js";
 import NoEventsComponent from "../components/no-events.js";
+import {getTypeOffers} from "../mock/trip-event.js";
 import {render, replace, RenderPosition} from "../utils/render.js";
 import {KeyCode} from "../const.js";
 
@@ -21,7 +22,7 @@ const renderDay = (siteTripDayListElement, index, timestamp, points, offers, cit
   points.forEach((dateEvent) => renderEvent(siteTripEventListElement, dateEvent, offers, cities));
 };
 
-const renderEvent = (eventListElement, event) => {
+const renderEvent = (eventListElement, event, offers, cities) => {
 
   const replaceEventToEdit = () => {
     replace(eventListElement, eventEditComponent, eventComponent);
@@ -40,8 +41,10 @@ const renderEvent = (eventListElement, event) => {
     }
   };
 
+  const offersTypeAll = getTypeOffers(offers, event.eventType); // Все офферы нужного типа
+
   const eventComponent = new EventComponent(event);
-  const eventEditComponent = new EventEditComponent(event);
+  const eventEditComponent = new EventEditComponent(event, offersTypeAll, cities);
 
   eventComponent.setEditButtonClickHandler(() => {
     replaceEventToEdit();

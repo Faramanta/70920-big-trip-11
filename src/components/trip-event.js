@@ -19,8 +19,8 @@ const createOffersMarkup = (offers) => {
 };
 
 const createTripEventTemplate = (event) => {
-  const {eventType, eventCity, startTimestamp, endTimestamp, eventOffers} = event;
 
+  const {eventType, eventCity, startTimestamp, endTimestamp, eventOffers} = event;
   const eventStart = eventTime(startTimestamp); // время старта
   const eventEnd = eventTime(endTimestamp); // время финиша
   const eventDur = eventDuration(startTimestamp, endTimestamp);
@@ -66,14 +66,15 @@ ${isOffersShowing ?
 };
 
 export default class Event extends AbstractComponent {
-  constructor(event) {
+  constructor(event, offersChecked) {
     super();
 
     this._event = event;
+    this._offersChecked = offersChecked;
   }
 
   getTemplate() {
-    return createTripEventTemplate(this._event);
+    return createTripEventTemplate(this._event, this._offersChecked);
   }
 
   setEditButtonClickHandler(handler) {

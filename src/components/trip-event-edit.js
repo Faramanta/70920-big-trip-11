@@ -1,5 +1,5 @@
 import AbstractComponent from "./abstract-components";
-import {EVENT_TYPES, CITY} from "../const.js";
+import {EVENT_TYPES, CITIES} from "../const.js";
 
 // Форма создания/редактирования
 const createEventTypesMarkup = (eventTypes) => {
@@ -40,6 +40,7 @@ const createCityMarkup = (cities) => {
 
 // полученные офферы, сравниваем всеь список офферов типа с офферами точки маршрута, совпавшие - чекнутые
 const createOffersSelectorMarkup = (offersTypeAll, eventOffers) => {
+
   return offersTypeAll
     .map((offerTypeAll) => {
 
@@ -70,12 +71,13 @@ const createOffersSelectorMarkup = (offersTypeAll, eventOffers) => {
     .join(`\n`);
 };
 
-const createTripEventEditTemplate = (event) => {
-  const {eventType, offersTypeAll, eventCity, eventOffers} = event;
+const createTripEventEditTemplate = (event, offersTypeAll, cities) => {
+  const {eventType, eventCity, eventOffers} = event;
+
   const eventTypesTransferMarkup = createEventTypesMarkup(EVENT_TYPES.slice(0, 7));
   const eventTypesActivityMarkup = createEventTypesMarkup(EVENT_TYPES.slice(7, 10));
-  const eventCityMarkup = createCityMarkup(CITY);
-  const isOffersShowing = offersTypeAll.length > 0; // есть ли выбранные offers
+  const eventCityMarkup = createCityMarkup(cities);
+  const isOffersShowing = offersTypeAll.length > 0; // есть лиs offers
   const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersTypeAll, eventOffers) : ``;
 
   return (
@@ -172,14 +174,16 @@ const createTripEventEditTemplate = (event) => {
 };
 
 export default class EventEdit extends AbstractComponent {
-  constructor(event) {
+  constructor(event, eventOffers, cities) {
     super();
 
     this._event = event;
+    this._eventOffers = eventOffers;
+    this._cities = cities;
   }
 
   getTemplate() {
-    return createTripEventEditTemplate(this._event);
+    return createTripEventEditTemplate(this._event, this._eventOffers, this._cities);
   }
 
   setSubmitHandler(handler) {

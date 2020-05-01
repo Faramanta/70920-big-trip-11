@@ -26,7 +26,7 @@ export const EVENT_TYPES = [
   EventType.RESTAURANT,
 ];
 
-export const CITY = [
+export const CITIES = [
   `Amsterdam`,
   `Chamonix`,
   `Geneva`
@@ -38,7 +38,7 @@ export const FILTERS = [
   `Past`
 ];
 
-export const MONTH = [
+export const MONTHS = [
   `Jan`,
   `Feb`,
   `Mar`,
