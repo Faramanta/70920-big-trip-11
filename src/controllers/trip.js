@@ -1,4 +1,4 @@
-import SortComponent, {SortType} from "../components/sort.js";
+import SortComponent from "../components/sort.js";
 import DaysComponent from "../components/trip-day-list.js";
 import DayComponent from "../components/trip-day-item.js";
 import EventsComponent from "../components/trip-event-list.js";
@@ -7,9 +7,10 @@ import EventEditComponent from "../components/trip-event-edit.js";
 import NoEventsComponent from "../components/no-events.js";
 import {getTypeOffers} from "../mock/trip-event.js";
 import {render, replace, RenderPosition} from "../utils/render.js";
-import {KeyCode} from "../const.js";
+import {getPreparedEvents, getSortedEvents} from "../utils/common.js";
+import {KeyCode, SortType} from "../const.js";
 
-const renderDay = (siteTripDayListElement, index, timestamp, points, offers, cities) => { // один день маршрута
+const renderDay = (siteTripDayListElement, points, offers, cities, index = null, timestamp = null) => { // один день маршрута
 
   const siteTripDayElement = new DayComponent(timestamp, index);
 
@@ -60,28 +61,10 @@ const renderEvent = (eventListElement, event, offers, cities) => {
   render(eventListElement.getElement(), eventComponent, RenderPosition.BEFOREEND);
 };
 
-const getSortedEvents = (events, sortType) => {
-  let sortedEvents = [];
-  const showingEvents = events.slice();
-
-  switch (sortType) {
-    case SortType.DEFAULT:
-      break;
-    case SortType.TIME:
-      sortedEvents = showingEvents.sort((a, b) => b.duration - a.duration);
-      break;
-    case SortType.PRICE:
-      sortedEvents = showingEvents.sort((a, b) => b.price - a.price);
-      break;
-  }
-
-  return sortedEvents;
-};
-
-const renderDefaultSort = (place, eventsGroups, offers, cities) => {
+const renderDays = (place, eventsGroups, offers, cities) => {
   Array.from(eventsGroups.entries()).forEach((eventsGroup, index) => {
     const [timestamp, points] = eventsGroup;
-    renderDay(place, index, timestamp, points, offers, cities);
+    renderDay(place, points, offers, cities, index, timestamp);
   });
 };
 
@@ -92,13 +75,11 @@ export default class TripController {
     this._noEventsComponent = new NoEventsComponent();
     this._sortComponent = new SortComponent();
     this._daysComponent = new DaysComponent();
-    this._eventListComponent = new EventsComponent();
-    this._dayComponent = new DayComponent();
   }
 
-  render(eventsGroups, offers, cities, events) {
+  render(events, offers, cities) {
 
-    if (eventsGroups.size === 0) {
+    if (events.size === 0) {
       render(this._container, this._noEventsComponent, RenderPosition.BEFOREEND); // отрисовка сообщения оо отсутствии точек
       return;
     }
@@ -106,23 +87,29 @@ export default class TripController {
     render(this._container, this._sortComponent, RenderPosition.AFTERBEGIN); // отрисовка сортировки
     render(this._container, this._daysComponent, RenderPosition.BEFOREEND); // отрисовка контейнера .trip-days
 
-    renderDefaultSort(this._daysComponent, eventsGroups, offers, cities);
+    const eventsGroups = getPreparedEvents(events);
+
+    renderDays(this._daysComponent, eventsGroups, offers, cities);
 
     this._sortComponent.setSortTypeChangeHandler((sortType) => {
 
-      const sortedEvents = getSortedEvents(events, sortType);
       const daysListElement = this._daysComponent.getElement(); // .trip-days
       daysListElement.innerHTML = ``;
+      const sortChangedItem = this._sortComponent.getElement().querySelector(`.trip-sort__item--day`);
 
       if (sortType === SortType.DEFAULT) {
-        renderDefaultSort(this._daysComponent, eventsGroups, offers, cities);
+        sortChangedItem.textContent = `Day`;
+        const defaultEventsGroup = getPreparedEvents(events);
+
+        renderDays(this._daysComponent, defaultEventsGroup, offers, cities);
         return;
       }
 
-      render(daysListElement, this._dayComponent, RenderPosition.BEFOREEND); // .trip-days__item
-      render(this._dayComponent.getElement(), this._eventListComponent, RenderPosition.BEFOREEND); // .trip-events__list
+      const sortedEvents = getSortedEvents(events, sortType);
 
-      sortedEvents.forEach((dateEvent) => renderEvent(this._eventListComponent, dateEvent, offers, cities));
+      sortChangedItem.textContent = ``;
+
+      renderDay(this._daysComponent, sortedEvents, offers, cities);
     });
   }
 }

@@ -61,3 +61,9 @@ export const KeyCode = {
   ESC: `Esc`,
   ESCAPE: `Escape`
 };
+
+export const SortType = {
+  DEFAULT: `sort-event`,
+  TIME: `sort-time`,
+  PRICE: `sort-price`,
+};

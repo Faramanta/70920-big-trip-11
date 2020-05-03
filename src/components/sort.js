@@ -1,16 +1,14 @@
-import AbstractComponent from "./abstract-components";
-
-export const SortType = {
-  DEFAULT: `sort-event`,
-  TIME: `sort-time`,
-  PRICE: `sort-price`,
-};
+import AbstractComponent from "./abstract-components.js";
+import {SortType} from "../const.js";
 
 // сортировка
 const createSortTemplate = () => {
   return (
     `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-      <span class="trip-sort__item  trip-sort__item--day">Day</span>
+      <span class="trip-sort__item  trip-sort__item--day">
+      
+      Day
+      </span>
 
       <div class="trip-sort__item  trip-sort__item--event">
         <input id="${SortType.DEFAULT}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="${SortType.DEFAULT}" checked>
@@ -53,10 +51,6 @@ export default class Sort extends AbstractComponent {
     return createSortTemplate();
   }
 
-  getSortType() {
-    return this._currentSortType;
-  }
-
   setSortTypeChangeHandler(handler) {
     this.getElement().addEventListener(`change`, (evt) => {
       const sortType = evt.target.getAttribute(`id`);
@@ -66,7 +60,6 @@ export default class Sort extends AbstractComponent {
       }
 
       this._currentSortType = sortType;
-
       handler(this._currentSortType);
     });
   }
