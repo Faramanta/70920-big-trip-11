@@ -95,10 +95,8 @@ export default class TripController {
 
       const daysListElement = this._daysComponent.getElement(); // .trip-days
       daysListElement.innerHTML = ``;
-      const sortChangedItem = this._sortComponent.getElement().querySelector(`.trip-sort__item--day`);
 
       if (sortType === SortType.DEFAULT) {
-        sortChangedItem.textContent = `Day`;
         const defaultEventsGroup = getPreparedEvents(events);
 
         renderDays(this._daysComponent, defaultEventsGroup, offers, cities);
@@ -106,8 +104,6 @@ export default class TripController {
       }
 
       const sortedEvents = getSortedEvents(events, sortType);
-
-      sortChangedItem.textContent = ``;
 
       renderDay(this._daysComponent, sortedEvents, offers, cities);
     });

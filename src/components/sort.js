@@ -59,8 +59,19 @@ export default class Sort extends AbstractComponent {
         return;
       }
 
+      this._setNameFieldSort(sortType);
+
       this._currentSortType = sortType;
       handler(this._currentSortType);
     });
+  }
+
+  _setNameFieldSort(sortType) {
+    const sortChangedItem = this.getElement().querySelector(`.trip-sort__item--day`);
+    if (sortType !== SortType.DEFAULT) {
+      sortChangedItem.textContent = ``;
+    } else {
+      sortChangedItem.textContent = `Day`;
+    }
   }
 }
