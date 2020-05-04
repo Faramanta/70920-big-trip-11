@@ -66,12 +66,12 @@ export default class Sort extends AbstractComponent {
     });
   }
 
-  _setNameFieldSort(sortType) {
-    const sortChangedItem = this.getElement().querySelector(`.trip-sort__item--day`);
+  _setSortFieldName(sortType) {
+    const sortChangedField = this.getElement().querySelector(`.trip-sort__item--day`);
     if (sortType !== SortType.DEFAULT) {
-      sortChangedItem.textContent = ``;
+      sortChangedField.textContent = ``;
     } else {
-      sortChangedItem.textContent = `Day`;
+      sortChangedField.textContent = `Day`;
     }
   }
 }
