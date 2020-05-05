@@ -1,4 +1,4 @@
-import AbstractComponent from "./abstract-components";
+import AbstractComponent from "./abstract-components.js";
 import {MONTHS} from "../const.js";
 
 // Элемент списка дней (один день)
@@ -12,9 +12,17 @@ const createTripDayItemTemplate = (timestamp, index) => {
   return (
     `<li class="trip-days__item  day">
       <div class="day__info">
-        <span class="day__counter">${dayIndex}</span>
-        <time class="day__date" datetime="2019-03-18">${monthName} ${dayNum}</time>
+        <span class="day__counter">${dayIndex ? dayIndex : ``}</span>
+        <time class="day__date" datetime="2019-03-18">${monthName ? monthName : ``} ${dayNum ? dayNum : ``}</time>
       </div>
+    </li>`
+  );
+};
+
+const createTripEmptyDayItemTemplate = () => {
+  return (
+    `<li class="trip-days__item  day">
+      <div class="day__info"></div>
     </li>`
   );
 };
@@ -25,9 +33,10 @@ export default class Day extends AbstractComponent {
 
     this._timestamp = timestamp;
     this._index = index;
+    this._isEpmtyViewMode = timestamp === null && index === null;
   }
 
   getTemplate() {
-    return createTripDayItemTemplate(this._timestamp, this._index);
+    return !this._isEpmtyViewMode ? createTripDayItemTemplate(this._timestamp, this._index) : createTripEmptyDayItemTemplate();
   }
 }

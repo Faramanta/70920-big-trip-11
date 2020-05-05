@@ -7,9 +7,10 @@ import EventEditComponent from "../components/trip-event-edit.js";
 import NoEventsComponent from "../components/no-events.js";
 import {getTypeOffers} from "../mock/trip-event.js";
 import {render, replace, RenderPosition} from "../utils/render.js";
-import {KeyCode} from "../const.js";
+import {getPreparedEvents, getSortedEvents} from "../utils/common.js";
+import {KeyCode, SortType} from "../const.js";
 
-const renderDay = (siteTripDayListElement, index, timestamp, points, offers, cities) => { // один день маршрута
+const renderDay = (siteTripDayListElement, points, offers, cities, index = null, timestamp = null) => { // один день маршрута
 
   const siteTripDayElement = new DayComponent(timestamp, index);
 
@@ -60,29 +61,51 @@ const renderEvent = (eventListElement, event, offers, cities) => {
   render(eventListElement.getElement(), eventComponent, RenderPosition.BEFOREEND);
 };
 
+const renderDays = (place, eventsGroups, offers, cities) => {
+  Array.from(eventsGroups.entries()).forEach((eventsGroup, index) => {
+    const [timestamp, points] = eventsGroup;
+    renderDay(place, points, offers, cities, index, timestamp);
+  });
+};
+
 export default class TripController {
   constructor(container) {
     this._container = container;
 
     this._noEventsComponent = new NoEventsComponent();
     this._sortComponent = new SortComponent();
-    this._sortComponent = new SortComponent();
     this._daysComponent = new DaysComponent();
   }
 
-  render(eventsGroups, offers, cities) {
+  render(events, offers, cities) {
 
-    if (eventsGroups.size === 0) {
-      render(this._container, this._noEventsComponent, RenderPosition.BEFOREEND); // отрисовка сообщения о точках
+    if (events.size === 0) {
+      render(this._container, this._noEventsComponent, RenderPosition.BEFOREEND); // отрисовка сообщения оо отсутствии точек
       return;
     }
 
     render(this._container, this._sortComponent, RenderPosition.AFTERBEGIN); // отрисовка сортировки
     render(this._container, this._daysComponent, RenderPosition.BEFOREEND); // отрисовка контейнера .trip-days
 
-    Array.from(eventsGroups.entries()).forEach((eventsGroup, index) => {
-      const [timestamp, points] = eventsGroup;
-      renderDay(this._daysComponent, index, timestamp, points, offers, cities);
+    const eventsGroups = getPreparedEvents(events);
+
+    renderDays(this._daysComponent, eventsGroups, offers, cities);
+
+    this._sortComponent.setSortTypeChangeHandler((sortType) => {
+
+      const daysListElement = this._daysComponent.getElement(); // .trip-days
+      daysListElement.innerHTML = ``;
+
+      if (sortType === SortType.DEFAULT) {
+        const defaultEventsGroup = getPreparedEvents(events);
+
+        renderDays(this._daysComponent, defaultEventsGroup, offers, cities);
+        return;
+      }
+
+      const sortedEvents = getSortedEvents(events, sortType);
+
+      renderDay(this._daysComponent, sortedEvents, offers, cities);
     });
   }
 }

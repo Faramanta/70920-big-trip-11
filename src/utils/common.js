@@ -1,4 +1,4 @@
-import {ONE_DAY, ONE_HOUR, ONE_MINUTE} from "../const.js";
+import {ONE_DAY, ONE_HOUR, ONE_MINUTE, SortType} from "../const.js";
 
 const castTimeFormat = (value) => {
   return value < 10 ? `0${value}` : Number(value);
@@ -25,6 +25,25 @@ export const eventDuration = (start, end) => {
   return `${days} ${hours} ${minutes}`;
 };
 
+export const getSortedEvents = (events, sortType) => {
+  let sortedEvents = [];
+  const showingEvents = events.slice();
+
+  switch (sortType) {
+    case SortType.DEFAULT:
+      sortedEvents = showingEvents.sort((a, b) => a.startTimestamp > b.startTimestamp);
+      break;
+    case SortType.TIME:
+      sortedEvents = showingEvents.sort((a, b) => b.duration - a.duration);
+      break;
+    case SortType.PRICE:
+      sortedEvents = showingEvents.sort((a, b) => b.price - a.price);
+      break;
+  }
+
+  return sortedEvents;
+};
+
 export const getGroupedEvents = (events) => {
   const eventsGroups = new Map();
   events.forEach((event) => {
@@ -48,4 +67,11 @@ export const getGroupedEvents = (events) => {
   });
 
   return eventsGroups;
+};
+
+export const getPreparedEvents = (events, sortType = SortType.DEFAULT) => {
+  const sortedEvents = getSortedEvents(events, sortType);
+  const groupedEvents = getGroupedEvents(sortedEvents);
+
+  return groupedEvents;
 };

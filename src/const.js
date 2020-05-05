@@ -1,4 +1,4 @@
-export const EVENT_COUNT = 10;
+export const EVENT_COUNT = 3;
 
 export const EventType = {
   TAXI: `Taxi`,
@@ -60,4 +60,10 @@ export const ONE_DAY = ONE_HOUR * 24; // 1000 * 60 * 60 * 24
 export const KeyCode = {
   ESC: `Esc`,
   ESCAPE: `Escape`
+};
+
+export const SortType = {
+  DEFAULT: `sort-event`,
+  TIME: `sort-time`,
+  PRICE: `sort-price`,
 };
