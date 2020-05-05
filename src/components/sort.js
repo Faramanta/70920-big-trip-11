@@ -59,7 +59,7 @@ export default class Sort extends AbstractComponent {
         return;
       }
 
-      this._setNameFieldSort(sortType);
+      this._setSortFieldName(sortType);
 
       this._currentSortType = sortType;
       handler(this._currentSortType);
