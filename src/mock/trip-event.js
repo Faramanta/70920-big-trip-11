@@ -88,7 +88,8 @@ const generateTripEvent = () => {
     endTimestamp,
     duration: endTimestamp - startTimestamp,
     price: getRandomIntegerNumber(10, 100),
-    eventOffers: offersSelected ? getRandomOffers(offersSelected) : `` // чекнутые офферы
+    eventOffers: offersSelected ? getRandomOffers(offersSelected) : ``, // чекнутые офферы
+    isFavorite: Math.random() > 0.5
   };
 };
 
