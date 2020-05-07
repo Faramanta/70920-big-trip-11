@@ -20,7 +20,7 @@ const renderDay = (siteTripDayListElement, points, offers, cities, onDataChange,
 
   return points.map((point) => {
 
-    const pointController = new PointController(siteTripEventListElement, point, offers, cities, onDataChange);
+    const pointController = new PointController(siteTripEventListElement, onDataChange);
 
     pointController.render(point, offers, cities);
 
