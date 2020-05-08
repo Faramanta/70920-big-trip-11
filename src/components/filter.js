@@ -1,5 +1,5 @@
 import {FILTERS} from "../const.js";
-import AbstractComponent from "./abstract-components";
+import AbstractComponent from "./abstract-component.js";
 
 const createFiltersMarkup = (filters) => {
   return filters

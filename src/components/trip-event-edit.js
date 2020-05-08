@@ -1,5 +1,7 @@
-import AbstractComponent from "./abstract-components";
+import AbstractSmartComponent from "./abstract-smart-component.js";
 import {EVENT_TYPES} from "../const.js";
+import {getTypeOffers} from "../mock/trip-event.js";
+
 
 // Форма создания/редактирования
 const createEventTypesMarkup = (eventTypes) => {
@@ -71,8 +73,9 @@ const createOffersSelectorMarkup = (offersTypeAll, eventOffers) => {
     .join(`\n`);
 };
 
-const createTripEventEditTemplate = (event, offersTypeAll, cities) => {
-  const {id, eventType, eventCity, price, eventOffers, isFavorite} = event;
+const createTripEventEditTemplate = (event, offersTypeAll, cities, options = {}) => {
+  const {id, eventCity, price, isFavorite, destination} = event;
+  const {eventType, eventOffers} = options;
 
   const eventTypesTransferMarkup = createEventTypesMarkup(EVENT_TYPES.slice(0, 7));
   const eventTypesActivityMarkup = createEventTypesMarkup(EVENT_TYPES.slice(7, 10));
@@ -153,46 +156,102 @@ const createTripEventEditTemplate = (event, offersTypeAll, cities) => {
             <span class="visually-hidden">Open event</span>
           </button>
         </header>
+  ${isOffersShowing || destination ?
+      `<section class="event__details">` : ``}
+         ${isOffersShowing ?
+      `<section class="event__section  event__section--offers">
+        <h3 class="event__section-title  event__section-title--offers">Offers</h3>
   
-  ${isOffersShowing ?
-      `<section class="event__details">
-          <section class="event__section  event__section--offers">
-            <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-  
-            <div class="event__available-offers">
+        <div class="event__available-offers">
             
-             ${offersSelectorMarkup}
+          ${offersSelectorMarkup}
              
+        </div>
+      </section>` : ``}
+          
+        ${destination ?
+      `<section class="event__section  event__section--destination">
+        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+        <p class="event__destination-description">Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.</p>
+
+        <div class="event__photos-container">
+          <div class="event__photos-tape">
+            <img class="event__photo" src="img/photos/1.jpg" alt="Event photo">
+              <img class="event__photo" src="img/photos/2.jpg" alt="Event photo">
+                <img class="event__photo" src="img/photos/3.jpg" alt="Event photo">
+                <img class="event__photo" src="img/photos/4.jpg" alt="Event photo">
+                <img class="event__photo" src="img/photos/5.jpg" alt="Event photo">
+              </div>
             </div>
-          </section>
-        </section>`
-      : ``
-    }
+          </section>` : ``}
+        ${isOffersShowing && destination ? `</section>` : ``}
       </form>
     </li>`
   );
 };
 
-export default class EventEdit extends AbstractComponent {
-  constructor(event, eventOffers, cities) {
+export default class EventEdit extends AbstractSmartComponent {
+  constructor(event, offers, cities) {
     super();
-
     this._event = event;
-    this._eventOffers = eventOffers;
+    this._offers = offers;
     this._cities = cities;
+    this._eventType = event.eventType;
+    this._eventOffers = event.eventOffers;
+    this._submitHandler = null;
+    this._subscribeOnEvents();
   }
 
   getTemplate() {
-    return createTripEventEditTemplate(this._event, this._eventOffers, this._cities);
+    return createTripEventEditTemplate(this._event, this._offers, this._cities, {
+      eventType: this._eventType,
+      eventOffers: this._eventOffers,
+    });
+  }
+
+  recoveryListeners() {
+    this.setSubmitHandler(this._submitHandler);
+    this._subscribeOnEvents();
+  }
+
+  rerender() {
+    super.rerender();
   }
 
   setSubmitHandler(handler) {
     this.getElement().querySelector(`form`)
       .addEventListener(`submit`, handler);
+
+    this._submitHandler = handler;
   }
 
   setFavoritesButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__favorite-checkbox`)
       .addEventListener(`change`, handler);
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    const typePlaceholder = element.querySelector(`.event__type-output`);
+    const selectTypes = element.querySelector(`.event__type-list`);
+    const typeIcon = element.querySelector(`.event__type-btn`).querySelector(`img`);
+
+    if (selectTypes) {
+      selectTypes.addEventListener(`change`, (evt) => {
+
+        const selectedType = evt.target.value;
+
+        this._eventType = selectedType;
+
+        typePlaceholder.textContent = selectedType[0].toUpperCase() + selectedType.slice(1) + ` to`;
+        typeIcon.setAttribute(`src`, `img/icons/` + selectedType + `.png`); // смена иконки согласно выбранному типу точки, временно
+
+        this._eventOffers = getTypeOffers(this._eventType);
+
+        this.rerender();
+      });
+    }
+
   }
 }

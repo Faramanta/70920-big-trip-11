@@ -67,3 +67,8 @@ export const SortType = {
   TIME: `sort-time`,
   PRICE: `sort-price`,
 };
+
+export const Mode = {
+  DEFAULT: `default`,
+  EDIT: `edit,`
+};

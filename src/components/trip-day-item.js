@@ -1,4 +1,4 @@
-import AbstractComponent from "./abstract-components.js";
+import AbstractComponent from "./abstract-component.js";
 import {MONTHS} from "../const.js";
 
 // Элемент списка дней (один день)

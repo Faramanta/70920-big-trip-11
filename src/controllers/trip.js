@@ -24,7 +24,6 @@ const renderDay = (siteTripDayListElement, points, offers, cities, onDataChange,
 
     pointController.render(point, offers, cities);
 
-    return pointController;
   });
 };
 
@@ -69,7 +68,7 @@ export default class TripController {
   }
 
   _onDataChange(pointController, oldData, newData) {
-    const index = this._events.findIndex((it) => it === oldData);
+    const index = this._events.findIndex((it) => it.id === oldData.id);
 
     if (index === -1) {
       return;
@@ -77,7 +76,7 @@ export default class TripController {
 
     this._events = [].concat(this._events.slice(0, index), newData, this._events.slice(index + 1));
 
-    pointController.render(this._events[index]);
+    pointController.render(this._events[index], this._offers, this._cities);
   }
 
   _onSortTypeChange(sortType) {

@@ -55,8 +55,8 @@ const getRandomIntegerNumber = (min, max) => {
 };
 
 // выбрать все офферы одного типа
-export const getTypeOffers = (offersObj, typeName) => {
-  return offersObj.filter((offer) => offer.type === typeName);
+export const getTypeOffers = (typeName) => {
+  return DefaultOffers.filter((offer) => offer.type === typeName);
 };
 
 // получение списка рандомных offers в количестве от 1 до длины массива
@@ -74,7 +74,7 @@ let globalIndex = 0;
 const generateTripEvent = () => {
 
   const type = getRandomArrayItem(EVENT_TYPES);
-  const offersSelected = getTypeOffers(DefaultOffers, type); // Все офферы нужного типа для генерации чекнутых офферов, которые потом будут приходить с сервера
+  const offersSelected = getTypeOffers(type); // Все офферы нужного типа для генерации чекнутых офферов, которые потом будут приходить с сервера
   const timestamp = new Date().getTime();
   const startTimestamp = timestamp + getRandomIntegerNumber(0, 86400000);
   const endTimestamp = startTimestamp + getRandomIntegerNumber(0, 86400000);
@@ -89,7 +89,8 @@ const generateTripEvent = () => {
     duration: endTimestamp - startTimestamp,
     price: getRandomIntegerNumber(10, 100),
     eventOffers: offersSelected ? getRandomOffers(offersSelected) : ``, // чекнутые офферы
-    isFavorite: Math.random() > 0.5
+    isFavorite: Math.random() > 0.5,
+    destination: null
   };
 };
 

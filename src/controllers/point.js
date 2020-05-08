@@ -2,12 +2,14 @@ import EventComponent from "../components/trip-event.js";
 import EventEditComponent from "../components/trip-event-edit.js";
 import {render, replace, RenderPosition} from "../utils/render.js";
 import {getTypeOffers} from "../mock/trip-event.js";
-import {KeyCode} from "../const.js";
+import {KeyCode, Mode} from "../const.js";
+
 
 export default class PointController {
   constructor(container, onDataChange) {
     this._container = container;
     this._onDataChange = onDataChange;
+    this._mode = Mode.DEFAULT;
 
     this._eventComponent = null;
     this._eventEditComponent = null;
@@ -16,6 +18,8 @@ export default class PointController {
   }
 
   render(event, offers, cities) {
+    const oldEventComponent = this._eventComponent;
+    const oldEventEditComponent = this._eventEditComponent;
 
     const offersTypeAll = getTypeOffers(offers, event.eventType); // Все офферы нужного типа
 
@@ -38,16 +42,29 @@ export default class PointController {
       this._replaceEditToEvent();
     });
 
-    render(this._container.getElement(), this._eventComponent, RenderPosition.BEFOREEND);
+    if (oldEventComponent && oldEventEditComponent) {
+      replace(this._eventComponent, oldEventComponent);
+      replace(this._eventEditComponent, oldEventEditComponent);
+    } else {
+      render(this._container.getElement(), this._eventComponent, RenderPosition.BEFOREEND);
+    }
+  }
+
+  setDefaultView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._replaceEditToEvent();
+    }
   }
 
   _replaceEventToEdit() {
     replace(this._eventEditComponent, this._eventComponent);
+    this._mode = Mode.EDIT;
   }
 
   _replaceEditToEvent() {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
     replace(this._eventComponent, this._eventEditComponent);
+    this._mode = Mode.DEFAULT;
   }
 
   _onEscKeyDown(evt) {
