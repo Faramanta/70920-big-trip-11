@@ -74,7 +74,7 @@ const createOffersSelectorMarkup = (offersTypeAll, eventOffers, id) => {
 };
 
 const createTripEventEditTemplate = (event, offers, cities) => {
-  const {id, eventCity, startTimestamp, endTimestamp, price, isFavorite, destination, eventType, eventOffers} = event;
+  const {id, eventCity, price, isFavorite, destination, eventType, eventOffers} = event;
 
   const offersTypeAll = getTypeOffers(offers, eventType);
 
