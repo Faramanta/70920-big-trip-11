@@ -1,7 +1,8 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {EVENT_TYPES} from "../const.js";
 import {getTypeOffers} from "../mock/trip-event.js";
-
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.min.css";
 
 // Форма создания/редактирования
 const createEventTypesMarkup = (eventTypes, id) => {
@@ -73,7 +74,7 @@ const createOffersSelectorMarkup = (offersTypeAll, eventOffers, id) => {
 };
 
 const createTripEventEditTemplate = (event, offers, cities) => {
-  const {id, eventCity, price, isFavorite, destination, eventType, eventOffers} = event;
+  const {id, eventCity, startTimestamp, endTimestamp, price, isFavorite, destination, eventType, eventOffers} = event;
 
   const offersTypeAll = getTypeOffers(offers, eventType);
 
@@ -122,15 +123,15 @@ const createTripEventEditTemplate = (event, offers, cities) => {
           </div>
   
           <div class="event__field-group  event__field-group--time">
-            <label class="visually-hidden" for="event-start-time-${id}">
+            <label class="visually-hidden" for="event-start-time-1">
               From
             </label>
-            <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="18/03/19 12:25">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 12:25">
             &mdash;
-            <label class="visually-hidden" for="event-end-time-${id}">
+            <label class="visually-hidden" for="event-end-time-1">
               To
             </label>
-            <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="18/03/19 13:35">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 13:35">
           </div>
   
           <div class="event__field-group  event__field-group--price">
@@ -200,7 +201,10 @@ export default class EventEdit extends AbstractSmartComponent {
     this._event.eventType = event.eventType;
     this._event.isFavorite = event.isFavorite;
 
+    this._flatpickr = null;
+
     this._submitHandler = null;
+    this._applyFlatpickr();
     this._subscribeOnEvents(offers);
   }
 
@@ -215,6 +219,8 @@ export default class EventEdit extends AbstractSmartComponent {
 
   rerender() {
     super.rerender();
+
+    this._applyFlatpickr();
   }
 
   reset() {
@@ -231,6 +237,28 @@ export default class EventEdit extends AbstractSmartComponent {
       .addEventListener(`submit`, handler);
 
     this._submitHandler = handler;
+  }
+
+  _applyFlatpickr() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+
+    const eventStart = this.getElement().querySelector(`#event-start-time-1`);
+    const eventEnd = this.getElement().querySelector(`#event-end-time-1`);
+
+    this._configFlatpickr(eventStart, this._event.startTimestamp);
+    this._configFlatpickr(eventEnd, this._event.endTimestamp);
+
+  }
+
+  _configFlatpickr(inputField, date) {
+    this._flatpickr = flatpickr(inputField, {
+      enableTime: true,
+      dateFormat: `d/m/y H:i`,
+      defaultDate: date || ``,
+    });
   }
 
   setFavoritesButtonClickHandler(handler) {

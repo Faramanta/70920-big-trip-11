@@ -11,5 +11,13 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, `public`), // где искать сборку
     watchContentBase: true // автоматическая перезагрузка страницы
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader']
+      }
+    ]
   }
 };
