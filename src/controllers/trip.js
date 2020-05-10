@@ -23,6 +23,9 @@ const renderDay = (siteTripDayListElement, points, offers, cities, onDataChange,
     const pointController = new PointController(siteTripEventListElement, onDataChange);
 
     pointController.render(point, offers, cities);
+
+    return pointController;
+
   });
 };
 

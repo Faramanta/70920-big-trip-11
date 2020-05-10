@@ -1,6 +1,6 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {EVENT_TYPES} from "../const.js";
-// import {getTypeOffers} from "../mock/trip-event.js";
+import {getTypeOffers, DefaultOffers} from "../mock/trip-event.js";
 
 
 // Форма создания/редактирования
@@ -42,7 +42,6 @@ const createCityMarkup = (cities) => {
 
 // полученные офферы, сравниваем всеь список офферов типа с офферами точки маршрута, совпавшие - чекнутые
 const createOffersSelectorMarkup = (offersTypeAll, eventOffers) => {
-
   return offersTypeAll
     .map((offerTypeAll) => {
 
@@ -195,17 +194,15 @@ export default class EventEdit extends AbstractSmartComponent {
     this._event = event;
     this._offers = offers;
     this._cities = cities;
-    this._eventType = event.eventType;
-    this._eventOffers = event.eventOffers;
+    // this._eventType = event.eventType;
+    // this._eventOffers = event.eventOffers;
+
     this._submitHandler = null;
     this._subscribeOnEvents(offers);
   }
 
   getTemplate() {
-    return createTripEventEditTemplate(this._event, this._offers, this._cities, {
-      eventType: this._eventType,
-      eventOffers: this._eventOffers,
-    });
+    return createTripEventEditTemplate(this._event, this._offers, this._cities);
   }
 
   recoveryListeners() {
@@ -230,28 +227,29 @@ export default class EventEdit extends AbstractSmartComponent {
   }
 
   _subscribeOnEvents() {
-
     const element = this.getElement();
 
-    const typePlaceholder = element.querySelector(`.event__type-output`);
-    const selectTypes = element.querySelector(`.event__type-list`);
-    const typeIcon = element.querySelector(`.event__type-btn`).querySelector(`img`);
+    const selectTypesList = element.querySelector(`.event__type-list`);
+
+    // const typePlaceholder = element.querySelector(`.event__type-output`);
+    // const typeIcon = element.querySelector(`.event__type-btn`).querySelector(`img`);
     // const allTypeOffers = element.querySelector(`.event__available-offers`);
 
-    if (selectTypes) {
-      selectTypes.addEventListener(`change`, (evt) => {
+    if (selectTypesList) {
+      selectTypesList.addEventListener(`change`, (evt) => {
 
         const selectedType = evt.target.value;
 
-        this._eventType = selectedType;
+        this._eventType = evt.target.value;
 
-        typePlaceholder.textContent = selectedType[0].toUpperCase() + selectedType.slice(1) + ` to`;
-        typeIcon.setAttribute(`src`, `img/icons/` + selectedType + `.png`); // смена иконки согласно выбранному типу точки, временно
+        // typePlaceholder.textContent = selectedType[0].toUpperCase() + selectedType.slice(1) + ` to`;
+        // typeIcon.setAttribute(`src`, `img/icons/` + selectedType + `.png`); // смена иконки согласно выбранному типу точки, временно
 
-        // const newOffers = getTypeOffers(this._offers, this._eventType);
+        this._eventOffers = getTypeOffers(DefaultOffers, selectedType);
 
         this.rerender();
       });
     }
   }
+
 }
