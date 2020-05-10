@@ -1,7 +1,6 @@
 import EventComponent from "../components/trip-event.js";
 import EventEditComponent from "../components/trip-event-edit.js";
 import {render, replace, RenderPosition} from "../utils/render.js";
-import {getTypeOffers} from "../mock/trip-event.js";
 import {KeyCode, Mode} from "../const.js";
 
 
@@ -18,13 +17,12 @@ export default class PointController {
   }
 
   render(event, offers, cities) {
+
     const oldEventComponent = this._eventComponent;
     const oldEventEditComponent = this._eventEditComponent;
 
-    const offersTypeAll = getTypeOffers(offers, event.eventType); // Все офферы нужного типа
-
     this._eventComponent = new EventComponent(event);
-    this._eventEditComponent = new EventEditComponent(event, offersTypeAll, cities);
+    this._eventEditComponent = new EventEditComponent(event, offers, cities);
 
     this._eventComponent.setEditButtonClickHandler(() => {
       this._replaceEventToEdit();

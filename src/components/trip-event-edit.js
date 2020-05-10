@@ -1,6 +1,6 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {EVENT_TYPES} from "../const.js";
-import {getTypeOffers} from "../mock/trip-event.js";
+// import {getTypeOffers} from "../mock/trip-event.js";
 
 
 // Форма создания/редактирования
@@ -73,9 +73,8 @@ const createOffersSelectorMarkup = (offersTypeAll, eventOffers) => {
     .join(`\n`);
 };
 
-const createTripEventEditTemplate = (event, offersTypeAll, cities, options = {}) => {
-  const {id, eventCity, price, isFavorite, destination} = event;
-  const {eventType, eventOffers} = options;
+const createTripEventEditTemplate = (event, offers, cities) => {
+  const {id, eventCity, price, isFavorite, destination, eventType, offersTypeAll, eventOffers} = event;
 
   const eventTypesTransferMarkup = createEventTypesMarkup(EVENT_TYPES.slice(0, 7));
   const eventTypesActivityMarkup = createEventTypesMarkup(EVENT_TYPES.slice(7, 10));
@@ -199,7 +198,7 @@ export default class EventEdit extends AbstractSmartComponent {
     this._eventType = event.eventType;
     this._eventOffers = event.eventOffers;
     this._submitHandler = null;
-    this._subscribeOnEvents();
+    this._subscribeOnEvents(offers);
   }
 
   getTemplate() {
@@ -231,11 +230,13 @@ export default class EventEdit extends AbstractSmartComponent {
   }
 
   _subscribeOnEvents() {
+
     const element = this.getElement();
 
     const typePlaceholder = element.querySelector(`.event__type-output`);
     const selectTypes = element.querySelector(`.event__type-list`);
     const typeIcon = element.querySelector(`.event__type-btn`).querySelector(`img`);
+    // const allTypeOffers = element.querySelector(`.event__available-offers`);
 
     if (selectTypes) {
       selectTypes.addEventListener(`change`, (evt) => {
@@ -247,11 +248,10 @@ export default class EventEdit extends AbstractSmartComponent {
         typePlaceholder.textContent = selectedType[0].toUpperCase() + selectedType.slice(1) + ` to`;
         typeIcon.setAttribute(`src`, `img/icons/` + selectedType + `.png`); // смена иконки согласно выбранному типу точки, временно
 
-        this._eventOffers = getTypeOffers(this._eventType);
+        // const newOffers = getTypeOffers(this._offers, this._eventType);
 
         this.rerender();
       });
     }
-
   }
 }

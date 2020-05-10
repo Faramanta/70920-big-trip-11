@@ -23,7 +23,6 @@ const renderDay = (siteTripDayListElement, points, offers, cities, onDataChange,
     const pointController = new PointController(siteTripEventListElement, onDataChange);
 
     pointController.render(point, offers, cities);
-
   });
 };
 
@@ -65,6 +64,7 @@ export default class TripController {
     const eventsGroups = getPreparedEvents(this._events);
 
     renderDays(this._daysComponent, eventsGroups, offers, cities, this._onDataChange);
+
   }
 
   _onDataChange(pointController, oldData, newData) {
