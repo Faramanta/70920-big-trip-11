@@ -1,6 +1,6 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {EVENT_TYPES} from "../const.js";
-import {getTypeOffers, DefaultOffers} from "../mock/trip-event.js";
+import {getTypeOffers} from "../mock/trip-event.js";
 
 
 // Форма создания/редактирования
@@ -53,14 +53,14 @@ const createOffersSelectorMarkup = (offersTypeAll, eventOffers, id) => {
         `<div class="event__offer-selector">
           <input 
             class="event__offer-checkbox  visually-hidden" 
-            id="event-offer-${offerTypeAll.type}-${id}" 
+            id="event-offer-${offerTypeAll.title}-${offerTypeAll.price}-${id}" 
             type="checkbox" 
             name="event-offer-${offerTypeAll.type}"
             ${isChecked ? `checked` : ``} 
             />
           <label 
             class="event__offer-label" 
-            for="event-offer-${offerTypeAll.type}-${id}"
+            for="event-offer-${offerTypeAll.title}-${offerTypeAll.price}-${id}"
           >
             <span class="event__offer-title">${offerTypeAll.title}</span>
             &plus;
@@ -197,6 +197,9 @@ export default class EventEdit extends AbstractSmartComponent {
     this._offers = offers;
     this._cities = cities;
 
+    this._event.eventType = event.eventType;
+    this._event.isFavorite = event.isFavorite;
+
     this._submitHandler = null;
     this._subscribeOnEvents(offers);
   }
@@ -212,6 +215,15 @@ export default class EventEdit extends AbstractSmartComponent {
 
   rerender() {
     super.rerender();
+  }
+
+  reset() {
+    const event = this._event;
+
+    this._event.eventType = event.eventType;
+    this._event.isFavorite = event.isFavorite;
+
+    this.rerender();
   }
 
   setSubmitHandler(handler) {
