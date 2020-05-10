@@ -4,7 +4,7 @@ import {getTypeOffers, DefaultOffers} from "../mock/trip-event.js";
 
 
 // Форма создания/редактирования
-const createEventTypesMarkup = (eventTypes) => {
+const createEventTypesMarkup = (eventTypes, id) => {
   return eventTypes
     .map((eventType) => {
 
@@ -13,14 +13,14 @@ const createEventTypesMarkup = (eventTypes) => {
       return (
         `<div class="event__type-item">
           <input
-            id="event-type-${eventTypeValue}-1"
+            id="event-type-${eventTypeValue}-${id}"
             class="event__type-input  visually-hidden"
             type="radio"
             name="event-type"
-            value="${eventTypeValue}">
+            value="${eventType}">
           <label
             class="event__type-label  event__type-label--${eventTypeValue}"
-            for="event-type-${eventTypeValue}-1">
+            for="event-type-${eventTypeValue}-${id}">
               ${eventType}
           </label>
         </div>`
@@ -41,7 +41,7 @@ const createCityMarkup = (cities) => {
 };
 
 // полученные офферы, сравниваем всеь список офферов типа с офферами точки маршрута, совпавшие - чекнутые
-const createOffersSelectorMarkup = (offersTypeAll, eventOffers) => {
+const createOffersSelectorMarkup = (offersTypeAll, eventOffers, id) => {
   return offersTypeAll
     .map((offerTypeAll) => {
 
@@ -53,14 +53,14 @@ const createOffersSelectorMarkup = (offersTypeAll, eventOffers) => {
         `<div class="event__offer-selector">
           <input 
             class="event__offer-checkbox  visually-hidden" 
-            id="event-offer-${offerTypeAll.type}-1" 
+            id="event-offer-${offerTypeAll.type}-${id}" 
             type="checkbox" 
             name="event-offer-${offerTypeAll.type}"
             ${isChecked ? `checked` : ``} 
             />
           <label 
             class="event__offer-label" 
-            for="event-offer-${offerTypeAll.type}-1"
+            for="event-offer-${offerTypeAll.type}-${id}"
           >
             <span class="event__offer-title">${offerTypeAll.title}</span>
             &plus;
@@ -73,13 +73,15 @@ const createOffersSelectorMarkup = (offersTypeAll, eventOffers) => {
 };
 
 const createTripEventEditTemplate = (event, offers, cities) => {
-  const {id, eventCity, price, isFavorite, destination, eventType, offersTypeAll, eventOffers} = event;
+  const {id, eventCity, price, isFavorite, destination, eventType, eventOffers} = event;
 
-  const eventTypesTransferMarkup = createEventTypesMarkup(EVENT_TYPES.slice(0, 7));
-  const eventTypesActivityMarkup = createEventTypesMarkup(EVENT_TYPES.slice(7, 10));
+  const offersTypeAll = getTypeOffers(offers, eventType);
+
+  const eventTypesTransferMarkup = createEventTypesMarkup(EVENT_TYPES.slice(0, 7), id);
+  const eventTypesActivityMarkup = createEventTypesMarkup(EVENT_TYPES.slice(7, 10), id);
   const eventCityMarkup = createCityMarkup(cities);
   const isOffersShowing = offersTypeAll.length > 0; // есть лиs offers
-  const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersTypeAll, eventOffers) : ``;
+  const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersTypeAll, eventOffers, id) : ``;
 
   return (
     `<li class="trip-events__item">
@@ -194,8 +196,6 @@ export default class EventEdit extends AbstractSmartComponent {
     this._event = event;
     this._offers = offers;
     this._cities = cities;
-    // this._eventType = event.eventType;
-    // this._eventOffers = event.eventOffers;
 
     this._submitHandler = null;
     this._subscribeOnEvents(offers);
@@ -236,11 +236,8 @@ export default class EventEdit extends AbstractSmartComponent {
 
         this._event.eventType = evt.target.value;
 
-        this._event.eventOffers = getTypeOffers(DefaultOffers, this._event.eventType);
-
         this.rerender();
       });
     }
   }
-
 }
