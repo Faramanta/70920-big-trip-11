@@ -1,4 +1,4 @@
-import AbstractComponent from "./abstract-components";
+import AbstractComponent from "./abstract-component.js";
 
 // меню
 const createMenuTemplate = () => {

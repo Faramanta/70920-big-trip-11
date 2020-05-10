@@ -1,4 +1,4 @@
-import AbstractComponent from "./abstract-components";
+import AbstractComponent from "./abstract-component.js";
 
 // Список дней
 const createTripDayListTemplate = () => `<ul class="trip-days"></ul>`;

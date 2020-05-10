@@ -1,4 +1,4 @@
-import AbstractComponent from "./abstract-components";
+import AbstractComponent from "./abstract-component.js";
 
 // контейнер для маршрута и стоимости
 const createTripInformationTemplate = () => `<section class="trip-main__trip-info  trip-info"></section>`;

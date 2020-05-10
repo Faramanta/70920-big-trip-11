@@ -1,4 +1,4 @@
-import AbstractComponent from "./abstract-components";
+import AbstractComponent from "./abstract-component.js";
 
 // Список точек маршрута
 const createTripEventsListTemplate = () => `<ul class="trip-events__list"></ul>`;
