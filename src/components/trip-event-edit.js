@@ -231,21 +231,12 @@ export default class EventEdit extends AbstractSmartComponent {
 
     const selectTypesList = element.querySelector(`.event__type-list`);
 
-    // const typePlaceholder = element.querySelector(`.event__type-output`);
-    // const typeIcon = element.querySelector(`.event__type-btn`).querySelector(`img`);
-    // const allTypeOffers = element.querySelector(`.event__available-offers`);
-
     if (selectTypesList) {
       selectTypesList.addEventListener(`change`, (evt) => {
 
-        const selectedType = evt.target.value;
+        this._event.eventType = evt.target.value;
 
-        this._eventType = evt.target.value;
-
-        // typePlaceholder.textContent = selectedType[0].toUpperCase() + selectedType.slice(1) + ` to`;
-        // typeIcon.setAttribute(`src`, `img/icons/` + selectedType + `.png`); // смена иконки согласно выбранному типу точки, временно
-
-        this._eventOffers = getTypeOffers(DefaultOffers, selectedType);
+        this._event.eventOffers = getTypeOffers(DefaultOffers, this._event.eventType);
 
         this.rerender();
       });
