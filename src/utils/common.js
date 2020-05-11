@@ -1,25 +1,28 @@
-import {ONE_DAY, ONE_HOUR, ONE_MINUTE, SortType} from "../const.js";
+import moment from "moment";
+import {SortType} from "../const.js";
 
 const castTimeFormat = (value) => {
-  return value < 10 ? `0${value}` : Number(value);
+  return value < 10 ? `0${value}` : String(value);
 };
 
 export const eventTime = (timestamp) => {
-  const hours = castTimeFormat(new Date(timestamp).getHours());
-  const minutes = castTimeFormat(new Date(timestamp).getMinutes());
-
-  return `${hours}:${minutes}`;
+  return moment(timestamp).format(`HH:mm`);
+};
+export const eventISOTime = (timestamp) => {
+  return moment(timestamp).format(`YYYY-mm-DTHH:mm`);
 };
 
 export const eventDuration = (start, end) => {
-  const duration = (end - start); // разница времени старта и финиша
+  const eventStart = moment(start);
+  const eventEnd = moment(end);
+  const duration = eventEnd.diff(eventStart); // продолжительность точки
 
-  const eventDurDay = Math.floor(duration / ONE_DAY); // количество дней
-  const eventDurHour = Math.floor((duration - (eventDurDay * ONE_HOUR)) / ONE_HOUR); // количество часов
-  const eventDurMin = Math.floor((duration - (eventDurDay * ONE_DAY) - (eventDurHour * ONE_HOUR)) / ONE_MINUTE);
+  const eventDurDay = moment.duration(duration).days(); // количество дней
+  const eventDurHour = moment.duration(duration).hours(); // количество часов
+  const eventDurMin = moment.duration(duration).minutes(); // количество минут
 
   const days = eventDurDay > 0 ? castTimeFormat(eventDurDay) + `D` : ``;
-  const hours = eventDurHour > 0 ? castTimeFormat(eventDurHour) + `H` : `00H`;
+  const hours = eventDurHour > 0 ? castTimeFormat(eventDurHour) + `H` : ``;
   const minutes = eventDurMin > 0 ? castTimeFormat(eventDurMin) + `M` : `00M`;
 
   return `${days} ${hours} ${minutes}`;

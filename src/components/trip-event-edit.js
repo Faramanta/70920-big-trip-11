@@ -1,7 +1,8 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {EVENT_TYPES} from "../const.js";
 import {getTypeOffers} from "../mock/trip-event.js";
-
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.min.css";
 
 // Форма создания/редактирования
 const createEventTypesMarkup = (eventTypes, id) => {
@@ -72,8 +73,8 @@ const createOffersSelectorMarkup = (offersTypeAll, eventOffers, id) => {
     .join(`\n`);
 };
 
-const createTripEventEditTemplate = (event, offers, cities) => {
-  const {id, eventCity, price, isFavorite, destination, eventType, eventOffers} = event;
+const createTripEventEditTemplate = (event, eventType, offers, cities) => {
+  const {id, eventCity, price, isFavorite, destination, eventOffers} = event;
 
   const offersTypeAll = getTypeOffers(offers, eventType);
 
@@ -122,15 +123,15 @@ const createTripEventEditTemplate = (event, offers, cities) => {
           </div>
   
           <div class="event__field-group  event__field-group--time">
-            <label class="visually-hidden" for="event-start-time-${id}">
+            <label class="visually-hidden" for="event-start-time-1">
               From
             </label>
-            <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="18/03/19 12:25">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 12:25">
             &mdash;
-            <label class="visually-hidden" for="event-end-time-${id}">
+            <label class="visually-hidden" for="event-end-time-1">
               To
             </label>
-            <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="18/03/19 13:35">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 13:35">
           </div>
   
           <div class="event__field-group  event__field-group--price">
@@ -197,15 +198,17 @@ export default class EventEdit extends AbstractSmartComponent {
     this._offers = offers;
     this._cities = cities;
 
-    this._event.eventType = event.eventType;
-    this._event.isFavorite = event.isFavorite;
+    this._eventType = this._event.eventType;
 
+    this._startFlatpickr = null;
+    this._endFlatpickr = null;
     this._submitHandler = null;
+    this._applyFlatpickr();
     this._subscribeOnEvents(offers);
   }
 
   getTemplate() {
-    return createTripEventEditTemplate(this._event, this._offers, this._cities);
+    return createTripEventEditTemplate(this._event, this._eventType, this._offers, this._cities);
   }
 
   recoveryListeners() {
@@ -215,15 +218,59 @@ export default class EventEdit extends AbstractSmartComponent {
 
   rerender() {
     super.rerender();
+
+    this._applyFlatpickr();
   }
 
   reset() {
-    const event = this._event;
-
-    this._event.eventType = event.eventType;
-    this._event.isFavorite = event.isFavorite;
+    this._eventType = this._event.eventType;
 
     this.rerender();
+  }
+
+  _applyFlatpickr() {
+    this._destroyFlatpickr();
+
+    const eventStart = this.getElement().querySelector(`#event-start-time-1`);
+    const eventEnd = this.getElement().querySelector(`#event-end-time-1`);
+
+    this._startFlatpickr = this._createFlatpickr(eventStart, this._event.startTimestamp);
+
+    this._endFlatpickr = this._createFlatpickr(eventEnd, this._event.endTimestamp);
+  }
+
+  _createFlatpickr(inputField, date) {
+    return flatpickr(inputField, {
+      enableTime: true,
+      dateFormat: `d/m/y H:i`,
+      defaultDate: date || ``,
+    });
+  }
+
+  _destroyFlatpickr() {
+    if (this._startFlatpickr) {
+      this._startFlatpickr.destroy();
+      this._startFlatpickr = null;
+    }
+    if (this._endFlatpickr) {
+      this._endFlatpickr.destroy();
+      this._endFlatpickr = null;
+    }
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    const selectTypesList = element.querySelector(`.event__type-list`);
+
+    if (selectTypesList) {
+      selectTypesList.addEventListener(`change`, (evt) => {
+
+        this._eventType = evt.target.value;
+
+        this.rerender();
+      });
+    }
   }
 
   setSubmitHandler(handler) {
@@ -236,20 +283,5 @@ export default class EventEdit extends AbstractSmartComponent {
   setFavoritesButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__favorite-checkbox`)
       .addEventListener(`change`, handler);
-  }
-
-  _subscribeOnEvents() {
-    const element = this.getElement();
-
-    const selectTypesList = element.querySelector(`.event__type-list`);
-
-    if (selectTypesList) {
-      selectTypesList.addEventListener(`change`, (evt) => {
-
-        this._event.eventType = evt.target.value;
-
-        this.rerender();
-      });
-    }
   }
 }

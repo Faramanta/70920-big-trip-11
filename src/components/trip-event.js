@@ -1,5 +1,5 @@
 import AbstractComponent from "./abstract-component.js";
-import {eventTime, eventDuration} from "../utils/common.js";
+import {eventTime, eventISOTime, eventDuration} from "../utils/common.js";
 
 // Точка маршрута
 
@@ -23,6 +23,9 @@ const createTripEventTemplate = (event) => {
   const {eventType, eventCity, startTimestamp, endTimestamp, price, eventOffers} = event;
   const eventStart = eventTime(startTimestamp); // время старта
   const eventEnd = eventTime(endTimestamp); // время финиша
+  const eventISOStart = eventISOTime(startTimestamp);
+  const eventISOEnd = eventISOTime(endTimestamp);
+
   const eventDur = eventDuration(startTimestamp, endTimestamp);
 
   const isOffersShowing = !!eventOffers; // есть ли выбранные offers
@@ -38,11 +41,11 @@ const createTripEventTemplate = (event) => {
   
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="2019-03-18T10:30">${eventStart}</time>
+            <time class="event__start-time" datetime="${eventISOStart}">${eventStart}</time>
             &mdash;
-            <time class="event__end-time" datetime="2019-03-18T11:00">${eventEnd}</time>
+            <time class="event__end-time" datetime="${eventISOEnd}">${eventEnd}</time>
           </p>
-          <p class="event__duration">${eventDur}M</p>
+          <p class="event__duration">${eventDur}</p>
         </div>
   
         <p class="event__price">
