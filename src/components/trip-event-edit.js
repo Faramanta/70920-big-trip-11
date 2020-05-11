@@ -73,8 +73,8 @@ const createOffersSelectorMarkup = (offersTypeAll, eventOffers, id) => {
     .join(`\n`);
 };
 
-const createTripEventEditTemplate = (event, offers, cities) => {
-  const {id, eventCity, price, isFavorite, destination, eventType, eventOffers} = event;
+const createTripEventEditTemplate = (event, eventType, offers, cities) => {
+  const {id, eventCity, price, isFavorite, destination, eventOffers} = event;
 
   const offersTypeAll = getTypeOffers(offers, eventType);
 
@@ -198,8 +198,7 @@ export default class EventEdit extends AbstractSmartComponent {
     this._offers = offers;
     this._cities = cities;
 
-    this._event.eventType = event.eventType;
-    this._event.isFavorite = event.isFavorite;
+    this._eventType = this._event.eventType;
 
     this._flatpickr = null;
 
@@ -209,7 +208,7 @@ export default class EventEdit extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createTripEventEditTemplate(this._event, this._offers, this._cities);
+    return createTripEventEditTemplate(this._event, this._eventType, this._offers, this._cities);
   }
 
   recoveryListeners() {
@@ -224,19 +223,9 @@ export default class EventEdit extends AbstractSmartComponent {
   }
 
   reset() {
-    const event = this._event;
-
-    this._event.eventType = event.eventType;
-    this._event.isFavorite = event.isFavorite;
+    this._eventType = this._event.eventType;
 
     this.rerender();
-  }
-
-  setSubmitHandler(handler) {
-    this.getElement().querySelector(`form`)
-      .addEventListener(`submit`, handler);
-
-    this._submitHandler = handler;
   }
 
   _applyFlatpickr() {
@@ -250,7 +239,6 @@ export default class EventEdit extends AbstractSmartComponent {
 
     this._configFlatpickr(eventStart, this._event.startTimestamp);
     this._configFlatpickr(eventEnd, this._event.endTimestamp);
-
   }
 
   _configFlatpickr(inputField, date) {
@@ -261,11 +249,6 @@ export default class EventEdit extends AbstractSmartComponent {
     });
   }
 
-  setFavoritesButtonClickHandler(handler) {
-    this.getElement().querySelector(`.event__favorite-checkbox`)
-      .addEventListener(`change`, handler);
-  }
-
   _subscribeOnEvents() {
     const element = this.getElement();
 
@@ -274,10 +257,22 @@ export default class EventEdit extends AbstractSmartComponent {
     if (selectTypesList) {
       selectTypesList.addEventListener(`change`, (evt) => {
 
-        this._event.eventType = evt.target.value;
+        this._eventType = evt.target.value;
 
         this.rerender();
       });
     }
+  }
+
+  setSubmitHandler(handler) {
+    this.getElement().querySelector(`form`)
+      .addEventListener(`submit`, handler);
+
+    this._submitHandler = handler;
+  }
+
+  setFavoritesButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-checkbox`)
+      .addEventListener(`change`, handler);
   }
 }
