@@ -200,10 +200,11 @@ export default class EventEdit extends AbstractSmartComponent {
 
     this._eventType = this._event.eventType;
 
-    this._flatpickr = null;
-
+    this._startFlatpickr = null;
+    this._endFlatpickr = null;
     this._submitHandler = null;
     this._applyFlatpickr();
+    this._destroyFlatpickr();
     this._subscribeOnEvents(offers);
   }
 
@@ -229,24 +230,32 @@ export default class EventEdit extends AbstractSmartComponent {
   }
 
   _applyFlatpickr() {
-    if (this._flatpickr) {
-      this._flatpickr.destroy();
-      this._flatpickr = null;
-    }
+    this._destroyFlatpickr();
 
     const eventStart = this.getElement().querySelector(`#event-start-time-1`);
     const eventEnd = this.getElement().querySelector(`#event-end-time-1`);
 
-    this._configFlatpickr(eventStart, this._event.startTimestamp);
-    this._configFlatpickr(eventEnd, this._event.endTimestamp);
+    this._startFlatpickr = this._createFlatpickr(eventStart, this._event.startTimestamp);
+    this._endFlatpickr = this._createFlatpickr(eventEnd, this._event.endTimestamp);
   }
 
-  _configFlatpickr(inputField, date) {
-    this._flatpickr = flatpickr(inputField, {
+  _createFlatpickr(inputField, date) {
+    return flatpickr(inputField, {
       enableTime: true,
       dateFormat: `d/m/y H:i`,
       defaultDate: date || ``,
     });
+  }
+
+  _destroyFlatpickr() {
+    if (this._startFlatpickr) {
+      this._startFlatpickr.destroy();
+      this._startFlatpickr = null;
+    }
+    if (this._endFlatpickr) {
+      this._endFlatpickr.destroy();
+      this._endFlatpickr = null;
+    }
   }
 
   _subscribeOnEvents() {
