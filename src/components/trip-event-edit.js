@@ -204,7 +204,6 @@ export default class EventEdit extends AbstractSmartComponent {
     this._endFlatpickr = null;
     this._submitHandler = null;
     this._applyFlatpickr();
-    this._destroyFlatpickr();
     this._subscribeOnEvents(offers);
   }
 
@@ -236,6 +235,7 @@ export default class EventEdit extends AbstractSmartComponent {
     const eventEnd = this.getElement().querySelector(`#event-end-time-1`);
 
     this._startFlatpickr = this._createFlatpickr(eventStart, this._event.startTimestamp);
+
     this._endFlatpickr = this._createFlatpickr(eventEnd, this._event.endTimestamp);
   }
 
