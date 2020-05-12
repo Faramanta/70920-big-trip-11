@@ -1,4 +1,4 @@
-export const EVENT_COUNT = 3;
+export const EVENT_COUNT = 10;
 
 export const EventType = {
   TAXI: `Taxi`,
@@ -32,10 +32,16 @@ export const CITIES = [
   `Geneva`
 ];
 
-export const FILTERS = [
-  `Everything`,
-  `Future`,
-  `Past`
+export const FilterType = {
+  EVERYTHING: `everything`,
+  FUTURE: `future`,
+  PAST: `past`
+};
+
+export const FILTER_TYPES = [
+  FilterType.EVERYTHING,
+  FilterType.FUTURE,
+  FilterType.PAST
 ];
 
 export const MONTHS = [

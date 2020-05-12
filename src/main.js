@@ -1,9 +1,9 @@
 import TripController from "./controllers/trip.js";
+import FilterController from "./controllers/filter.js";
 import TripInfoComponent from "./components/trip-information.js";
 import RouteComponent from "./components/route-information.js";
 import CostComponent from "./components/cost-information.js";
 import MenuComponent from "./components/menu.js";
-import FilterComponent from "./components/filter.js";
 import PointModel from "./models/points.js";
 import {render, RenderPosition} from "./utils/render.js";
 import {generateTripEvents, DefaultOffers} from "./mock/trip-event.js";
@@ -23,10 +23,12 @@ const tripInfo = new TripInfoComponent();
 render(siteTripInformationElement, tripInfo, RenderPosition.AFTERBEGIN); // контейнер для маршрута и стоимости .trip-main__trip-info
 render(tripInfo.getElement(), new CostComponent(), RenderPosition.BEFOREEND); // отрисовка стоимости маршрута
 
-const siteMenuElement = siteHeaderElement.querySelector(`.trip-main__trip-controls`); // контейнер для меню и фильтра
+const siteControlsElement = siteHeaderElement.querySelector(`.trip-main__trip-controls`); // контейнер для меню и фильтра
 
-render(siteMenuElement, new MenuComponent(), RenderPosition.AFTERBEGIN); // отрисовка меню
-render(siteMenuElement, new FilterComponent(), RenderPosition.BEFOREEND); // отрисовка фильтра
+render(siteControlsElement, new MenuComponent(), RenderPosition.AFTERBEGIN); // отрисовка меню
+
+const filterController = new FilterController(siteControlsElement, eventsModel);
+filterController.render();
 
 const siteEventContainerElement = siteContentElement.querySelector(`.trip-events`);
 

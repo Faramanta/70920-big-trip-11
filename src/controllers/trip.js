@@ -57,7 +57,10 @@ export default class TripController {
     this._onViewChange = this._onViewChange.bind(this);
     this._onDataChange = this._onDataChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
+    this._onFilterTypeChange = this._onFilterTypeChange.bind(this);
+
     this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
+    this._eventsModel.setFilterChangeHandler(this._onFilterTypeChange);
   }
 
   render(offers, cities) {
@@ -93,7 +96,6 @@ export default class TripController {
   }
 
   _onSortTypeChange(sortType) {
-
     const daysListElement = this._daysComponent.getElement(); // .trip-days
     daysListElement.innerHTML = ``;
 
@@ -108,5 +110,15 @@ export default class TripController {
     const sortedEvents = getSortedEvents(this._eventsModel.getEvents(), sortType);
 
     renderDay(this._daysComponent, sortedEvents, this._offers, this._cities);
+  }
+
+  _onFilterTypeChange() {
+    const daysListElement = this._daysComponent.getElement(); // .trip-days
+
+    daysListElement.innerHTML = ``;
+
+    const defaultEventsGroup = getPreparedEvents(this._eventsModel.getEvents());
+
+    renderDays(this._daysComponent, defaultEventsGroup, this._offers, this._cities);
   }
 }
