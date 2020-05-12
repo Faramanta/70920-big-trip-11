@@ -45,10 +45,10 @@ const renderDays = (place, eventsGroups, offers, cities, onDataChange, onViewCha
 };
 
 export default class TripController {
-  constructor(container) {
+  constructor(container, eventsModel) {
     this._container = container;
+    this._eventsModel = eventsModel;
 
-    this.events = [];
     this._pointControllers = [];
     this._noEventsComponent = new NoEventsComponent();
     this._sortComponent = new SortComponent();
@@ -60,8 +60,8 @@ export default class TripController {
     this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
   }
 
-  render(events, offers, cities) {
-    this._events = events;
+  render(offers, cities) {
+    const events = this._eventsModel.getEvents();
     this._offers = offers;
     this._cities = cities;
 
@@ -73,7 +73,7 @@ export default class TripController {
     render(this._container, this._sortComponent, RenderPosition.AFTERBEGIN); // отрисовка сортировки
     render(this._container, this._daysComponent, RenderPosition.BEFOREEND); // отрисовка контейнера .trip-days
 
-    const eventsGroups = getPreparedEvents(this._events);
+    const eventsGroups = getPreparedEvents(this._eventsModel.getEvents());
 
     const pointControllers = renderDays(this._daysComponent, eventsGroups, offers, cities, this._onDataChange, this._onViewChange);
 
@@ -82,19 +82,14 @@ export default class TripController {
 
   _onViewChange() {
     this._pointControllers.forEach((it) => it.setDefaultView());
-
   }
 
   _onDataChange(pointController, oldData, newData) {
-    const index = this._events.findIndex((it) => it.id === oldData.id);
+    const isSuccess = this._eventsModel.updateEvent(oldData, newData);
 
-    if (index === -1) {
-      return;
+    if (isSuccess) {
+      pointController.render(newData);
     }
-
-    this._events = [].concat(this._events.slice(0, index), newData, this._events.slice(index + 1));
-
-    pointController.render(this._events[index], this._offers, this._cities);
   }
 
   _onSortTypeChange(sortType) {
@@ -103,14 +98,14 @@ export default class TripController {
     daysListElement.innerHTML = ``;
 
     if (sortType === SortType.DEFAULT) {
-      const defaultEventsGroup = getPreparedEvents(this._events);
+      const defaultEventsGroup = getPreparedEvents(this._eventsModel.getEvents());
 
       renderDays(this._daysComponent, defaultEventsGroup, this._offers, this._cities);
 
       return;
     }
 
-    const sortedEvents = getSortedEvents(this._events, sortType);
+    const sortedEvents = getSortedEvents(this._eventsModel.getEvents(), sortType);
 
     renderDay(this._daysComponent, sortedEvents, this._offers, this._cities);
   }

@@ -4,11 +4,14 @@ import RouteComponent from "./components/route-information.js";
 import CostComponent from "./components/cost-information.js";
 import MenuComponent from "./components/menu.js";
 import FilterComponent from "./components/filter.js";
+import PointModel from "./models/points.js";
 import {render, RenderPosition} from "./utils/render.js";
 import {generateTripEvents, DefaultOffers} from "./mock/trip-event.js";
 import {EVENT_COUNT, CITIES} from "./const.js";
 
 const events = generateTripEvents(EVENT_COUNT);
+const eventsModel = new PointModel();
+eventsModel.setEvents(events);
 
 const siteMainElement = document.querySelector(`.page-body`);
 const siteHeaderElement = siteMainElement.querySelector(`.page-header`);
@@ -27,10 +30,10 @@ render(siteMenuElement, new FilterComponent(), RenderPosition.BEFOREEND); // о�
 
 const siteEventContainerElement = siteContentElement.querySelector(`.trip-events`);
 
-const tripController = new TripController(siteEventContainerElement);
+const tripController = new TripController(siteEventContainerElement, eventsModel);
 
 if (events.size !== 0) {
   render(tripInfo.getElement(), new RouteComponent(), RenderPosition.AFTERBEGIN); // отрисовка информации о маршруте
 }
 
-tripController.render(events, DefaultOffers, CITIES);
+tripController.render(DefaultOffers, CITIES);
