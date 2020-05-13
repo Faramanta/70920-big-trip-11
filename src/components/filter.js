@@ -1,14 +1,14 @@
 import {FILTER_TYPES} from "../const.js";
 import AbstractComponent from "./abstract-component.js";
 
-const createFiltersMarkup = (filterTypes) => {
-  return filterTypes
-    .map((filterType) => {
+const createFiltersMarkup = (filters) => {
+  return filters
+    .map((filter) => {
 
       return (
         `<div class="trip-filters__filter">
-          <input id="filter-${filterType}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${filterType}" >
-          <label class="trip-filters__filter-label" for="filter-${filterType}">${filterType}</label>
+          <input id="filter-${filter.name}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${filter.name}" ${filter.checked ? `checked` : ``}>
+          <label class="trip-filters__filter-label" for="filter-${filter.name}">${filter.name}</label>
         </div>`
       );
     })
@@ -16,8 +16,8 @@ const createFiltersMarkup = (filterTypes) => {
 };
 
 // фильтры
-const createFiltersTemplate = () => {
-  const filterMarkup = createFiltersMarkup(FILTER_TYPES);
+const createFiltersTemplate = (filters) => {
+  const filterMarkup = createFiltersMarkup(filters);
   return (
     `<form class="trip-filters" action="#" method="get">
       ${filterMarkup}

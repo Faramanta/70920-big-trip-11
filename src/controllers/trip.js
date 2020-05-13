@@ -98,7 +98,7 @@ export default class TripController {
     }
   }
 
-  _onSortTypeChange(sortType) {
+  _onSortTypeChange(sortType, index, timestamp) {
     this._cleanComponent();
 
     if (sortType === SortType.DEFAULT) {
@@ -110,7 +110,7 @@ export default class TripController {
 
     const sortedEvents = getSortedEvents(this._eventsModel.getEvents(), sortType);
 
-    renderDay(this._daysComponent, sortedEvents, this._offers, this._cities);
+    renderDay(this._daysComponent, sortedEvents, this._offers, this._cities, this._onDataChange, index, timestamp, this._onViewChange);
   }
 
   _onFilterTypeChange() {
@@ -125,6 +125,6 @@ export default class TripController {
 
   _renderSortedDays() {
     const defaultEventsGroup = getPreparedEvents(this._eventsModel.getEvents());
-    renderDays(this._daysComponent, defaultEventsGroup, this._offers, this._cities);
+    renderDays(this._daysComponent, defaultEventsGroup, this._offers, this._cities, this._onDataChange, this._onViewChange);
   }
 }
