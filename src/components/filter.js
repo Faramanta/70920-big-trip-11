@@ -1,4 +1,3 @@
-import {FILTER_TYPES} from "../const.js";
 import AbstractComponent from "./abstract-component.js";
 
 const createFiltersMarkup = (filters) => {
