@@ -9,10 +9,10 @@ export const getEventsByFilter = (events, filterType) => {
       filteredEvents = events;
       break;
     case FilterType.FUTURE:
-      filteredEvents = events.filter((event) => event.startTimestamp > today);
+      filteredEvents = events.filter((eventItem) => eventItem.startTimestamp > today);
       break;
     case FilterType.PAST:
-      filteredEvents = events.filter((event) => event.startTimestamp < today);
+      filteredEvents = events.filter((eventItem) => eventItem.startTimestamp < today);
       break;
   }
 

@@ -10,8 +10,8 @@ export default class FilterController {
     this._filterComponent = null;
     this._activeFilterType = FilterType.EVERYTHING;
 
-    this._onDataChange = this._onDataChange.bind(this);
     this._onFilterTypeChange = this._onFilterTypeChange.bind(this);
+    this._onDataChange = this._onDataChange.bind(this);
 
     this._eventsModel.setDataChangeHandler(this._onDataChange);
   }
@@ -25,11 +25,9 @@ export default class FilterController {
         checked: filterType === this._activeFilterType,
       };
     });
-
     const oldComponent = this._filterComponent;
 
     this._filterComponent = new FilterComponent(filters);
-
     this._filterComponent.setFilterChangeHandler(this._onFilterTypeChange);
 
     if (oldComponent) {
@@ -37,6 +35,11 @@ export default class FilterController {
     } else {
       render(container, this._filterComponent, RenderPosition.BEFOREEND);
     }
+  }
+
+  setDefaultView() {
+    this._activeFilterType = FilterType.EVERYTHING;
+    this.render();
   }
 
   _onFilterTypeChange(filterType) {

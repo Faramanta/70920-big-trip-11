@@ -2,6 +2,8 @@ import AbstractSmartComponent from "./abstract-smart-component.js";
 import {EVENT_TYPES} from "../const.js";
 import {getTypeOffers} from "../mock/trip-event.js";
 import flatpickr from "flatpickr";
+import {encode} from "he";
+
 import "flatpickr/dist/flatpickr.min.css";
 
 // Форма создания/редактирования
@@ -74,9 +76,11 @@ const createOffersSelectorMarkup = (offersTypeAll, eventOffers, id) => {
 };
 
 const createTripEventEditTemplate = (event, eventType, offers, cities) => {
-  const {id, eventCity, price, isFavorite, destination, eventOffers} = event;
+  const {id, eventCity: notSanitizedCity, price, isFavorite, destination, eventOffers} = event;
 
   const offersTypeAll = getTypeOffers(offers, eventType);
+
+  const eventCity = encode(notSanitizedCity);
 
   const eventTypesTransferMarkup = createEventTypesMarkup(EVENT_TYPES.slice(0, 7), id);
   const eventTypesActivityMarkup = createEventTypesMarkup(EVENT_TYPES.slice(7, 10), id);
@@ -86,7 +90,7 @@ const createTripEventEditTemplate = (event, eventType, offers, cities) => {
 
   return (
     `<li class="trip-events__item">
-      <form class="event  event--edit" action="#" method="post">
+      <form class="trip-events__item event  event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-${id}">
@@ -139,7 +143,7 @@ const createTripEventEditTemplate = (event, eventType, offers, cities) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${price}">
+            <input class="event__input  event__input--price" id="event-price-${id}" type="number" name="event-price" value="${price}">
           </div>
   
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -178,17 +182,41 @@ const createTripEventEditTemplate = (event, eventType, offers, cities) => {
         <div class="event__photos-container">
           <div class="event__photos-tape">
             <img class="event__photo" src="img/photos/1.jpg" alt="Event photo">
-              <img class="event__photo" src="img/photos/2.jpg" alt="Event photo">
-                <img class="event__photo" src="img/photos/3.jpg" alt="Event photo">
-                <img class="event__photo" src="img/photos/4.jpg" alt="Event photo">
-                <img class="event__photo" src="img/photos/5.jpg" alt="Event photo">
-              </div>
-            </div>
-          </section>` : ``}
+            <img class="event__photo" src="img/photos/2.jpg" alt="Event photo">
+            <img class="event__photo" src="img/photos/3.jpg" alt="Event photo">
+            <img class="event__photo" src="img/photos/4.jpg" alt="Event photo">
+            <img class="event__photo" src="img/photos/5.jpg" alt="Event photo">
+          </div>
+        </div>
+      </section>` : ``}
         ${isOffersShowing && destination ? `</section>` : ``}
       </form>
     </li>`
   );
+};
+
+const parseFormData = (formData) => {
+  const eventType = formData.get(`event-type`);
+  const startTimestamp = formData.get(`event-start-time`);
+  const endTimestamp = formData.get(`event-end-time`);
+  const price = formData.get(`event-price`);
+  const eventCity = encode(formData.get(`event-destination`));
+  const destination = formData.get(`event__destination-description`);
+  let offersTypeAll = [];
+  let eventOffers = [];
+  let photos = [];
+
+  return {
+    eventType,
+    startTimestamp,
+    endTimestamp,
+    price,
+    eventCity,
+    destination,
+    offersTypeAll,
+    eventOffers,
+    photos
+  };
 };
 
 export default class EventEdit extends AbstractSmartComponent {
@@ -207,12 +235,26 @@ export default class EventEdit extends AbstractSmartComponent {
     this._subscribeOnEvents(offers);
   }
 
+  getData() {
+    const form = this.getElement().querySelector(`.event`);
+    const formData = new FormData(form);
+
+    return parseFormData(formData);
+  }
+
   getTemplate() {
     return createTripEventEditTemplate(this._event, this._eventType, this._offers, this._cities);
   }
 
+  removeElement() {
+    this._destroyFlatpickr();
+
+    super.removeElement();
+  }
+
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
+    this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
     this._subscribeOnEvents();
   }
 
@@ -226,6 +268,10 @@ export default class EventEdit extends AbstractSmartComponent {
     this._eventType = this._event.eventType;
 
     this.rerender();
+  }
+
+  destroy() {
+    this._destroyFlatpickr();
   }
 
   _applyFlatpickr() {
@@ -278,6 +324,13 @@ export default class EventEdit extends AbstractSmartComponent {
       .addEventListener(`submit`, handler);
 
     this._submitHandler = handler;
+  }
+
+  setDeleteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`)
+      .addEventListener(`click`, handler);
+
+    this._deleteButtonClickHandler = handler;
   }
 
   setFavoritesButtonClickHandler(handler) {

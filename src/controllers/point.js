@@ -1,8 +1,20 @@
 import EventComponent from "../components/trip-event.js";
 import EventEditComponent from "../components/trip-event-edit.js";
-import {render, replace, RenderPosition} from "../utils/render.js";
+import {render, remove, replace, RenderPosition} from "../utils/render.js";
 import {KeyCode, Mode} from "../const.js";
 
+export const EmptyEvent = {
+  destination: null,
+  endTimestamp: new Date().getTime(),
+  eventCity: ``,
+  eventOffers: [],
+  eventType: `Taxi`,
+  id: -1,
+  isFavorite: false,
+  price: 0,
+  startTimestamp: new Date().getTime(),
+  timestamp: new Date().getTime()
+};
 
 export default class PointController {
   constructor(container, onDataChange, onViewChange) {
@@ -17,11 +29,12 @@ export default class PointController {
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
-  render(event, offers, cities) {
+  render(event, offers, cities, mode) {
 
     const oldEventComponent = this._eventComponent;
     const oldEventEditComponent = this._eventEditComponent;
 
+    this._mode = mode;
     this._eventComponent = new EventComponent(event);
     this._eventEditComponent = new EventEditComponent(event, offers, cities);
 
@@ -38,14 +51,31 @@ export default class PointController {
 
     this._eventEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      this._replaceEditToEvent();
+      const data = this._eventEditComponent.getData();
+      this._onDataChange(this, event, data);
     });
 
-    if (oldEventComponent && oldEventEditComponent) {
-      replace(this._eventComponent, oldEventComponent);
-      replace(this._eventEditComponent, oldEventEditComponent);
-    } else {
-      render(this._container.getElement(), this._eventComponent, RenderPosition.BEFOREEND);
+    this._eventEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, event, null));
+
+    switch (mode) {
+      case Mode.DEFAULT:
+        if (oldEventEditComponent && oldEventComponent) {
+          replace(this._eventComponent, oldEventComponent);
+          replace(this._eventEditComponent, oldEventEditComponent);
+          this._replaceEditToEvent();
+        } else {
+          render(this._container.getElement(), this._eventComponent, RenderPosition.BEFOREEND);
+        }
+        break;
+
+      case Mode.ADDING:
+        if (oldEventEditComponent && oldEventComponent) {
+          remove(oldEventEditComponent);
+          remove(oldEventComponent);
+        }
+        document.addEventListener(`keydown`, this._onEscKeyDown);
+        render(this._container, this._eventEditComponent, RenderPosition.AFTERBEGIN);
+        break;
     }
   }
 
@@ -53,6 +83,19 @@ export default class PointController {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceEditToEvent();
     }
+  }
+
+  destroyFP() {
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
+    if (this._eventEditComponent) {
+      this._eventEditComponent.destroy();
+    }
+  }
+
+  destroy() {
+    remove(this._eventEditComponent);
+    remove(this._eventComponent);
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
   _replaceEventToEdit() {
@@ -64,7 +107,11 @@ export default class PointController {
   _replaceEditToEvent() {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
     this._eventEditComponent.reset();
-    replace(this._eventComponent, this._eventEditComponent);
+
+    if (document.contains(this._eventEditComponent.getElement())) {
+      replace(this._eventComponent, this._eventEditComponent);
+    }
+
     this._mode = Mode.DEFAULT;
   }
 
@@ -72,6 +119,10 @@ export default class PointController {
     const isEscKey = evt.key === KeyCode.ESC || evt.key === KeyCode.ESCAPE;
 
     if (isEscKey) {
+      if (this._mode === Mode.ADDING) {
+        this._onDataChange(this, EmptyEvent, null);
+      }
+
       this._replaceEditToEvent();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     }

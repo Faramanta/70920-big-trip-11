@@ -1,4 +1,4 @@
-export const EVENT_COUNT = 10;
+export const EVENT_COUNT = 5;
 
 export const EventType = {
   TAXI: `Taxi`,
@@ -76,5 +76,11 @@ export const SortType = {
 
 export const Mode = {
   DEFAULT: `default`,
-  EDIT: `edit,`
+  EDIT: `edit`,
+  ADDING: `adding`
+};
+
+export const MenuItem = {
+  TABLE: `table`,
+  STATS: `stats`,
 };

@@ -3,10 +3,12 @@ import DaysComponent from "../components/trip-day-list.js";
 import DayComponent from "../components/trip-day-item.js";
 import EventsComponent from "../components/trip-event-list.js";
 import NoEventsComponent from "../components/no-events.js";
-import PointController from "../controllers/point.js";
+import PointController, {EmptyEvent} from "../controllers/point.js";
 import {render, RenderPosition} from "../utils/render.js";
-import {getPreparedEvents, getSortedEvents} from "../utils/common.js";
+import {getPreparedEvents} from "../utils/common.js";
 import {SortType} from "../const.js";
+
+import {Mode} from "../const.js";
 
 const renderDay = (siteTripDayListElement, points, offers, cities, onDataChange, index = null, timestamp = null, onViewChange) => { // один день маршрута
 
@@ -22,7 +24,7 @@ const renderDay = (siteTripDayListElement, points, offers, cities, onDataChange,
 
     const pointController = new PointController(siteTripEventListElement, onDataChange, onViewChange);
 
-    pointController.render(point, offers, cities);
+    pointController.render(point, offers, cities, Mode.DEFAULT);
 
     return pointController;
 
@@ -36,9 +38,9 @@ const renderDays = (place, eventsGroups, offers, cities, onDataChange, onViewCha
 
   Array.from(eventsGroups.entries()).forEach((eventsGroup, index) => {
     const [timestamp, points] = eventsGroup;
-    const pointController = renderDay(place, points, offers, cities, onDataChange, index, timestamp, onViewChange);
+    const pointControllers = renderDay(place, points, offers, cities, onDataChange, index, timestamp, onViewChange);
 
-    controllers.push(...pointController);
+    controllers.push(...pointControllers);
   });
 
   return controllers;
@@ -48,19 +50,20 @@ export default class TripController {
   constructor(container, eventsModel) {
     this._container = container;
     this._eventsModel = eventsModel;
+    this._sortType = SortType.DEFAULT;
+    this._creatingEvent = null;
 
     this._pointControllers = [];
+    this._eventsComponent = new EventsComponent();
     this._noEventsComponent = new NoEventsComponent();
     this._sortComponent = new SortComponent();
     this._daysComponent = new DaysComponent();
-
-    this._cleanComponent();
 
     this._onViewChange = this._onViewChange.bind(this);
     this._onDataChange = this._onDataChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
     this._onFilterTypeChange = this._onFilterTypeChange.bind(this);
-    this._renderSortedDays = this._renderSortedDays.bind(this);
+    this._reRender = this.renderContent.bind(this);
 
     this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
     this._eventsModel.setFilterChangeHandler(this._onFilterTypeChange);
@@ -79,11 +82,20 @@ export default class TripController {
     render(this._container, this._sortComponent, RenderPosition.AFTERBEGIN); // отрисовка сортировки
     render(this._container, this._daysComponent, RenderPosition.BEFOREEND); // отрисовка контейнера .trip-days
 
-    const eventsGroups = getPreparedEvents(this._eventsModel.getEvents());
+    this.renderContent();
+  }
 
-    const pointControllers = renderDays(this._daysComponent, eventsGroups, offers, cities, this._onDataChange, this._onViewChange);
+  createEvent() {
+    if (this._creatingEvent) {
+      return;
+    }
 
-    this._pointControllers = pointControllers;
+    const place = document.querySelector(`.trip-days`);
+
+    this._sortComponent.reset();
+
+    this._creatingEvent = new PointController(place, this._onDataChange, this._onViewChange);
+    this._creatingEvent.render(EmptyEvent, this._offers, this._cities, Mode.ADDING);
   }
 
   _onViewChange() {
@@ -91,40 +103,60 @@ export default class TripController {
   }
 
   _onDataChange(pointController, oldData, newData) {
-    const isSuccess = this._eventsModel.updateEvent(oldData.id, newData);
+    if (oldData.id === EmptyEvent.id) {
+      this._creatingEvent = null;
 
-    if (isSuccess) {
-      pointController.render(newData, this._offers, this._cities);
+      if (newData === null) {
+        pointController.destroy();
+      } else {
+        this._eventsModel.addEvent(newData);
+        pointController.render(newData, Mode.DEFAULT);
+      }
+    } else if (newData === null) {
+      this._eventsModel.removeEvent(oldData.id);
+    } else {
+      const isSuccess = this._eventsModel.updateEvent(oldData.id, newData);
+
+      if (isSuccess) {
+        pointController.render(newData, this._offers, this._cities);
+      }
     }
   }
 
-  _onSortTypeChange(sortType, index, timestamp) {
-    this._cleanComponent();
+  _onSortTypeChange(sortType) {
+    this._sortType = sortType;
+    this.renderContent();
+  }
 
-    if (sortType === SortType.DEFAULT) {
+  _onFilterTypeChange() {
+    this._sortType = SortType.DEFAULT;
+    this._sortComponent.reset();
+    this.renderContent();
+  }
 
-      this._renderSortedDays();
+  _destroy() {
+    const daysListElement = this._daysComponent.getElement(); // .trip-days
+    daysListElement.innerHTML = ``;
+
+    this._pointControllers.forEach((controller) => {
+      controller.destroyFP();
+      controller = null;
+    });
+
+    this._pointControllers = [];
+  }
+
+  renderContent() {
+    this._destroy();
+
+    if (this._sortType === SortType.DEFAULT) {
+      const groupedEvents = getPreparedEvents(this._eventsModel.getEvents(), this._sortType);
+      this._pointControllers = renderDays(this._daysComponent, groupedEvents, this._offers, this._cities, this._onDataChange, this._onViewChange);
 
       return;
     }
 
-    const sortedEvents = getSortedEvents(this._eventsModel.getEvents(), sortType);
-
-    renderDay(this._daysComponent, sortedEvents, this._offers, this._cities, this._onDataChange, index, timestamp, this._onViewChange);
-  }
-
-  _onFilterTypeChange() {
-    this._cleanComponent();
-    this._renderSortedDays();
-  }
-
-  _cleanComponent() {
-    const daysListElement = this._daysComponent.getElement(); // .trip-days
-    daysListElement.innerHTML = ``;
-  }
-
-  _renderSortedDays() {
-    const defaultEventsGroup = getPreparedEvents(this._eventsModel.getEvents());
-    renderDays(this._daysComponent, defaultEventsGroup, this._offers, this._cities, this._onDataChange, this._onViewChange);
+    const sortedEvents = getPreparedEvents(this._eventsModel.getEvents(), this._sortType);
+    this._pointControllers = renderDays(this._daysComponent, sortedEvents, this._offers, this._cities, this._onDataChange, this._onViewChange);
   }
 }

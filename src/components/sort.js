@@ -51,6 +51,11 @@ export default class Sort extends AbstractComponent {
     return createSortTemplate();
   }
 
+  reset() {
+    this._currentSortType = SortType.DEFAULT;
+    this.getElement().reset();
+  }
+
   setSortTypeChangeHandler(handler) {
     this.getElement().addEventListener(`change`, (evt) => {
       const sortType = evt.target.getAttribute(`id`);
@@ -65,6 +70,7 @@ export default class Sort extends AbstractComponent {
       handler(this._currentSortType);
     });
   }
+
 
   _setSortFieldName(sortType) {
     const sortChangedField = this.getElement().querySelector(`.trip-sort__item--day`);
