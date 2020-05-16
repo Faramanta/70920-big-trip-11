@@ -39,10 +39,3 @@ if (events.size !== 0) {
 }
 
 tripController.render(DefaultOffers, CITIES);
-
-// const newEventBtn = siteTripInformationElement.querySelector(`.trip-main__event-add-btn`);
-// newEventBtn.addEventListener(`click`, () => {
-//   tripController.createEvent();
-//   newEventBtn.setAttribute(`disabled`, `disabled`);
-// });
-
