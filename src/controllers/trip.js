@@ -3,7 +3,7 @@ import DaysComponent from "../components/trip-day-list.js";
 import DayComponent from "../components/trip-day-item.js";
 import EventsComponent from "../components/trip-event-list.js";
 import NoEventsComponent from "../components/no-events.js";
-import PointController, {EmptyEvent} from "../controllers/point.js";
+import PointController, {EMPTY_EVENT} from "../controllers/point.js";
 import {render, RenderPosition} from "../utils/render.js";
 import {getPreparedEvents} from "../utils/common.js";
 import {SortType} from "../const.js";
@@ -31,7 +31,6 @@ const renderDay = (siteTripDayListElement, points, offers, cities, onDataChange,
   });
 };
 
-
 const renderDays = (place, eventsGroups, offers, cities, onDataChange, onViewChange) => {
 
   const controllers = [];
@@ -53,6 +52,8 @@ export default class TripController {
     this._sortType = SortType.DEFAULT;
     this._creatingEvent = null;
 
+    this._newEventBtn = document.querySelector(`.trip-main__event-add-btn`);
+
     this._pointControllers = [];
     this._eventsComponent = new EventsComponent();
     this._noEventsComponent = new NoEventsComponent();
@@ -67,6 +68,8 @@ export default class TripController {
 
     this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
     this._eventsModel.setFilterChangeHandler(this._onFilterTypeChange);
+
+    this.addNewEventBtnClickHandler();
   }
 
   render(offers, cities) {
@@ -85,7 +88,7 @@ export default class TripController {
     this.renderContent();
   }
 
-  createEvent() {
+  createNewEvent() {
     if (this._creatingEvent) {
       return;
     }
@@ -95,7 +98,7 @@ export default class TripController {
     this._sortComponent.reset();
 
     this._creatingEvent = new PointController(place, this._onDataChange, this._onViewChange);
-    this._creatingEvent.render(EmptyEvent, this._offers, this._cities, Mode.ADDING);
+    this._creatingEvent.render(EMPTY_EVENT, this._offers, this._cities, Mode.ADDING);
   }
 
   _onViewChange() {
@@ -103,22 +106,26 @@ export default class TripController {
   }
 
   _onDataChange(pointController, oldData, newData) {
-    if (oldData.id === EmptyEvent.id) {
+    if (oldData.id === EMPTY_EVENT.id) {
       this._creatingEvent = null;
 
       if (newData === null) {
         pointController.destroy();
+        this._newEventBtn.disabled = false;
       } else {
         this._eventsModel.addEvent(newData);
-        pointController.render(newData, Mode.DEFAULT);
+        this.renderContent();
       }
     } else if (newData === null) {
-      this._eventsModel.removeEvent(oldData.id);
+      const isSuccess = this._eventsModel.removeEvent(oldData.id);
+      if (isSuccess) {
+        pointController.destroy();
+      }
     } else {
       const isSuccess = this._eventsModel.updateEvent(oldData.id, newData);
 
       if (isSuccess) {
-        pointController.render(newData, this._offers, this._cities);
+        this.renderContent();
       }
     }
   }
@@ -158,5 +165,13 @@ export default class TripController {
 
     const sortedEvents = getPreparedEvents(this._eventsModel.getEvents(), this._sortType);
     this._pointControllers = renderDays(this._daysComponent, sortedEvents, this._offers, this._cities, this._onDataChange, this._onViewChange);
+  }
+
+  addNewEventBtnClickHandler() {
+    this._newEventBtn.addEventListener(`click`, () => {
+      this._newEventBtn.disabled = true;
+      this.createNewEvent();
+      this._onViewChange();
+    });
   }
 }

@@ -1,14 +1,14 @@
 import EventComponent from "../components/trip-event.js";
 import EventEditComponent from "../components/trip-event-edit.js";
 import {render, remove, replace, RenderPosition} from "../utils/render.js";
-import {KeyCode, Mode} from "../const.js";
+import {KeyCode, Mode, EventType} from "../const.js";
 
-export const EmptyEvent = {
+export const EMPTY_EVENT = {
   destination: null,
   endTimestamp: new Date().getTime(),
   eventCity: ``,
   eventOffers: [],
-  eventType: `Taxi`,
+  eventType: EventType.TAXI,
   id: -1,
   isFavorite: false,
   price: 0,
@@ -120,7 +120,7 @@ export default class PointController {
 
     if (isEscKey) {
       if (this._mode === Mode.ADDING) {
-        this._onDataChange(this, EmptyEvent, null);
+        this._onDataChange(this, EMPTY_EVENT, null);
       }
 
       this._replaceEditToEvent();

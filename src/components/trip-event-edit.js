@@ -233,6 +233,7 @@ export default class EventEdit extends AbstractSmartComponent {
     this._submitHandler = null;
     this._applyFlatpickr();
     this._subscribeOnEvents(offers);
+    this._inputValidated();
   }
 
   getData() {
@@ -317,6 +318,23 @@ export default class EventEdit extends AbstractSmartComponent {
         this.rerender();
       });
     }
+  }
+
+  _inputValidated() {
+    const validatedInput = this.getElement().querySelector(`.event__input--destination`);
+    const saveBtn = this.getElement().querySelector(`.event__save-btn`);
+
+    saveBtn.disabled = true;
+
+    validatedInput.addEventListener(`input`, (evt) => {
+      const inputText = evt.target.value;
+
+      const option = this.getElement().querySelector(`datalist option[value = ` + inputText + `]`);
+
+      if (option) {
+        saveBtn.disabled = false;
+      }
+    });
   }
 
   setSubmitHandler(handler) {
