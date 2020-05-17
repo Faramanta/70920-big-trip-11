@@ -1,5 +1,7 @@
 export const EVENT_COUNT = 5;
 
+export const HIDDEN_CLASS = `visually-hidden`;
+
 export const EventType = {
   TAXI: `Taxi`,
   BUS: `Bus`,
@@ -21,6 +23,20 @@ export const EVENT_TYPES = [
   EventType.TRANSPORT,
   EventType.DRIVE,
   EventType.FLIGHT,
+  EventType.CHECKIN,
+  EventType.SIGHTSEEING,
+  EventType.RESTAURANT,
+];
+export const EVENT_TYPES_TRANSPORT = [
+  EventType.TAXI,
+  EventType.BUS,
+  EventType.TRAIN,
+  EventType.SHIP,
+  EventType.TRANSPORT,
+  EventType.DRIVE,
+  EventType.FLIGHT,
+];
+export const EVENT_TYPES_ACTIVITY = [
   EventType.CHECKIN,
   EventType.SIGHTSEEING,
   EventType.RESTAURANT,
@@ -81,6 +97,19 @@ export const Mode = {
 };
 
 export const MenuItem = {
-  TABLE: `table`,
-  STATS: `stats`,
+  TABLE: `Table`,
+  STATS: `Stats`,
+};
+
+export const typeIcons = {
+  'Taxi': `🚕`,
+  'Bus': `🚌`,
+  'Train': `🚂`,
+  'Ship': `🛳`,
+  'Transport': `🚊`,
+  'Drive': `🚗`,
+  'Flight': `✈️`,
+  'Check-in': `🏨`,
+  'Sightseeing': `🏛️`,
+  'Restaurant': `🍴`
 };

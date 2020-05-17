@@ -1,12 +1,10 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {EVENT_TYPES} from "../const.js";
+import {EVENT_TYPES_ACTIVITY, EVENT_TYPES_TRANSPORT} from "../const.js";
 import {getTypeOffers} from "../mock/trip-event.js";
 import flatpickr from "flatpickr";
 import {encode} from "he";
-
 import "flatpickr/dist/flatpickr.min.css";
 
-// Форма создания/редактирования
 const createEventTypesMarkup = (eventTypes, id) => {
   return eventTypes
     .map((eventType) => {
@@ -82,8 +80,8 @@ const createTripEventEditTemplate = (event, eventType, offers, cities) => {
 
   const eventCity = encode(notSanitizedCity);
 
-  const eventTypesTransferMarkup = createEventTypesMarkup(EVENT_TYPES.slice(0, 7), id);
-  const eventTypesActivityMarkup = createEventTypesMarkup(EVENT_TYPES.slice(7, 10), id);
+  const eventTypesTransferMarkup = createEventTypesMarkup(EVENT_TYPES_TRANSPORT.slice(), id);
+  const eventTypesActivityMarkup = createEventTypesMarkup(EVENT_TYPES_ACTIVITY.slice(), id);
   const eventCityMarkup = createCityMarkup(cities);
   const isOffersShowing = offersTypeAll.length > 0; // есть лиs offers
   const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersTypeAll, eventOffers, id) : ``;

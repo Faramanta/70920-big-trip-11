@@ -5,8 +5,8 @@ import {MenuItem} from "../const.js";
 const createMenuTemplate = () => {
   return (
     `<nav class="trip-controls__trip-tabs  trip-tabs">
-      <a class="trip-tabs__btn trip-tabs__btn--active" href="#" data-menu-type="${MenuItem.TABLE}">Table</a>
-      <a class="trip-tabs__btn" data-menu-type="${MenuItem.STATS}" href="#">Stats</a>
+      <a class="trip-tabs__btn trip-tabs__btn--active" href="#" data-menu-item="${MenuItem.TABLE}">Table</a>
+      <a class="trip-tabs__btn" data-menu-item="${MenuItem.STATS}" href="#">Stats</a>
     </nav>`
   );
 };
@@ -20,19 +20,29 @@ export default class Menu extends AbstractComponent {
     return createMenuTemplate();
   }
 
-  // setActiveMenuItem(menuItem) {
-  //   const activeClass = `trip-tabs__btn--active`;
-  //   const itemMenu = this.getElement().querySelector(`.trip-tabs__btn`);
-  //
-  //   const itemsMenu = Array.from(this.getElement().querySelector(`.trip-tabs__btn`));
-  //   itemsMenu.forEach((tab) => tab.classList.remove(activeClass));
-  //
-  //   if (itemMenu) {
-  //     itemMenu.classList.add(activeClass);
-  //   }
-  // }
-  //
-  //
+  setActiveItem(menuItem) {
+    const items = this.getElement().querySelectorAll(`.trip-tabs__btn`);
+
+    items.forEach((item) => {
+      item.classList.remove(`trip-tabs__btn--active`);
+      return item.textContent === menuItem ? item.classList.add(`trip-tabs__btn--active`) : item.classList.remove(`trip-tabs__btn--active`);
+    });
+  }
+
+  setOnChange(handler) {
+    this.getElement().addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+
+      if (evt.target.tagName !== `A`) {
+        return;
+      }
+
+      const menuItem = evt.target.dataset.menuItem;
+
+      handler(menuItem);
+    });
+  }
+
 }
 
 
