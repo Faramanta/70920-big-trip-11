@@ -57,7 +57,7 @@ export default class Points {
   }
 
   addEvent(event) {
-    this._events = [].concat(event, this._events);
+    this._events = [].concat(this._events, event);
     this._callHandlers(this._dataChangeHandlers);
   }
 

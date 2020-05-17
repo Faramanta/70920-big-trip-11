@@ -3,7 +3,7 @@ import EventEditComponent from "../components/trip-event-edit.js";
 import {render, remove, replace, RenderPosition} from "../utils/render.js";
 import {KeyCode, Mode, EventType} from "../const.js";
 
-export const EMPTY_EVENT = {
+const EMPTY_EVENT = {
   destination: null,
   endTimestamp: new Date().getTime(),
   eventCity: ``,
@@ -17,9 +17,11 @@ export const EMPTY_EVENT = {
 };
 
 export default class PointController {
-  constructor(container, onDataChange, onViewChange) {
+  constructor(container, onDataChange, onViewChange, onFavoriteChange, onCloseCreateForm = null) {
     this._container = container;
+    this._onCloseCreateForm = onCloseCreateForm;
     this._onDataChange = onDataChange;
+    this._onFavoriteChange = onFavoriteChange;
     this._onViewChange = onViewChange;
     this._mode = Mode.DEFAULT;
 
@@ -35,6 +37,11 @@ export default class PointController {
     const oldEventEditComponent = this._eventEditComponent;
 
     this._mode = mode;
+
+    if (this._mode === Mode.ADDING) {
+      event = EMPTY_EVENT;
+    }
+
     this._eventComponent = new EventComponent(event);
     this._eventEditComponent = new EventEditComponent(event, offers, cities);
 
@@ -44,15 +51,17 @@ export default class PointController {
     });
 
     this._eventEditComponent.setFavoritesButtonClickHandler(() => {
-      this._onDataChange(this, event, Object.assign({}, event, {
+      this._onFavoriteChange(this, event, Object.assign({}, event, {
         isFavorite: !event.isFavorite,
       }));
     });
 
     this._eventEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      const data = this._eventEditComponent.getData();
-      this._onDataChange(this, event, data);
+      if (this._eventEditComponent.isFormValid) {
+        const data = this._eventEditComponent.getData();
+        this._onDataChange(this, event, data);
+      }
     });
 
     this._eventEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, event, null));
@@ -85,13 +94,6 @@ export default class PointController {
     }
   }
 
-  destroyFP() {
-    document.removeEventListener(`keydown`, this._onEscKeyDown);
-    if (this._eventEditComponent) {
-      this._eventEditComponent.destroy();
-    }
-  }
-
   destroy() {
     remove(this._eventEditComponent);
     remove(this._eventComponent);
@@ -107,11 +109,7 @@ export default class PointController {
   _replaceEditToEvent() {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
     this._eventEditComponent.reset();
-
-    if (document.contains(this._eventEditComponent.getElement())) {
-      replace(this._eventComponent, this._eventEditComponent);
-    }
-
+    replace(this._eventComponent, this._eventEditComponent);
     this._mode = Mode.DEFAULT;
   }
 
@@ -120,11 +118,10 @@ export default class PointController {
 
     if (isEscKey) {
       if (this._mode === Mode.ADDING) {
-        this._onDataChange(this, EMPTY_EVENT, null);
+        this._onCloseCreateForm();
+      } else {
+        this._replaceEditToEvent();
       }
-
-      this._replaceEditToEvent();
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
     }
   }
 }

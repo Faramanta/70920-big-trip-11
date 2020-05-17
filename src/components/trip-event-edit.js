@@ -195,16 +195,10 @@ const createTripEventEditTemplate = (event, eventType, offers, cities) => {
   );
 };
 
-const parseFormData = (formData) => {
-  const eventType = formData.get(`event-type`);
-  const startTimestamp = formData.get(`event-start-time`);
-  const endTimestamp = formData.get(`event-end-time`);
-  const price = formData.get(`event-price`);
+const parseFormData = (formData, eventType, startTimestamp, endTimestamp) => {
   const eventCity = encode(formData.get(`event-destination`));
-  const destination = formData.get(`event__destination-description`);
-  let offersTypeAll = [];
+  const price = formData.get(`event-price`);
   let eventOffers = [];
-  let photos = [];
 
   return {
     eventType,
@@ -212,10 +206,7 @@ const parseFormData = (formData) => {
     endTimestamp,
     price,
     eventCity,
-    destination,
-    offersTypeAll,
     eventOffers,
-    photos
   };
 };
 
@@ -228,19 +219,24 @@ export default class EventEdit extends AbstractSmartComponent {
 
     this._eventType = this._event.eventType;
 
+    this._isFormDirty = false;
+
     this._startFlatpickr = null;
     this._endFlatpickr = null;
     this._submitHandler = null;
+    this._inputDestination = null;
+    this._form = null;
     this._applyFlatpickr();
     this._subscribeOnEvents(offers);
-    this._inputValidated();
+    this._initFormValidation();
+  }
+
+  get isFormValid() {
+    return this._form.checkValidity();
   }
 
   getData() {
-    const form = this.getElement().querySelector(`.event`);
-    const formData = new FormData(form);
-
-    return parseFormData(formData);
+    return parseFormData(new FormData(this._form), this._eventType, this._startFlatpickr.selectedDates[0].valueOf(), this._endFlatpickr.selectedDates[0].valueOf());
   }
 
   getTemplate() {
@@ -257,6 +253,7 @@ export default class EventEdit extends AbstractSmartComponent {
     this.setSubmitHandler(this._submitHandler);
     this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
     this._subscribeOnEvents();
+    this._initFormValidation();
   }
 
   rerender() {
@@ -320,28 +317,50 @@ export default class EventEdit extends AbstractSmartComponent {
     }
   }
 
-  _inputValidated() {
-    const validatedInput = this.getElement().querySelector(`.event__input--destination`);
-    const saveBtn = this.getElement().querySelector(`.event__save-btn`);
+  _initFormValidation() {
+    this._form = this.getElement().querySelector(`form`);
+    this._inputDestination = this._form.querySelector(`.event__input--destination`);
 
-    saveBtn.disabled = true;
-
-    validatedInput.addEventListener(`input`, (evt) => {
-      const inputText = evt.target.value;
-
-      const option = this.getElement().querySelector(`datalist option[value = ` + inputText + `]`);
-
-      if (option) {
-        saveBtn.disabled = false;
+    this._inputDestination.addEventListener(`input`, (_evt) => {
+      if (this._isFormDirty) {
+        this._validatedDestination();
       }
     });
   }
 
-  setSubmitHandler(handler) {
-    this.getElement().querySelector(`form`)
-      .addEventListener(`submit`, handler);
+  _validateForm() {
+    this._validatedDestination(this._inputDestination);
+    this._form.reportValidity();
+  }
 
-    this._submitHandler = handler;
+  _validatedDestination() {
+    let inputText = this._inputDestination.value;
+
+    if (inputText) {
+      inputText = `${inputText.charAt(0).toUpperCase()}${inputText.slice(1)}`;
+    }
+
+    const city = this._cities.includes(inputText);
+
+    if (city) {
+      this._inputDestination.value = inputText;
+      this._inputDestination.setCustomValidity(``);
+      this._inputDestination.style.backgroundColor = `transparent`;
+    } else {
+      this._inputDestination.setCustomValidity(`Выберите значение из списка`);
+      this._inputDestination.style.backgroundColor = `rgba(255, 0, 0, .5)`;
+    }
+  }
+
+  setSubmitHandler(handler) {
+    this._submitHandler = (evt) => {
+      this._isFormDirty = true;
+      this._validateForm();
+      handler(evt);
+    };
+
+    // this.getElement().querySelector(`form`).addEventListener(`submit`, this._submitHandler);
+    this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, this._submitHandler);
   }
 
   setDeleteButtonClickHandler(handler) {
