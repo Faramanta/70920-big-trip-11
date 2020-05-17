@@ -33,14 +33,34 @@ export default class PointController {
 
   render(event, offers, cities, mode) {
 
-    const oldEventComponent = this._eventComponent;
-    const oldEventEditComponent = this._eventEditComponent;
-
     this._mode = mode;
 
     if (this._mode === Mode.ADDING) {
-      event = EMPTY_EVENT;
+      this._renderAddMode(EMPTY_EVENT, offers, cities);
+      return;
+    } else {
+      this._renderDefaultOrEditMode(event, offers, cities);
     }
+  }
+
+  setDefaultView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._replaceEditToEvent();
+    }
+  }
+
+  destroy() {
+    remove(this._eventEditComponent);
+    if (this._eventComponent) {
+      remove(this._eventComponent);
+    }
+
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
+  }
+
+  _renderDefaultOrEditMode(event, offers, cities) {
+    const oldEventComponent = this._eventComponent;
+    const oldEventEditComponent = this._eventEditComponent;
 
     this._eventComponent = new EventComponent(event);
     this._eventEditComponent = new EventEditComponent(event, offers, cities);
@@ -66,38 +86,49 @@ export default class PointController {
 
     this._eventEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, event, null));
 
-    switch (mode) {
+    switch (this._mode) {
       case Mode.DEFAULT:
-        if (oldEventEditComponent && oldEventComponent) {
+        if (oldEventComponent) {
           replace(this._eventComponent, oldEventComponent);
-          replace(this._eventEditComponent, oldEventEditComponent);
-          this._replaceEditToEvent();
         } else {
-          render(this._container.getElement(), this._eventComponent, RenderPosition.BEFOREEND);
+          render(this._container, this._eventComponent, RenderPosition.BEFOREEND);
         }
         break;
 
-      case Mode.ADDING:
-        if (oldEventEditComponent && oldEventComponent) {
-          remove(oldEventEditComponent);
-          remove(oldEventComponent);
+      case Mode.EDIT:
+        if (oldEventEditComponent) {
+          oldEventEditComponent.destroy();
+          replace(this._eventEditComponent, oldEventEditComponent);
+        } else {
+          render(this._container, this._eventEditComponent, RenderPosition.BEFOREEND);
         }
         document.addEventListener(`keydown`, this._onEscKeyDown);
-        render(this._container, this._eventEditComponent, RenderPosition.AFTERBEGIN);
         break;
     }
   }
 
-  setDefaultView() {
-    if (this._mode !== Mode.DEFAULT) {
-      this._replaceEditToEvent();
-    }
-  }
+  _renderAddMode(event, offers, cities) {
 
-  destroy() {
-    remove(this._eventEditComponent);
-    remove(this._eventComponent);
-    document.removeEventListener(`keydown`, this._onEscKeyDown);
+    this._eventEditComponent = new EventEditComponent(event, offers, cities);
+
+    this._eventEditComponent.setFavoritesButtonClickHandler(() => {
+      this._onFavoriteChange(this, event, Object.assign({}, event, {
+        isFavorite: !event.isFavorite,
+      }));
+    });
+
+    this._eventEditComponent.setSubmitHandler((evt) => {
+      evt.preventDefault();
+      if (this._eventEditComponent.isFormValid) {
+        const data = this._eventEditComponent.getData();
+        this._onDataChange(this, event, data);
+      }
+    });
+
+    this._eventEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, event, null));
+
+    document.addEventListener(`keydown`, this._onEscKeyDown);
+    render(this._container, this._eventEditComponent, RenderPosition.AFTERBEGIN);
   }
 
   _replaceEventToEdit() {

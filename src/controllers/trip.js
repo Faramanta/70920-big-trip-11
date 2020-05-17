@@ -22,7 +22,7 @@ const renderDay = (siteTripDayListElement, points, offers, cities, onDataChange,
 
   return points.map((point) => {
 
-    const pointController = new PointController(siteTripEventListElement, onDataChange, onViewChange, onFavoriteChange);
+    const pointController = new PointController(siteTripEventListElement.getElement(), onDataChange, onViewChange, onFavoriteChange);
 
     pointController.render(point, offers, cities, Mode.DEFAULT);
 
@@ -112,7 +112,11 @@ export default class TripController {
   }
 
   _onFavoriteChange(pointController, oldData, newData) {
-    this._eventsModel.updateEvent(oldData.id, newData);
+    const isSuccess = this._eventsModel.updateEvent(oldData.id, newData);
+
+    if (isSuccess) {
+      pointController.render(newData, this._offers, this._cities, Mode.EDIT);
+    }
   }
 
   _onDataChange(pointController, oldData, newData) {

@@ -224,6 +224,8 @@ export default class EventEdit extends AbstractSmartComponent {
     this._startFlatpickr = null;
     this._endFlatpickr = null;
     this._submitHandler = null;
+    this._deleteButtonClickHandler = null;
+    this._favoriteButtonClickHandler = null;
     this._inputDestination = null;
     this._form = null;
     this._applyFlatpickr();
@@ -252,6 +254,7 @@ export default class EventEdit extends AbstractSmartComponent {
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
     this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
+    this.setFavoritesButtonClickHandler(this._favoriteButtonClickHandler);
     this._subscribeOnEvents();
     this._initFormValidation();
   }
@@ -353,13 +356,14 @@ export default class EventEdit extends AbstractSmartComponent {
   }
 
   setSubmitHandler(handler) {
-    this._submitHandler = (evt) => {
-      this._isFormDirty = true;
-      this._validateForm();
-      handler(evt);
-    };
+    if (!this._submitHandler) {
+      this._submitHandler = (evt) => {
+        this._isFormDirty = true;
+        this._validateForm();
+        handler(evt);
+      };
+    }
 
-    // this.getElement().querySelector(`form`).addEventListener(`submit`, this._submitHandler);
     this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, this._submitHandler);
   }
 
@@ -367,11 +371,18 @@ export default class EventEdit extends AbstractSmartComponent {
     this.getElement().querySelector(`.event__reset-btn`)
       .addEventListener(`click`, handler);
 
-    this._deleteButtonClickHandler = handler;
+    if (!this._deleteButtonClickHandler) {
+      this._deleteButtonClickHandler = handler;
+    }
   }
 
   setFavoritesButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__favorite-checkbox`)
       .addEventListener(`change`, handler);
+
+    if (!this._favoriteButtonClickHandler) {
+      this._favoriteButtonClickHandler = handler;
+    }
+
   }
 }
