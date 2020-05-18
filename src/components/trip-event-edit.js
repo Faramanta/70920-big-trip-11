@@ -2,6 +2,8 @@ import AbstractSmartComponent from "./abstract-smart-component.js";
 import {EVENT_TYPES} from "../const.js";
 import {getTypeOffers} from "../mock/trip-event.js";
 import flatpickr from "flatpickr";
+import {encode} from "he";
+
 import "flatpickr/dist/flatpickr.min.css";
 
 // Форма создания/редактирования
@@ -74,9 +76,11 @@ const createOffersSelectorMarkup = (offersTypeAll, eventOffers, id) => {
 };
 
 const createTripEventEditTemplate = (event, eventType, offers, cities) => {
-  const {id, eventCity, price, isFavorite, destination, eventOffers} = event;
+  const {id, eventCity: notSanitizedCity, price, isFavorite, destination, eventOffers} = event;
 
   const offersTypeAll = getTypeOffers(offers, eventType);
+
+  const eventCity = encode(notSanitizedCity);
 
   const eventTypesTransferMarkup = createEventTypesMarkup(EVENT_TYPES.slice(0, 7), id);
   const eventTypesActivityMarkup = createEventTypesMarkup(EVENT_TYPES.slice(7, 10), id);
@@ -86,7 +90,7 @@ const createTripEventEditTemplate = (event, eventType, offers, cities) => {
 
   return (
     `<li class="trip-events__item">
-      <form class="event  event--edit" action="#" method="post">
+      <form class="trip-events__item event  event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-${id}">
@@ -139,7 +143,7 @@ const createTripEventEditTemplate = (event, eventType, offers, cities) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${price}">
+            <input class="event__input  event__input--price" id="event-price-${id}" type="number" name="event-price" value="${price}">
           </div>
   
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -178,17 +182,32 @@ const createTripEventEditTemplate = (event, eventType, offers, cities) => {
         <div class="event__photos-container">
           <div class="event__photos-tape">
             <img class="event__photo" src="img/photos/1.jpg" alt="Event photo">
-              <img class="event__photo" src="img/photos/2.jpg" alt="Event photo">
-                <img class="event__photo" src="img/photos/3.jpg" alt="Event photo">
-                <img class="event__photo" src="img/photos/4.jpg" alt="Event photo">
-                <img class="event__photo" src="img/photos/5.jpg" alt="Event photo">
-              </div>
-            </div>
-          </section>` : ``}
+            <img class="event__photo" src="img/photos/2.jpg" alt="Event photo">
+            <img class="event__photo" src="img/photos/3.jpg" alt="Event photo">
+            <img class="event__photo" src="img/photos/4.jpg" alt="Event photo">
+            <img class="event__photo" src="img/photos/5.jpg" alt="Event photo">
+          </div>
+        </div>
+      </section>` : ``}
         ${isOffersShowing && destination ? `</section>` : ``}
       </form>
     </li>`
   );
+};
+
+const parseFormData = (formData, eventType, startTimestamp, endTimestamp) => {
+  const eventCity = encode(formData.get(`event-destination`));
+  const price = formData.get(`event-price`);
+  let eventOffers = [];
+
+  return {
+    eventType,
+    startTimestamp,
+    endTimestamp,
+    price,
+    eventCity,
+    eventOffers,
+  };
 };
 
 export default class EventEdit extends AbstractSmartComponent {
@@ -200,20 +219,44 @@ export default class EventEdit extends AbstractSmartComponent {
 
     this._eventType = this._event.eventType;
 
+    this._isFormDirty = false;
+
     this._startFlatpickr = null;
     this._endFlatpickr = null;
     this._submitHandler = null;
+    this._deleteButtonClickHandler = null;
+    this._favoriteButtonClickHandler = null;
+    this._inputDestination = null;
+    this._form = null;
     this._applyFlatpickr();
     this._subscribeOnEvents(offers);
+    this._initFormValidation();
+  }
+
+  get isFormValid() {
+    return this._form.checkValidity();
+  }
+
+  getData() {
+    return parseFormData(new FormData(this._form), this._eventType, this._startFlatpickr.selectedDates[0].valueOf(), this._endFlatpickr.selectedDates[0].valueOf());
   }
 
   getTemplate() {
     return createTripEventEditTemplate(this._event, this._eventType, this._offers, this._cities);
   }
 
+  removeElement() {
+    this._destroyFlatpickr();
+
+    super.removeElement();
+  }
+
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
+    this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
+    this.setFavoritesButtonClickHandler(this._favoriteButtonClickHandler);
     this._subscribeOnEvents();
+    this._initFormValidation();
   }
 
   rerender() {
@@ -226,6 +269,10 @@ export default class EventEdit extends AbstractSmartComponent {
     this._eventType = this._event.eventType;
 
     this.rerender();
+  }
+
+  destroy() {
+    this._destroyFlatpickr();
   }
 
   _applyFlatpickr() {
@@ -273,15 +320,69 @@ export default class EventEdit extends AbstractSmartComponent {
     }
   }
 
-  setSubmitHandler(handler) {
-    this.getElement().querySelector(`form`)
-      .addEventListener(`submit`, handler);
+  _initFormValidation() {
+    this._form = this.getElement().querySelector(`form`);
+    this._inputDestination = this._form.querySelector(`.event__input--destination`);
 
-    this._submitHandler = handler;
+    this._inputDestination.addEventListener(`input`, (_evt) => {
+      if (this._isFormDirty) {
+        this._validatedDestination();
+      }
+    });
+  }
+
+  _validateForm() {
+    this._validatedDestination(this._inputDestination);
+    this._form.reportValidity();
+  }
+
+  _validatedDestination() {
+    let inputText = this._inputDestination.value;
+
+    if (inputText) {
+      inputText = `${inputText.charAt(0).toUpperCase()}${inputText.slice(1)}`;
+    }
+
+    const city = this._cities.includes(inputText);
+
+    if (city) {
+      this._inputDestination.value = inputText;
+      this._inputDestination.setCustomValidity(``);
+      this._inputDestination.style.backgroundColor = `transparent`;
+    } else {
+      this._inputDestination.setCustomValidity(`Выберите значение из списка`);
+      this._inputDestination.style.backgroundColor = `rgba(255, 0, 0, .5)`;
+    }
+  }
+
+  setSubmitHandler(handler) {
+    if (!this._submitHandler) {
+      this._submitHandler = (evt) => {
+        this._isFormDirty = true;
+        this._validateForm();
+        handler(evt);
+      };
+    }
+
+    this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, this._submitHandler);
+  }
+
+  setDeleteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`)
+      .addEventListener(`click`, handler);
+
+    if (!this._deleteButtonClickHandler) {
+      this._deleteButtonClickHandler = handler;
+    }
   }
 
   setFavoritesButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__favorite-checkbox`)
       .addEventListener(`change`, handler);
+
+    if (!this._favoriteButtonClickHandler) {
+      this._favoriteButtonClickHandler = handler;
+    }
+
   }
 }

@@ -1,13 +1,27 @@
 import EventComponent from "../components/trip-event.js";
 import EventEditComponent from "../components/trip-event-edit.js";
-import {render, replace, RenderPosition} from "../utils/render.js";
-import {KeyCode, Mode} from "../const.js";
+import {render, remove, replace, RenderPosition} from "../utils/render.js";
+import {KeyCode, Mode, EventType} from "../const.js";
 
+const EMPTY_EVENT = {
+  destination: null,
+  endTimestamp: new Date().getTime(),
+  eventCity: ``,
+  eventOffers: [],
+  eventType: EventType.TAXI,
+  id: -1,
+  isFavorite: false,
+  price: 0,
+  startTimestamp: new Date().getTime(),
+  timestamp: new Date().getTime()
+};
 
 export default class PointController {
-  constructor(container, onDataChange, onViewChange) {
+  constructor(container, onDataChange, onViewChange, onFavoriteChange, onCloseCreateForm = null) {
     this._container = container;
+    this._onCloseCreateForm = onCloseCreateForm;
     this._onDataChange = onDataChange;
+    this._onFavoriteChange = onFavoriteChange;
     this._onViewChange = onViewChange;
     this._mode = Mode.DEFAULT;
 
@@ -17,8 +31,34 @@ export default class PointController {
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
-  render(event, offers, cities) {
+  render(event, offers, cities, mode) {
 
+    this._mode = mode;
+
+    if (this._mode === Mode.ADDING) {
+      this._renderAddMode(EMPTY_EVENT, offers, cities);
+      return;
+    } else {
+      this._renderDefaultOrEditMode(event, offers, cities);
+    }
+  }
+
+  setDefaultView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._replaceEditToEvent();
+    }
+  }
+
+  destroy() {
+    remove(this._eventEditComponent);
+    if (this._eventComponent) {
+      remove(this._eventComponent);
+    }
+
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
+  }
+
+  _renderDefaultOrEditMode(event, offers, cities) {
     const oldEventComponent = this._eventComponent;
     const oldEventEditComponent = this._eventEditComponent;
 
@@ -31,28 +71,64 @@ export default class PointController {
     });
 
     this._eventEditComponent.setFavoritesButtonClickHandler(() => {
-      this._onDataChange(this, event, Object.assign({}, event, {
+      this._onFavoriteChange(this, event, Object.assign({}, event, {
         isFavorite: !event.isFavorite,
       }));
     });
 
     this._eventEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      this._replaceEditToEvent();
+      if (this._eventEditComponent.isFormValid) {
+        const data = this._eventEditComponent.getData();
+        this._onDataChange(this, event, data);
+      }
     });
 
-    if (oldEventComponent && oldEventEditComponent) {
-      replace(this._eventComponent, oldEventComponent);
-      replace(this._eventEditComponent, oldEventEditComponent);
-    } else {
-      render(this._container.getElement(), this._eventComponent, RenderPosition.BEFOREEND);
+    this._eventEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, event, null));
+
+    switch (this._mode) {
+      case Mode.DEFAULT:
+        if (oldEventComponent) {
+          replace(this._eventComponent, oldEventComponent);
+        } else {
+          render(this._container, this._eventComponent, RenderPosition.BEFOREEND);
+        }
+        break;
+
+      case Mode.EDIT:
+        if (oldEventEditComponent) {
+          oldEventEditComponent.destroy();
+          replace(this._eventEditComponent, oldEventEditComponent);
+        } else {
+          render(this._container, this._eventEditComponent, RenderPosition.BEFOREEND);
+        }
+        document.addEventListener(`keydown`, this._onEscKeyDown);
+        break;
     }
   }
 
-  setDefaultView() {
-    if (this._mode !== Mode.DEFAULT) {
-      this._replaceEditToEvent();
-    }
+  _renderAddMode(event, offers, cities) {
+
+    this._eventEditComponent = new EventEditComponent(event, offers, cities);
+
+    this._eventEditComponent.setFavoritesButtonClickHandler(() => {
+      this._onFavoriteChange(this, event, Object.assign({}, event, {
+        isFavorite: !event.isFavorite,
+      }));
+    });
+
+    this._eventEditComponent.setSubmitHandler((evt) => {
+      evt.preventDefault();
+      if (this._eventEditComponent.isFormValid) {
+        const data = this._eventEditComponent.getData();
+        this._onDataChange(this, event, data);
+      }
+    });
+
+    this._eventEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, event, null));
+
+    document.addEventListener(`keydown`, this._onEscKeyDown);
+    render(this._container, this._eventEditComponent, RenderPosition.AFTERBEGIN);
   }
 
   _replaceEventToEdit() {
@@ -72,8 +148,11 @@ export default class PointController {
     const isEscKey = evt.key === KeyCode.ESC || evt.key === KeyCode.ESCAPE;
 
     if (isEscKey) {
-      this._replaceEditToEvent();
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
+      if (this._mode === Mode.ADDING) {
+        this._onCloseCreateForm();
+      } else {
+        this._replaceEditToEvent();
+      }
     }
   }
 }
