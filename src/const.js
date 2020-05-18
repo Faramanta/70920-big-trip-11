@@ -101,6 +101,12 @@ export const MenuItem = {
   STATS: `Stats`,
 };
 
+export const ChartTitle = {
+  MONEY: `MONEY`,
+  TRANSPORT: `TRANSPORT`,
+  TIME_SPEND: `TIME SPEND`
+};
+
 export const typeIcons = {
   'Taxi': `🚕`,
   'Bus': `🚌`,

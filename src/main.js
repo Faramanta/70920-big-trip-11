@@ -47,7 +47,6 @@ const statisticComponent = new StatsComponent(eventsModel);
 
 render(sitePageBodyContainerElement, statisticComponent, RenderPosition.BEFOREEND); // отрисовка статистики
 
-
 siteMenu.setOnChange((menuItem) => {
   siteMenu.setActiveItem(menuItem);
   switch (menuItem) {

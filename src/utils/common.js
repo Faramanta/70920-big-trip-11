@@ -28,6 +28,12 @@ export const eventDuration = (start, end) => {
   return `${days} ${hours} ${minutes}`;
 };
 
+export const getEventDuration = (start, end) => {
+  const eventStart = moment(start);
+  const eventEnd = moment(end);
+  return eventEnd.diff(eventStart);
+};
+
 export const getSortedEvents = (events, sortType) => {
   let sortedEvents = [];
   const showingEvents = events.slice();
@@ -37,7 +43,9 @@ export const getSortedEvents = (events, sortType) => {
       sortedEvents = showingEvents.sort((a, b) => a.startTimestamp > b.startTimestamp);
       break;
     case SortType.TIME:
-      sortedEvents = showingEvents.sort((a, b) => b.duration - a.duration);
+      sortedEvents = showingEvents.sort((a, b) => {
+        return getEventDuration(b.startTimestamp, b.endTimestamp) - getEventDuration(a.startTimestamp, a.endTimestamp);
+      });
       break;
     case SortType.PRICE:
       sortedEvents = showingEvents.sort((a, b) => b.price - a.price);
