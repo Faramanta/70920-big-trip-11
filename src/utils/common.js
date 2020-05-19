@@ -91,12 +91,8 @@ export const getPreparedEvents = (events, sortType = SortType.DEFAULT) => {
   return groupedEvents;
 };
 
-export const getUniqItems = (item, index, array) => {
-  return array.indexOf(item) === index;
-};
-
 export const getEventsType = (events) => {
-  return events.map((event) => event.eventType).filter(getUniqItems);
+  return Array.from(new Set(events.map((event) => event.eventType)));
 };
 
 export const calculateTypeCount = (events, type) => {
