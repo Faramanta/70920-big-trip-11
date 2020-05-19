@@ -4,10 +4,11 @@ import TripInfoComponent from "./components/trip-information.js";
 import RouteComponent from "./components/route-information.js";
 import CostComponent from "./components/cost-information.js";
 import MenuComponent from "./components/menu.js";
+import StatsComponent from "./components/stats.js";
 import PointModel from "./models/points.js";
 import {render, RenderPosition} from "./utils/render.js";
 import {generateTripEvents, DefaultOffers} from "./mock/trip-event.js";
-import {EVENT_COUNT, CITIES} from "./const.js";
+import {EVENT_COUNT, CITIES, MenuItem} from "./const.js";
 
 const events = generateTripEvents(EVENT_COUNT);
 const eventsModel = new PointModel();
@@ -16,16 +17,18 @@ eventsModel.setEvents(events);
 const siteMainElement = document.querySelector(`.page-body`);
 const siteHeaderElement = siteMainElement.querySelector(`.page-header`);
 const siteContentElement = siteMainElement.querySelector(`.page-main`);
+const sitePageBodyContainerElement = siteContentElement.querySelector(`.page-body__container`);
 const siteTripInformationElement = siteHeaderElement.querySelector(`.trip-main`);
 
 const tripInfo = new TripInfoComponent();
+const siteMenu = new MenuComponent();
 
 render(siteTripInformationElement, tripInfo, RenderPosition.AFTERBEGIN); // контейнер для маршрута и стоимости .trip-main__trip-info
 render(tripInfo.getElement(), new CostComponent(), RenderPosition.BEFOREEND); // отрисовка стоимости маршрута
 
 const siteControlsElement = siteHeaderElement.querySelector(`.trip-main__trip-controls`); // контейнер для меню и фильтра
 
-render(siteControlsElement, new MenuComponent(), RenderPosition.AFTERBEGIN); // отрисовка меню
+render(siteControlsElement, siteMenu, RenderPosition.AFTERBEGIN); // отрисовка мен
 
 const filterController = new FilterController(siteControlsElement, eventsModel);
 filterController.render();
@@ -39,3 +42,22 @@ if (events.size !== 0) {
 }
 
 tripController.render(DefaultOffers, CITIES);
+
+const statisticComponent = new StatsComponent(eventsModel);
+
+render(sitePageBodyContainerElement, statisticComponent, RenderPosition.BEFOREEND); // отрисовка статистики
+
+siteMenu.setOnChange((menuItem) => {
+  siteMenu.setActiveItem(menuItem);
+  switch (menuItem) {
+    case MenuItem.TABLE:
+      statisticComponent.hide();
+      tripController.show();
+      tripController.renderContent();
+      break;
+    case MenuItem.STATS:
+      statisticComponent.show();
+      tripController.hide();
+      break;
+  }
+});

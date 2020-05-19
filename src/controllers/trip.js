@@ -6,7 +6,7 @@ import NoEventsComponent from "../components/no-events.js";
 import PointController from "../controllers/point.js";
 import {render, RenderPosition} from "../utils/render.js";
 import {getPreparedEvents, getSortedEvents} from "../utils/common.js";
-import {SortType} from "../const.js";
+import {SortType, HIDDEN_CLASS} from "../const.js";
 
 import {Mode} from "../const.js";
 
@@ -67,7 +67,7 @@ export default class TripController {
     this._onFavoriteChange = this._onFavoriteChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
     this._onFilterTypeChange = this._onFilterTypeChange.bind(this);
-    this._reRender = this.renderContent.bind(this);
+    this.renderContent = this.renderContent.bind(this);
 
     this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
     this._eventsModel.setFilterChangeHandler(this._onFilterTypeChange);
@@ -89,6 +89,15 @@ export default class TripController {
     render(this._container, this._daysComponent, RenderPosition.BEFOREEND); // отрисовка контейнера .trip-days
 
     this.renderContent();
+  }
+
+
+  hide() {
+    this._container.classList.add(HIDDEN_CLASS);
+  }
+
+  show() {
+    this._container.classList.remove(HIDDEN_CLASS);
   }
 
   createNewEvent() {
@@ -182,7 +191,6 @@ export default class TripController {
 
   renderContent() {
     this._destroy();
-
     if (this._sortType === SortType.DEFAULT) {
       const groupedEvents = getPreparedEvents(this._eventsModel.getEvents(), this._sortType);
       this._pointControllers = renderDays(this._daysComponent, groupedEvents, this._offers, this._cities, this._onDataChange, this._onViewChange, this._onFavoriteChange);

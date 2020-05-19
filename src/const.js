@@ -1,5 +1,7 @@
 export const EVENT_COUNT = 5;
 
+export const HIDDEN_CLASS = `visually-hidden`;
+
 export const EventType = {
   TAXI: `Taxi`,
   BUS: `Bus`,
@@ -21,6 +23,20 @@ export const EVENT_TYPES = [
   EventType.TRANSPORT,
   EventType.DRIVE,
   EventType.FLIGHT,
+  EventType.CHECKIN,
+  EventType.SIGHTSEEING,
+  EventType.RESTAURANT,
+];
+export const EVENT_TYPES_TRANSPORT = [
+  EventType.TAXI,
+  EventType.BUS,
+  EventType.TRAIN,
+  EventType.SHIP,
+  EventType.TRANSPORT,
+  EventType.DRIVE,
+  EventType.FLIGHT,
+];
+export const EVENT_TYPES_ACTIVITY = [
   EventType.CHECKIN,
   EventType.SIGHTSEEING,
   EventType.RESTAURANT,
@@ -81,6 +97,44 @@ export const Mode = {
 };
 
 export const MenuItem = {
-  TABLE: `table`,
-  STATS: `stats`,
+  TABLE: `Table`,
+  STATS: `Stats`,
+};
+
+export const ChartTitle = {
+  MONEY: `MONEY`,
+  TRANSPORT: `TRANSPORT`,
+  TIME_SPEND: `TIME SPEND`
+};
+
+export const typeIcons = {
+  'Taxi': `🚕`,
+  'Bus': `🚌`,
+  'Train': `🚂`,
+  'Ship': `🛳`,
+  'Transport': `🚊`,
+  'Drive': `🚗`,
+  'Flight': `✈️`,
+  'Check-in': `🏨`,
+  'Sightseeing': `🏛️`,
+  'Restaurant': `🍴`
+};
+
+export const chartOptions = {
+  'type': `horizontalBar`,
+  'datasetsBackgroundColor': `#ffffff`,
+  'datasetsHoverBackgroundColor': `#ffffff`,
+  'datasetsAnchor': `start`,
+  'datalabelsFontSize': 13,
+  'datalabelsColor': `#000000`,
+  'datalabelAnchor': `end`,
+  'datalabelAlign': `start`,
+  'titleFontColor': `#000000`,
+  'titleFontSize': 23,
+  'titlePosition': `left`,
+  'ticksFontColor': `#000000`,
+  'ticksPadding': 5,
+  'ticksFontSize': 13,
+  'barThickness': 44,
+  'minBarLength': 50,
 };
