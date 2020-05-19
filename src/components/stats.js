@@ -1,36 +1,17 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {EVENT_TYPES_TRANSPORT, typeIcons, ChartTitle} from "../const.js";
-import {getEventDuration} from "../utils/common.js";
+import {EVENT_TYPES_TRANSPORT,
+  typeIcons,
+  ChartTitle,
+  chartOptions} from "../const.js";
+import {getEventsType,
+  calculateTypeCount,
+  calculateTypePrice,
+  calculateTypeDuration,
+  eventDurationFormat} from "../utils/common.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import moment from "moment";
 
 const BAR_HEIGHT = 46;
-
-const getUniqItems = (item, index, array) => {
-  return array.indexOf(item) === index;
-};
-
-const getEventsType = (events) => {
-  return events.map((event) => event.eventType).filter(getUniqItems);
-};
-
-const calculateTypeCount = (events, type) => {
-  return events.filter((it) => it.eventType === type).length;
-};
-
-const calculateTypePrice = (events, type) => {
-  const chartTypeEvents = events.filter((it) => it.eventType === type);
-
-  return chartTypeEvents.reduce((accumulator, item) => accumulator + item.price, 0);
-};
-
-const calculateTypeDuration = (events, type) => {
-  const chartDurationEvents = events.filter((it) => it.eventType === type);
-  const chartDurationEventsTimestamp = chartDurationEvents.reduce((accumulator, item) => accumulator + getEventDuration(item.startTimestamp, item.endTimestamp), 0);
-
-  return Math.floor(moment.duration(chartDurationEventsTimestamp).asHours());
-};
 
 const getChartConfig = (types, data, title, formatter) => {
   return {
@@ -40,36 +21,36 @@ const getChartConfig = (types, data, title, formatter) => {
       labels: types,
       datasets: [{
         data,
-        backgroundColor: `#ffffff`,
-        hoverBackgroundColor: `#ffffff`,
-        anchor: `start`
+        backgroundColor: chartOptions.datasetsBackgroundColor,
+        hoverBackgroundColor: chartOptions.datasetsHoverBackgroundColor,
+        anchor: chartOptions.datasetsAnchor
       }]
     },
     options: {
       plugins: {
         datalabels: {
           font: {
-            size: 13
+            size: chartOptions.datalabelsFontSize
           },
-          color: `#000000`,
-          anchor: `end`,
-          align: `start`,
+          color: chartOptions.datalabelsColor,
+          anchor: chartOptions.datalabelAnchor,
+          align: chartOptions.datalabelAlign,
           formatter
         }
       },
       title: {
         display: true,
         text: title,
-        fontColor: `#000000`,
-        fontSize: 23,
-        position: `left`
+        fontColor: chartOptions.titleFontColor,
+        fontSize: chartOptions.titleFontSize,
+        position: chartOptions.titlePosition
       },
       scales: {
         yAxes: [{
           ticks: {
-            fontColor: `#000000`,
-            padding: 5,
-            fontSize: 13,
+            fontColor: chartOptions.ticksFontColor,
+            padding: chartOptions.ticksPadding,
+            fontSize: chartOptions.ticksFontSize,
             callback: (type) => {
               return `${typeIcons[type]} ${type}`;
             },
@@ -78,7 +59,7 @@ const getChartConfig = (types, data, title, formatter) => {
             display: false,
             drawBorder: false
           },
-          barThickness: 44,
+          barThickness: chartOptions.barThickness,
         }],
         xAxes: [{
           ticks: {
@@ -89,7 +70,7 @@ const getChartConfig = (types, data, title, formatter) => {
             display: false,
             drawBorder: false
           },
-          minBarLength: 50
+          minBarLength: chartOptions.minBarLength
         }],
       },
       legend: {
@@ -101,7 +82,6 @@ const getChartConfig = (types, data, title, formatter) => {
     }
   };
 };
-
 
 const renderMoneyChart = (chart, events) => {
 
@@ -129,7 +109,10 @@ const renderTimeSpendChart = (chart, events) => {
 
   const eventTypes = getEventsType(events);
   const data = eventTypes.map((type) => calculateTypeDuration(events, type));
-  const formatter = (val) => `${val}H`;
+
+  const formatter = (val) => {
+    return eventDurationFormat(val);
+  };
 
   chart.height = BAR_HEIGHT * eventTypes.length;
 

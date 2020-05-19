@@ -54,7 +54,6 @@ siteMenu.setOnChange((menuItem) => {
       statisticComponent.hide();
       tripController.show();
       tripController.renderContent();
-      tripController._onFilterTypeChange();
       break;
     case MenuItem.STATS:
       statisticComponent.show();

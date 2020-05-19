@@ -1,7 +1,7 @@
 import moment from "moment";
 import {SortType} from "../const.js";
 
-const castTimeFormat = (value) => {
+export const castTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
 };
 
@@ -17,6 +17,10 @@ export const eventDuration = (start, end) => {
   const eventEnd = moment(end);
   const duration = eventEnd.diff(eventStart); // продолжительность точки
 
+  return eventDurationFormat(duration);
+};
+
+export const eventDurationFormat = (duration) => {
   const eventDurDay = moment.duration(duration).days(); // количество дней
   const eventDurHour = moment.duration(duration).hours(); // количество часов
   const eventDurMin = moment.duration(duration).minutes(); // количество минут
@@ -85,4 +89,28 @@ export const getPreparedEvents = (events, sortType = SortType.DEFAULT) => {
   const groupedEvents = getGroupedEvents(sortedEvents);
 
   return groupedEvents;
+};
+
+export const getUniqItems = (item, index, array) => {
+  return array.indexOf(item) === index;
+};
+
+export const getEventsType = (events) => {
+  return events.map((event) => event.eventType).filter(getUniqItems);
+};
+
+export const calculateTypeCount = (events, type) => {
+  return events.filter((it) => it.eventType === type).length;
+};
+
+export const calculateTypePrice = (events, type) => {
+  const chartTypeEvents = events.filter((it) => it.eventType === type);
+
+  return chartTypeEvents.reduce((accumulator, item) => accumulator + item.price, 0);
+};
+
+export const calculateTypeDuration = (events, type) => {
+  const chartDurationEvents = events.filter((it) => it.eventType === type);
+  const chartDurationEventsTimestamp = chartDurationEvents.reduce((accumulator, item) => accumulator + getEventDuration(item.startTimestamp, item.endTimestamp), 0);
+  return moment.duration(chartDurationEventsTimestamp).asMilliseconds();
 };

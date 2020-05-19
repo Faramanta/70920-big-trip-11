@@ -119,3 +119,22 @@ export const typeIcons = {
   'Sightseeing': `🏛️`,
   'Restaurant': `🍴`
 };
+
+export const chartOptions = {
+  'type': `horizontalBar`,
+  'datasetsBackgroundColor': `#ffffff`,
+  'datasetsHoverBackgroundColor': `#ffffff`,
+  'datasetsAnchor': `start`,
+  'datalabelsFontSize': 13,
+  'datalabelsColor': `#000000`,
+  'datalabelAnchor': `end`,
+  'datalabelAlign': `start`,
+  'titleFontColor': `#000000`,
+  'titleFontSize': 23,
+  'titlePosition': `left`,
+  'ticksFontColor': `#000000`,
+  'ticksPadding': 5,
+  'ticksFontSize': 13,
+  'barThickness': 44,
+  'minBarLength': 50,
+};
