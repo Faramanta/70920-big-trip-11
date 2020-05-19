@@ -1,8 +1,8 @@
-export const EVENT_COUNT = 5;
+export const POINT_COUNT = 5;
 
 export const HIDDEN_CLASS = `visually-hidden`;
 
-export const EventType = {
+export const PointType = {
   TAXI: `Taxi`,
   BUS: `Bus`,
   TRAIN: `Train`,
@@ -15,31 +15,31 @@ export const EventType = {
   RESTAURANT: `Restaurant`,
 };
 
-export const EVENT_TYPES = [
-  EventType.TAXI,
-  EventType.BUS,
-  EventType.TRAIN,
-  EventType.SHIP,
-  EventType.TRANSPORT,
-  EventType.DRIVE,
-  EventType.FLIGHT,
-  EventType.CHECKIN,
-  EventType.SIGHTSEEING,
-  EventType.RESTAURANT,
+export const POINT_TYPES = [
+  PointType.TAXI,
+  PointType.BUS,
+  PointType.TRAIN,
+  PointType.SHIP,
+  PointType.TRANSPORT,
+  PointType.DRIVE,
+  PointType.FLIGHT,
+  PointType.CHECKIN,
+  PointType.SIGHTSEEING,
+  PointType.RESTAURANT,
 ];
-export const EVENT_TYPES_TRANSPORT = [
-  EventType.TAXI,
-  EventType.BUS,
-  EventType.TRAIN,
-  EventType.SHIP,
-  EventType.TRANSPORT,
-  EventType.DRIVE,
-  EventType.FLIGHT,
+export const POINT_TYPES_TRANSPORT = [
+  PointType.TAXI,
+  PointType.BUS,
+  PointType.TRAIN,
+  PointType.SHIP,
+  PointType.TRANSPORT,
+  PointType.DRIVE,
+  PointType.FLIGHT,
 ];
-export const EVENT_TYPES_ACTIVITY = [
-  EventType.CHECKIN,
-  EventType.SIGHTSEEING,
-  EventType.RESTAURANT,
+export const POINT_TYPES_ACTIVITY = [
+  PointType.CHECKIN,
+  PointType.SIGHTSEEING,
+  PointType.RESTAURANT,
 ];
 
 export const CITIES = [

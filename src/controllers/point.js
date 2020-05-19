@@ -1,14 +1,14 @@
-import EventComponent from "../components/trip-event.js";
-import EventEditComponent from "../components/trip-event-edit.js";
+import PointComponent from "../components/trip-event.js";
+import PointEditComponent from "../components/trip-event-edit.js";
 import {render, remove, replace, RenderPosition} from "../utils/render.js";
-import {KeyCode, Mode, EventType} from "../const.js";
+import {KeyCode, Mode, PointType} from "../const.js";
 
-const EMPTY_EVENT = {
+const EMPTY_POINT = {
   destination: null,
   endTimestamp: new Date().getTime(),
-  eventCity: ``,
-  eventOffers: [],
-  eventType: EventType.TAXI,
+  pointCity: ``,
+  pointOffers: [],
+  pointType: PointType.TAXI,
   id: -1,
   isFavorite: false,
   price: 0,
@@ -25,122 +25,122 @@ export default class PointController {
     this._onViewChange = onViewChange;
     this._mode = Mode.DEFAULT;
 
-    this._eventComponent = null;
-    this._eventEditComponent = null;
+    this._pointComponent = null;
+    this._pointEditComponent = null;
 
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
-  render(event, offers, cities, mode) {
+  render(point, offers, cities, mode) {
 
     this._mode = mode;
 
     if (this._mode === Mode.ADDING) {
-      this._renderAddMode(EMPTY_EVENT, offers, cities);
+      this._renderAddMode(EMPTY_POINT, offers, cities);
       return;
     } else {
-      this._renderDefaultOrEditMode(event, offers, cities);
+      this._renderDefaultOrEditMode(point, offers, cities);
     }
   }
 
   setDefaultView() {
     if (this._mode !== Mode.DEFAULT) {
-      this._replaceEditToEvent();
+      this._replaceEditToPoint();
     }
   }
 
   destroy() {
-    remove(this._eventEditComponent);
-    if (this._eventComponent) {
-      remove(this._eventComponent);
+    remove(this._pointEditComponent);
+    if (this._pointComponent) {
+      remove(this._pointComponent);
     }
 
     document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
-  _renderDefaultOrEditMode(event, offers, cities) {
-    const oldEventComponent = this._eventComponent;
-    const oldEventEditComponent = this._eventEditComponent;
+  _renderDefaultOrEditMode(point, offers, cities) {
+    const oldPointComponent = this._pointComponent;
+    const oldPointEditComponent = this._pointEditComponent;
 
-    this._eventComponent = new EventComponent(event);
-    this._eventEditComponent = new EventEditComponent(event, offers, cities);
+    this._pointComponent = new PointComponent(point);
+    this._pointEditComponent = new PointEditComponent(point, offers, cities);
 
-    this._eventComponent.setEditButtonClickHandler(() => {
-      this._replaceEventToEdit();
+    this._pointComponent.setEditButtonClickHandler(() => {
+      this._replacePointToEdit();
       document.addEventListener(`keydown`, this._onEscKeyDown);
     });
 
-    this._eventEditComponent.setFavoritesButtonClickHandler(() => {
-      this._onFavoriteChange(this, event, Object.assign({}, event, {
-        isFavorite: !event.isFavorite,
+    this._pointEditComponent.setFavoritesButtonClickHandler(() => {
+      this._onFavoriteChange(this, point, Object.assign({}, point, {
+        isFavorite: !point.isFavorite,
       }));
     });
 
-    this._eventEditComponent.setSubmitHandler((evt) => {
+    this._pointEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      if (this._eventEditComponent.isFormValid) {
-        const data = this._eventEditComponent.getData();
-        this._onDataChange(this, event, data);
+      if (this._pointEditComponent.isFormValid) {
+        const data = this._pointEditComponent.getData();
+        this._onDataChange(this, point, data);
       }
     });
 
-    this._eventEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, event, null));
+    this._pointEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, point, null));
 
     switch (this._mode) {
       case Mode.DEFAULT:
-        if (oldEventComponent) {
-          replace(this._eventComponent, oldEventComponent);
+        if (oldPointComponent) {
+          replace(this._pointComponent, oldPointComponent);
         } else {
-          render(this._container, this._eventComponent, RenderPosition.BEFOREEND);
+          render(this._container, this._pointComponent, RenderPosition.BEFOREEND);
         }
         break;
 
       case Mode.EDIT:
-        if (oldEventEditComponent) {
-          oldEventEditComponent.destroy();
-          replace(this._eventEditComponent, oldEventEditComponent);
+        if (oldPointEditComponent) {
+          oldPointEditComponent.destroy();
+          replace(this._pointEditComponent, oldPointEditComponent);
         } else {
-          render(this._container, this._eventEditComponent, RenderPosition.BEFOREEND);
+          render(this._container, this._pointEditComponent, RenderPosition.BEFOREEND);
         }
         document.addEventListener(`keydown`, this._onEscKeyDown);
         break;
     }
   }
 
-  _renderAddMode(event, offers, cities) {
+  _renderAddMode(point, offers, cities) {
 
-    this._eventEditComponent = new EventEditComponent(event, offers, cities);
+    this._pointEditComponent = new PointEditComponent(point, offers, cities);
 
-    this._eventEditComponent.setFavoritesButtonClickHandler(() => {
-      this._onFavoriteChange(this, event, Object.assign({}, event, {
-        isFavorite: !event.isFavorite,
+    this._pointEditComponent.setFavoritesButtonClickHandler(() => {
+      this._onFavoriteChange(this, point, Object.assign({}, point, {
+        isFavorite: !point.isFavorite,
       }));
     });
 
-    this._eventEditComponent.setSubmitHandler((evt) => {
+    this._pointEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      if (this._eventEditComponent.isFormValid) {
-        const data = this._eventEditComponent.getData();
-        this._onDataChange(this, event, data);
+      if (this._pointEditComponent.isFormValid) {
+        const data = this._pointEditComponent.getData();
+        this._onDataChange(this, point, data);
       }
     });
 
-    this._eventEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, event, null));
+    this._pointEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, point, null));
 
     document.addEventListener(`keydown`, this._onEscKeyDown);
-    render(this._container, this._eventEditComponent, RenderPosition.AFTERBEGIN);
+    render(this._container, this._pointEditComponent, RenderPosition.AFTERBEGIN);
   }
 
-  _replaceEventToEdit() {
+  _replacePointToEdit() {
     this._onViewChange();
-    replace(this._eventEditComponent, this._eventComponent);
+    replace(this._pointEditComponent, this._pointComponent);
     this._mode = Mode.EDIT;
   }
 
-  _replaceEditToEvent() {
+  _replaceEditToPoint() {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
-    this._eventEditComponent.reset();
-    replace(this._eventComponent, this._eventEditComponent);
+    this._pointEditComponent.reset();
+    replace(this._pointComponent, this._pointEditComponent);
     this._mode = Mode.DEFAULT;
   }
 
@@ -151,7 +151,7 @@ export default class PointController {
       if (this._mode === Mode.ADDING) {
         this._onCloseCreateForm();
       } else {
-        this._replaceEditToEvent();
+        this._replaceEditToPoint();
       }
     }
   }

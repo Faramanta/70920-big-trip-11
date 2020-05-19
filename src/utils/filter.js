@@ -1,20 +1,20 @@
 import {FilterType} from "../const.js";
 
-export const getEventsByFilter = (events, filterType) => {
+export const getPointsByFilter = (points, filterType) => {
   const today = new Date().getTime();
-  let filteredEvents = [];
+  let filteredPoints = [];
 
   switch (filterType) {
     case FilterType.EVERYTHING:
-      filteredEvents = events;
+      filteredPoints = points;
       break;
     case FilterType.FUTURE:
-      filteredEvents = events.filter((eventItem) => eventItem.startTimestamp > today);
+      filteredPoints = points.filter((pointItem) => pointItem.startTimestamp > today);
       break;
     case FilterType.PAST:
-      filteredEvents = events.filter((eventItem) => eventItem.startTimestamp < today);
+      filteredPoints = points.filter((pointItem) => pointItem.startTimestamp < today);
       break;
   }
 
-  return filteredEvents;
+  return filteredPoints;
 };

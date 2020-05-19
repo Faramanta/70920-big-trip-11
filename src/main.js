@@ -7,12 +7,12 @@ import MenuComponent from "./components/menu.js";
 import StatsComponent from "./components/stats.js";
 import PointModel from "./models/points.js";
 import {render, RenderPosition} from "./utils/render.js";
-import {generateTripEvents, DefaultOffers} from "./mock/trip-event.js";
-import {EVENT_COUNT, CITIES, MenuItem} from "./const.js";
+import {generateTripPoints, DefaultOffers} from "./mock/trip-event.js";
+import {POINT_COUNT, CITIES, MenuItem} from "./const.js";
 
-const events = generateTripEvents(EVENT_COUNT);
-const eventsModel = new PointModel();
-eventsModel.setEvents(events);
+const points = generateTripPoints(POINT_COUNT);
+const pointsModel = new PointModel();
+pointsModel.setPoints(points);
 
 const siteMainElement = document.querySelector(`.page-body`);
 const siteHeaderElement = siteMainElement.querySelector(`.page-header`);
@@ -30,20 +30,20 @@ const siteControlsElement = siteHeaderElement.querySelector(`.trip-main__trip-co
 
 render(siteControlsElement, siteMenu, RenderPosition.AFTERBEGIN); // отрисовка мен
 
-const filterController = new FilterController(siteControlsElement, eventsModel);
+const filterController = new FilterController(siteControlsElement, pointsModel);
 filterController.render();
 
-const siteEventContainerElement = siteContentElement.querySelector(`.trip-events`);
+const sitePointContainerElement = siteContentElement.querySelector(`.trip-events`);
 
-const tripController = new TripController(siteEventContainerElement, eventsModel);
+const tripController = new TripController(sitePointContainerElement, pointsModel);
 
-if (events.size !== 0) {
+if (points.size !== 0) {
   render(tripInfo.getElement(), new RouteComponent(), RenderPosition.AFTERBEGIN); // отрисовка информации о маршруте
 }
 
 tripController.render(DefaultOffers, CITIES);
 
-const statisticComponent = new StatsComponent(eventsModel);
+const statisticComponent = new StatsComponent(pointsModel);
 
 render(sitePageBodyContainerElement, statisticComponent, RenderPosition.BEFOREEND); // отрисовка статистики
 

@@ -1,13 +1,13 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {EVENT_TYPES_TRANSPORT,
+import {POINT_TYPES_TRANSPORT,
   typeIcons,
   ChartTitle,
   chartOptions} from "../const.js";
-import {getEventsType,
+import {getPointsType,
   calculateTypeCount,
   calculateTypePrice,
   calculateTypeDuration,
-  eventDurationFormat} from "../utils/common.js";
+  pointDurationFormat} from "../utils/common.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
@@ -83,40 +83,40 @@ const getChartConfig = (types, data, title, formatter) => {
   };
 };
 
-const renderMoneyChart = (chart, events) => {
+const renderMoneyChart = (chart, points) => {
 
-  const eventTypes = getEventsType(events);
-  const data = eventTypes.map((type) => calculateTypePrice(events, type));
+  const pointTypes = getPointsType(points);
+  const data = pointTypes.map((type) => calculateTypePrice(points, type));
   const formatter = (val) => `€ ${val}`;
 
-  chart.height = BAR_HEIGHT * eventTypes.length;
+  chart.height = BAR_HEIGHT * pointTypes.length;
 
-  return new Chart(chart, getChartConfig(eventTypes, data, ChartTitle.MONEY, formatter));
+  return new Chart(chart, getChartConfig(pointTypes, data, ChartTitle.MONEY, formatter));
 };
 
-const renderTransportChart = (chart, events) => {
+const renderTransportChart = (chart, points) => {
 
-  const eventTypes = getEventsType(events).filter((type) => type.indexOf() !== EVENT_TYPES_TRANSPORT.indexOf(type));
-  const data = eventTypes.map((type) => calculateTypeCount(events, type));
+  const pointTypes = getPointsType(points).filter((type) => type.indexOf() !== POINT_TYPES_TRANSPORT.indexOf(type));
+  const data = pointTypes.map((type) => calculateTypeCount(points, type));
   const formatter = (val) => `${val}x`;
 
-  chart.height = BAR_HEIGHT * eventTypes.length;
+  chart.height = BAR_HEIGHT * pointTypes.length;
 
-  return new Chart(chart, getChartConfig(eventTypes, data, ChartTitle.TRANSPORT, formatter));
+  return new Chart(chart, getChartConfig(pointTypes, data, ChartTitle.TRANSPORT, formatter));
 };
 
-const renderTimeSpendChart = (chart, events) => {
+const renderTimeSpendChart = (chart, points) => {
 
-  const eventTypes = getEventsType(events);
-  const data = eventTypes.map((type) => calculateTypeDuration(events, type));
+  const pointTypes = getPointsType(points);
+  const data = pointTypes.map((type) => calculateTypeDuration(points, type));
 
   const formatter = (val) => {
-    return eventDurationFormat(val);
+    return pointDurationFormat(val);
   };
 
-  chart.height = BAR_HEIGHT * eventTypes.length;
+  chart.height = BAR_HEIGHT * pointTypes.length;
 
-  return new Chart(chart, getChartConfig(eventTypes, data, ChartTitle.TIME_SPEND, formatter));
+  return new Chart(chart, getChartConfig(pointTypes, data, ChartTitle.TIME_SPEND, formatter));
 };
 
 const createStatsTemplate = () => {
@@ -140,10 +140,10 @@ const createStatsTemplate = () => {
 };
 
 export default class Stats extends AbstractSmartComponent {
-  constructor(events) {
+  constructor(points) {
     super();
 
-    this._events = events;
+    this._points = points;
     this._moneyChart = null;
     this._transportChart = null;
     this._timeSpendChart = null;
@@ -158,13 +158,13 @@ export default class Stats extends AbstractSmartComponent {
   show() {
     super.show();
 
-    this.rerender(this._events);
+    this.rerender(this._points);
   }
 
   recoveryListeners() {}
 
-  rerender(events) {
-    this._events = events;
+  rerender(points) {
+    this._points = points;
 
     this._renderCharts();
   }
@@ -172,7 +172,7 @@ export default class Stats extends AbstractSmartComponent {
   _renderCharts() {
     const element = this.getElement();
 
-    const events = this._events.getEvents();
+    const points = this._points.getPoints();
 
     const moneyCtx = element.querySelector(`.statistics__chart--money`);
     const transportCtx = element.querySelector(`.statistics__chart--transport`);
@@ -180,9 +180,9 @@ export default class Stats extends AbstractSmartComponent {
 
     this._resetCharts();
 
-    this._moneyChart = renderMoneyChart(moneyCtx, events);
-    this._transportChart = renderTransportChart(transportCtx, events);
-    this._timeSpendChart = renderTimeSpendChart(timeSpendCtx, events);
+    this._moneyChart = renderMoneyChart(moneyCtx, points);
+    this._transportChart = renderTransportChart(transportCtx, points);
+    this._timeSpendChart = renderTimeSpendChart(timeSpendCtx, points);
   }
 
   _resetCharts() {

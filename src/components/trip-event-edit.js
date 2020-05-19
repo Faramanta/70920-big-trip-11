@@ -1,28 +1,28 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {EVENT_TYPES_ACTIVITY, EVENT_TYPES_TRANSPORT} from "../const.js";
+import {POINT_TYPES_ACTIVITY, POINT_TYPES_TRANSPORT} from "../const.js";
 import {getTypeOffers} from "../mock/trip-event.js";
 import flatpickr from "flatpickr";
 import {encode} from "he";
 import "flatpickr/dist/flatpickr.min.css";
 
-const createEventTypesMarkup = (eventTypes, id) => {
-  return eventTypes
-    .map((eventType) => {
+const createPointTypesMarkup = (pointTypes, id) => {
+  return pointTypes
+    .map((pointType) => {
 
-      const eventTypeValue = eventType.toLowerCase();
+      const pointTypeValue = pointType.toLowerCase();
 
       return (
         `<div class="event__type-item">
           <input
-            id="event-type-${eventTypeValue}-${id}"
+            id="event-type-${pointTypeValue}-${id}"
             class="event__type-input  visually-hidden"
             type="radio"
             name="event-type"
-            value="${eventType}">
+            value="${pointType}">
           <label
-            class="event__type-label  event__type-label--${eventTypeValue}"
-            for="event-type-${eventTypeValue}-${id}">
-              ${eventType}
+            class="event__type-label  event__type-label--${pointTypeValue}"
+            for="event-type-${pointTypeValue}-${id}">
+              ${pointType}
           </label>
         </div>`
       );
@@ -42,11 +42,11 @@ const createCityMarkup = (cities) => {
 };
 
 // полученные офферы, сравниваем всеь список офферов типа с офферами точки маршрута, совпавшие - чекнутые
-const createOffersSelectorMarkup = (offersTypeAll, eventOffers, id) => {
+const createOffersSelectorMarkup = (offersTypeAll, pointOffers, id) => {
   return offersTypeAll
     .map((offerTypeAll) => {
 
-      const isOfferExist = eventOffers.some((offer) => offerTypeAll === offer);
+      const isOfferExist = pointOffers.some((offer) => offerTypeAll === offer);
 
       const isChecked = isOfferExist ? true : ``;
 
@@ -73,18 +73,18 @@ const createOffersSelectorMarkup = (offersTypeAll, eventOffers, id) => {
     .join(`\n`);
 };
 
-const createTripEventEditTemplate = (event, eventType, offers, cities) => {
-  const {id, eventCity: notSanitizedCity, price, isFavorite, destination, eventOffers} = event;
+const createTripPointEditTemplate = (point, pointType, offers, cities) => {
+  const {id, pointCity: notSanitizedCity, price, isFavorite, destination, pointOffers} = point;
 
-  const offersTypeAll = getTypeOffers(offers, eventType);
+  const offersTypeAll = getTypeOffers(offers, pointType);
 
-  const eventCity = encode(notSanitizedCity);
+  const pointCity = encode(notSanitizedCity);
 
-  const eventTypesTransferMarkup = createEventTypesMarkup(EVENT_TYPES_TRANSPORT.slice(), id);
-  const eventTypesActivityMarkup = createEventTypesMarkup(EVENT_TYPES_ACTIVITY.slice(), id);
-  const eventCityMarkup = createCityMarkup(cities);
+  const pointTypesTransferMarkup = createPointTypesMarkup(POINT_TYPES_TRANSPORT.slice(), id);
+  const pointTypesActivityMarkup = createPointTypesMarkup(POINT_TYPES_ACTIVITY.slice(), id);
+  const pointCityMarkup = createCityMarkup(cities);
   const isOffersShowing = offersTypeAll.length > 0; // есть лиs offers
-  const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersTypeAll, eventOffers, id) : ``;
+  const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersTypeAll, pointOffers, id) : ``;
 
   return (
     `<li class="trip-events__item">
@@ -93,7 +93,7 @@ const createTripEventEditTemplate = (event, eventType, offers, cities) => {
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-${id}">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${eventType}.png" alt="Event type icon">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${pointType}.png" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${id}" type="checkbox">
   
@@ -101,14 +101,14 @@ const createTripEventEditTemplate = (event, eventType, offers, cities) => {
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Transfer</legend>
                 
-                ${eventTypesTransferMarkup}
+                ${pointTypesTransferMarkup}
                 
               </fieldset>
   
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Activity</legend>
                 
-                ${eventTypesActivityMarkup}
+                ${pointTypesActivityMarkup}
                 
               </fieldset>
             </div>
@@ -116,11 +116,11 @@ const createTripEventEditTemplate = (event, eventType, offers, cities) => {
   
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-${id}">
-              ${eventType} to
+              ${pointType} to
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${eventCity}" list="destination-list-${id}">
+            <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${pointCity}" list="destination-list-${id}">
             <datalist id="destination-list-${id}">
-              ${eventCityMarkup}
+              ${pointCityMarkup}
             </datalist>
           </div>
   
@@ -193,29 +193,29 @@ const createTripEventEditTemplate = (event, eventType, offers, cities) => {
   );
 };
 
-const parseFormData = (formData, eventType, startTimestamp, endTimestamp) => {
-  const eventCity = encode(formData.get(`event-destination`));
+const parseFormData = (formData, pointType, startTimestamp, endTimestamp) => {
+  const pointCity = encode(formData.get(`event-destination`));
   const price = formData.get(`event-price`);
-  let eventOffers = [];
+  let pointOffers = [];
 
   return {
-    eventType,
+    pointType,
     startTimestamp,
     endTimestamp,
     price,
-    eventCity,
-    eventOffers,
+    pointCity,
+    pointOffers,
   };
 };
 
-export default class EventEdit extends AbstractSmartComponent {
-  constructor(event, offers, cities) {
+export default class PointEdit extends AbstractSmartComponent {
+  constructor(point, offers, cities) {
     super();
-    this._event = event;
+    this._point = point;
     this._offers = offers;
     this._cities = cities;
 
-    this._eventType = this._event.eventType;
+    this._pointType = this._point.pointType;
 
     this._isFormDirty = false;
 
@@ -236,11 +236,11 @@ export default class EventEdit extends AbstractSmartComponent {
   }
 
   getData() {
-    return parseFormData(new FormData(this._form), this._eventType, this._startFlatpickr.selectedDates[0].valueOf(), this._endFlatpickr.selectedDates[0].valueOf());
+    return parseFormData(new FormData(this._form), this._pointType, this._startFlatpickr.selectedDates[0].valueOf(), this._endFlatpickr.selectedDates[0].valueOf());
   }
 
   getTemplate() {
-    return createTripEventEditTemplate(this._event, this._eventType, this._offers, this._cities);
+    return createTripPointEditTemplate(this._point, this._pointType, this._offers, this._cities);
   }
 
   removeElement() {
@@ -264,7 +264,7 @@ export default class EventEdit extends AbstractSmartComponent {
   }
 
   reset() {
-    this._eventType = this._event.eventType;
+    this._pointType = this._point.pointType;
 
     this.rerender();
   }
@@ -276,12 +276,12 @@ export default class EventEdit extends AbstractSmartComponent {
   _applyFlatpickr() {
     this._destroyFlatpickr();
 
-    const eventStart = this.getElement().querySelector(`#event-start-time-1`);
-    const eventEnd = this.getElement().querySelector(`#event-end-time-1`);
+    const pointStart = this.getElement().querySelector(`#event-start-time-1`);
+    const pointEnd = this.getElement().querySelector(`#event-end-time-1`);
 
-    this._startFlatpickr = this._createFlatpickr(eventStart, this._event.startTimestamp);
+    this._startFlatpickr = this._createFlatpickr(pointStart, this._point.startTimestamp);
 
-    this._endFlatpickr = this._createFlatpickr(eventEnd, this._event.endTimestamp);
+    this._endFlatpickr = this._createFlatpickr(pointEnd, this._point.endTimestamp);
   }
 
   _createFlatpickr(inputField, date) {
@@ -311,7 +311,7 @@ export default class EventEdit extends AbstractSmartComponent {
     if (selectTypesList) {
       selectTypesList.addEventListener(`change`, (evt) => {
 
-        this._eventType = evt.target.value;
+        this._pointType = evt.target.value;
 
         this.rerender();
       });
