@@ -70,6 +70,7 @@ export const getGroupedPoints = (points) => {
     const startTimestampDay = startDay.getTime();
     const endTimestampDay = endDay.getTime();
 
+
     if (!pointsGroups.has(startTimestampDay)) {
       const dayPoints = points.filter((point1) => {
 

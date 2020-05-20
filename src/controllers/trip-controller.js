@@ -3,7 +3,7 @@ import DaysComponent from "../components/trip-day-list.js";
 import DayComponent from "../components/trip-day-item.js";
 import PointsComponent from "../components/trip-event-list.js";
 import NoPointsComponent from "../components/no-events.js";
-import PointController from "../controllers/point.js";
+import PointController from "./point-controller.js";
 import {render, RenderPosition} from "../utils/render.js";
 import {getPreparedPoints, getSortedPoints} from "../utils/common.js";
 import {SortType, HIDDEN_CLASS} from "../const.js";
@@ -46,9 +46,10 @@ const renderDays = (place, pointsGroups, offers, cities, onDataChange, onViewCha
 };
 
 export default class TripController {
-  constructor(container, pointsModel) {
+  constructor(container, pointsModel, api) {
     this._container = container;
     this._pointsModel = pointsModel;
+    this._api = api;
     this._sortType = SortType.DEFAULT;
     this._createController = null;
 
@@ -79,6 +80,7 @@ export default class TripController {
     const points = this._pointsModel.getPoints();
     this._offers = offers;
     this._cities = cities;
+
 
     if (points.size === 0) {
       render(this._container, this._noPointsComponent, RenderPosition.BEFOREEND); // отрисовка сообщения оо отсутствии точек
@@ -137,15 +139,19 @@ export default class TripController {
 
     } else if (newData === null) {
       const isSuccess = this._pointsModel.removePoint(oldData.id);
+
       if (isSuccess) {
         pointController.destroy();
       }
     } else {
-      const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+      this._api.updatePoint(oldData.id, newData)
+        .then((pointModel) => {
+          const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
 
-      if (isSuccess) {
-        this.renderContent();
-      }
+          if (isSuccess) {
+            this.renderContent();
+          }
+        });
     }
   }
 

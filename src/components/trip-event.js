@@ -19,8 +19,8 @@ const createOffersMarkup = (offers) => {
 };
 
 const createTripPointTemplate = (point) => {
-
   const {pointType, pointCity, startTimestamp, endTimestamp, price, pointOffers} = point;
+
   const pointStart = pointTime(startTimestamp); // время старта
   const pointEnd = pointTime(endTimestamp); // время финиша
   const pointISOStart = pointISOTime(startTimestamp);
@@ -68,15 +68,14 @@ ${isOffersShowing ?
 };
 
 export default class Point extends AbstractComponent {
-  constructor(point, offersChecked) {
+  constructor(point) {
     super();
-
+    
     this._point = point;
-    this._offersChecked = offersChecked;
   }
 
   getTemplate() {
-    return createTripPointTemplate(this._point, this._offersChecked);
+    return createTripPointTemplate(this._point);
   }
 
   setEditButtonClickHandler(handler) {

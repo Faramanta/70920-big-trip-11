@@ -1,5 +1,6 @@
-import TripController from "./controllers/trip.js";
-import FilterController from "./controllers/filter.js";
+import API from "./api.js";
+import TripController from "./controllers/trip-controller.js";
+import FilterController from "./controllers/filter-controller.js";
 import TripInfoComponent from "./components/trip-information.js";
 import RouteComponent from "./components/route-information.js";
 import CostComponent from "./components/cost-information.js";
@@ -7,12 +8,14 @@ import MenuComponent from "./components/menu.js";
 import StatsComponent from "./components/stats.js";
 import PointModel from "./models/points.js";
 import {render, RenderPosition} from "./utils/render.js";
-import {generateTripPoints, DefaultOffers} from "./mock/trip-event.js";
-import {POINT_COUNT, CITIES, MenuItem} from "./const.js";
+import {DefaultOffers} from "./mock/trip-event.js";
+import {CITIES, MenuItem} from "./const.js";
 
-const points = generateTripPoints(POINT_COUNT);
+const AUTHORIZATION = `Basic eo0w590ik29889b`;
+
+const api = new API(AUTHORIZATION);
+
 const pointsModel = new PointModel();
-pointsModel.setPoints(points);
 
 const siteMainElement = document.querySelector(`.page-body`);
 const siteHeaderElement = siteMainElement.querySelector(`.page-header`);
@@ -35,13 +38,13 @@ filterController.render();
 
 const sitePointContainerElement = siteContentElement.querySelector(`.trip-events`);
 
-const tripController = new TripController(sitePointContainerElement, pointsModel);
+const tripController = new TripController(sitePointContainerElement, pointsModel, api);
 
-if (points.size !== 0) {
+if (pointsModel.size !== 0) {
   render(tripInfo.getElement(), new RouteComponent(), RenderPosition.AFTERBEGIN); // отрисовка информации о маршруте
 }
 
-tripController.render(DefaultOffers, CITIES);
+// tripController.render(DefaultOffers, CITIES);
 
 const statisticComponent = new StatsComponent(pointsModel);
 
@@ -61,3 +64,9 @@ siteMenu.setOnChange((menuItem) => {
       break;
   }
 });
+
+api.getPoints()
+  .then((points) => {
+    pointsModel.setPoints(points);
+    tripController.render(DefaultOffers, CITIES);
+  });
