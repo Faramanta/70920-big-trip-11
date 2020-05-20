@@ -1,5 +1,6 @@
 import PointComponent from "../components/trip-event.js";
 import PointEditComponent from "../components/trip-event-edit.js";
+import PointModel from "../models/point.js";
 import {render, remove, replace, RenderPosition} from "../utils/render.js";
 import {KeyCode, Mode, PointType} from "../const.js";
 
@@ -14,6 +15,28 @@ const EMPTY_POINT = {
   price: 0,
   startTimestamp: new Date().getTime(),
   timestamp: new Date().getTime()
+};
+
+const parseFormData = (formData, point, pointType) => {
+  const pointCity = formData.get(`event-destination`);
+  const price = formData.get(`event-price`);
+  const startTimestamp = formData.get(`event-start-time`);
+  const endTimestamp = formData.get(`event-end-time`);
+  const isFavorite = formData.get(`event-favorite`);
+  const destination = 0;
+
+  return new PointModel({
+    "base_price": price,
+    "type": pointType,
+    "date_from": startTimestamp,
+    "date_to": endTimestamp,
+    "destination": {
+      name: pointCity,
+      description: destination.description,
+      picture: destination
+    },
+    "is_favorite": isFavorite,
+  });
 };
 
 export default class PointController {
@@ -31,15 +54,13 @@ export default class PointController {
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
-  render(point, offers, cities, mode) {
-
+  render(point, offers, destinations, mode) {
     this._mode = mode;
 
     if (this._mode === Mode.ADDING) {
-      this._renderAddMode(EMPTY_POINT, offers, cities);
-      return;
+      this._renderAddMode(EMPTY_POINT, offers, destinations);
     } else {
-      this._renderDefaultOrEditMode(point, offers, cities);
+      this._renderDefaultOrEditMode(point, offers, destinations);
     }
   }
 
@@ -71,15 +92,17 @@ export default class PointController {
     });
 
     this._pointEditComponent.setFavoritesButtonClickHandler(() => {
-      this._onFavoriteChange(this, point, Object.assign({}, point, {
-        isFavorite: !point.isFavorite,
-      }));
+      const newPoint = PointModel.clone(point);
+      newPoint.isFavorite = !newPoint.isFavorite;
+      this._onFavoriteChange(this, point, newPoint);
     });
 
     this._pointEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
       if (this._pointEditComponent.isFormValid) {
-        const data = this._pointEditComponent.getData();
+        const formData = this._pointEditComponent.getData();
+        const data = parseFormData(formData);
+
         this._onDataChange(this, point, data);
       }
     });

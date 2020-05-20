@@ -1,4 +1,5 @@
 import {PointType, POINT_TYPES, CITIES} from "../const.js";
+import {getTypeOffers} from "../utils/common.js";
 
 export const DefaultOffers = [{
   type: PointType.FLIGHT,
@@ -52,11 +53,6 @@ const getRandomArrayItem = (array) => {
 // случайное число из диапазона
 const getRandomIntegerNumber = (min, max) => {
   return min + Math.floor(Math.random() * (max - min));
-};
-
-// выбрать все офферы одного типа
-export const getTypeOffers = (offers, typeName) => {
-  return offers.filter((offer) => offer.type === typeName);
 };
 
 // получение списка рандомных offers в количестве от 1 до длины массива

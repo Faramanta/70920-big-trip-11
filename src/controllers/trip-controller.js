@@ -10,7 +10,7 @@ import {SortType, HIDDEN_CLASS} from "../const.js";
 
 import {Mode} from "../const.js";
 
-const renderDay = (siteTripDayListElement, points, offers, cities, onDataChange, onViewChange, onFavoriteChange, index = null, timestamp = null) => { // один день маршрута
+const renderDay = (siteTripDayListElement, points, offers, destinations, onDataChange, onViewChange, onFavoriteChange, index = null, timestamp = null) => { // один день маршрута
 
   const siteTripDayElement = new DayComponent(timestamp, index);
 
@@ -24,20 +24,20 @@ const renderDay = (siteTripDayListElement, points, offers, cities, onDataChange,
 
     const pointController = new PointController(siteTripPointListElement.getElement(), onDataChange, onViewChange, onFavoriteChange);
 
-    pointController.render(point, offers, cities, Mode.DEFAULT);
+    pointController.render(point, offers, destinations, Mode.DEFAULT);
 
     return pointController;
 
   });
 };
 
-const renderDays = (place, pointsGroups, offers, cities, onDataChange, onViewChange, onFavoriteChange) => {
+const renderDays = (place, pointsGroups, offers, destinations, onDataChange, onViewChange, onFavoriteChange) => {
 
   const controllers = [];
 
   Array.from(pointsGroups.entries()).forEach((pointsGroup, index) => {
     const [timestamp, points] = pointsGroup;
-    const pointControllers = renderDay(place, points, offers, cities, onDataChange, onViewChange, onFavoriteChange, index, timestamp);
+    const pointControllers = renderDay(place, points, offers, destinations, onDataChange, onViewChange, onFavoriteChange, index, timestamp);
 
     controllers.push(...pointControllers);
   });
@@ -50,6 +50,7 @@ export default class TripController {
     this._container = container;
     this._pointsModel = pointsModel;
     this._api = api;
+
     this._sortType = SortType.DEFAULT;
     this._createController = null;
 
@@ -76,10 +77,10 @@ export default class TripController {
     this.addNewPointBtnClickHandler();
   }
 
-  render(offers, cities) {
+  render(offers, destinations) {
     const points = this._pointsModel.getPoints();
     this._offers = offers;
-    this._cities = cities;
+    this._destinations = destinations;
 
 
     if (points.size === 0) {
@@ -110,7 +111,7 @@ export default class TripController {
     const place = document.querySelector(`.trip-days`);
 
     this._createController = new PointController(place, this._onDataChange, this._onViewChange, this._onFavoriteChange, this._onCloseCreateForm);
-    this._createController.render(null, this._offers, this._cities, Mode.ADDING);
+    this._createController.render(null, this._offers, this._destinations, Mode.ADDING);
   }
 
   _onViewChange() {
@@ -126,7 +127,7 @@ export default class TripController {
     const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
 
     if (isSuccess) {
-      pointController.render(newData, this._offers, this._cities, Mode.EDIT);
+      pointController.render(newData, this._offers, this._destinations, Mode.EDIT);
     }
   }
 
@@ -199,13 +200,13 @@ export default class TripController {
     this._destroy();
     if (this._sortType === SortType.DEFAULT) {
       const groupedPoints = getPreparedPoints(this._pointsModel.getPoints(), this._sortType);
-      this._pointControllers = renderDays(this._daysComponent, groupedPoints, this._offers, this._cities, this._onDataChange, this._onViewChange, this._onFavoriteChange);
+      this._pointControllers = renderDays(this._daysComponent, groupedPoints, this._offers, this._destinations, this._onDataChange, this._onViewChange, this._onFavoriteChange);
 
       return;
     }
 
     const sortedPoints = getSortedPoints(this._pointsModel.getPoints(), this._sortType);
-    this._pointControllers = renderDay(this._daysComponent, sortedPoints, this._offers, this._cities, this._onDataChange, this._onViewChange, this._onFavoriteChange);
+    this._pointControllers = renderDay(this._daysComponent, sortedPoints, this._offers, this._destinations, this._onDataChange, this._onViewChange, this._onFavoriteChange);
   }
 
   addNewPointBtnClickHandler() {

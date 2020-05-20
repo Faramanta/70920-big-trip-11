@@ -1,6 +1,6 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {POINT_TYPES_ACTIVITY, POINT_TYPES_TRANSPORT} from "../const.js";
-import {getTypeOffers} from "../mock/trip-event.js";
+import {capitalizeFirstLetter, getTypeOffers} from "../utils/common.js";
 import flatpickr from "flatpickr";
 import {encode} from "he";
 import "flatpickr/dist/flatpickr.min.css";
@@ -31,22 +31,49 @@ const createPointTypesMarkup = (pointTypes, id) => {
 };
 
 // список городов в форме редактирования
-const createCityMarkup = (cities) => {
-  return cities
-    .map((city) => {
+const createCityMarkup = (destinations) => {
+  return destinations
+    .map((destination) => {
       return (
-        `<option value="${city}"></option>`
+        `<option value="${destination.name}"></option>`
       );
     })
     .join(`\n`);
 };
 
-// полученные офферы, сравниваем всеь список офферов типа с офферами точки маршрута, совпавшие - чекнутые
-const createOffersSelectorMarkup = (offersTypeAll, pointOffers, id) => {
-  return offersTypeAll
-    .map((offerTypeAll) => {
+// список фото в форме редактирования
+const createPhotosMarkup = (photos) => {
+  return photos
+    .map((photo) => {
+      return (
+        `<img class="event__photo" src="${photo.src}" alt="Event photo">`
+      );
+    })
+    .join(`\n`);
+};
 
-      const isOfferExist = pointOffers.some((offer) => offerTypeAll === offer);
+// destinations в форме редактирования
+const createDestinationMarkup = (pointDestination) => {
+  return (
+    `<section class="event__section  event__section--destination">
+    <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+    <p class="event__destination-description">${pointDestination.description ? pointDestination.description : ``}</p>
+
+    <div class="event__photos-container">
+      <div class="event__photos-tape">
+        ${createPhotosMarkup(pointDestination.pictures)}
+      </div>
+    </div>
+  </section>`
+  );
+};
+
+// полученные офферы, сравниваем всеь список офферов типа с офферами точки маршрута, совпавшие - чекнутые
+const createOffersSelectorMarkup = (offersTypeAllOnly, pointOffers, id) => {
+  return offersTypeAllOnly
+    .map((offerTypeAllOnly) => {
+
+      const isOfferExist = pointOffers.some((pointOffer) => (offerTypeAllOnly.title === pointOffer.title) || (offerTypeAllOnly.price === pointOffer.price));
 
       const isChecked = isOfferExist ? true : ``;
 
@@ -54,18 +81,18 @@ const createOffersSelectorMarkup = (offersTypeAll, pointOffers, id) => {
         `<div class="event__offer-selector">
           <input 
             class="event__offer-checkbox  visually-hidden" 
-            id="event-offer-${offerTypeAll.title}-${offerTypeAll.price}-${id}" 
+            id="event-offer-${offerTypeAllOnly.title}-${offerTypeAllOnly.price}-${id}" 
             type="checkbox" 
-            name="event-offer-${offerTypeAll.type}"
+            name="event-offer-${offerTypeAllOnly}"
             ${isChecked ? `checked` : ``} 
             />
           <label 
             class="event__offer-label" 
-            for="event-offer-${offerTypeAll.title}-${offerTypeAll.price}-${id}"
+            for="event-offer-${offerTypeAllOnly.title}-${offerTypeAllOnly.price}-${id}"
           >
-            <span class="event__offer-title">${offerTypeAll.title}</span>
+            <span class="event__offer-title">${offerTypeAllOnly.title}</span>
             &plus;
-            &euro;&nbsp;<span class="event__offer-price">${offerTypeAll.price}</span>
+            &euro;&nbsp;<span class="event__offer-price">${offerTypeAllOnly.price}</span>
           </label>
         </div>`
       );
@@ -73,18 +100,22 @@ const createOffersSelectorMarkup = (offersTypeAll, pointOffers, id) => {
     .join(`\n`);
 };
 
-const createTripPointEditTemplate = (point, pointType, offers, cities) => {
-  const {id, pointCity: notSanitizedCity, price, isFavorite, destination, pointOffers} = point;
+const createTripPointEditTemplate = (point, pointType, offers, destinations) => {
+  const {id, pointCity: notSanitizedCity, pointDestination, price, isFavorite, pointOffers} = point;
 
   const offersTypeAll = getTypeOffers(offers, pointType);
+  const offersTypeAllOnly = [];
+  offersTypeAll.map((offerTypeAll) => offersTypeAllOnly.push(...offerTypeAll.offers));
 
   const pointCity = encode(notSanitizedCity);
+  const pointTypeName = capitalizeFirstLetter(pointType);
 
   const pointTypesTransferMarkup = createPointTypesMarkup(POINT_TYPES_TRANSPORT.slice(), id);
   const pointTypesActivityMarkup = createPointTypesMarkup(POINT_TYPES_ACTIVITY.slice(), id);
-  const pointCityMarkup = createCityMarkup(cities);
+  const pointCityMarkup = createCityMarkup(destinations);
   const isOffersShowing = offersTypeAll.length > 0; // есть лиs offers
-  const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersTypeAll, pointOffers, id) : ``;
+  const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersTypeAllOnly, pointOffers, id) : ``;
+  const destinationMarkup = pointDestination ? createDestinationMarkup(pointDestination) : ``;
 
   return (
     `<li class="trip-events__item">
@@ -116,7 +147,7 @@ const createTripPointEditTemplate = (point, pointType, offers, cities) => {
   
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-${id}">
-              ${pointType} to
+              ${pointTypeName} to
             </label>
             <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${pointCity}" list="destination-list-${id}">
             <datalist id="destination-list-${id}">
@@ -159,61 +190,33 @@ const createTripPointEditTemplate = (point, pointType, offers, cities) => {
             <span class="visually-hidden">Open event</span>
           </button>
         </header>
-  ${isOffersShowing || destination ?
+  ${isOffersShowing || pointDestination ?
       `<section class="event__details">` : ``}
-         ${isOffersShowing ?
+        ${isOffersShowing ?
       `<section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-  
-        <div class="event__available-offers">
-            
-          ${offersSelectorMarkup}
-             
-        </div>
-      </section>` : ``}
-          
-        ${destination ?
-      `<section class="event__section  event__section--destination">
-        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-        <p class="event__destination-description">Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.</p>
 
-        <div class="event__photos-container">
-          <div class="event__photos-tape">
-            <img class="event__photo" src="img/photos/1.jpg" alt="Event photo">
-            <img class="event__photo" src="img/photos/2.jpg" alt="Event photo">
-            <img class="event__photo" src="img/photos/3.jpg" alt="Event photo">
-            <img class="event__photo" src="img/photos/4.jpg" alt="Event photo">
-            <img class="event__photo" src="img/photos/5.jpg" alt="Event photo">
-          </div>
-        </div>
-      </section>` : ``}
-        ${isOffersShowing && destination ? `</section>` : ``}
-      </form>
-    </li>`
+        <div class="event__available-offers">
+          
+          ${offersSelectorMarkup}
+           
+      </div>
+    </section>` : ``}
+    
+    ${pointDestination ?
+      `${destinationMarkup}` : ``}
+     ${isOffersShowing && pointDestination ? `</section>` : ``}
+    </form>
+  </li>`
   );
 };
 
-const parseFormData = (formData, pointType, startTimestamp, endTimestamp) => {
-  const pointCity = encode(formData.get(`event-destination`));
-  const price = formData.get(`event-price`);
-  let pointOffers = [];
-
-  return {
-    pointType,
-    startTimestamp,
-    endTimestamp,
-    price,
-    pointCity,
-    pointOffers,
-  };
-};
-
 export default class PointEdit extends AbstractSmartComponent {
-  constructor(point, offers, cities) {
+  constructor(point, offers, destination) {
     super();
     this._point = point;
     this._offers = offers;
-    this._cities = cities;
+    this._destination = destination;
 
     this._pointType = this._point.pointType;
 
@@ -236,11 +239,12 @@ export default class PointEdit extends AbstractSmartComponent {
   }
 
   getData() {
-    return parseFormData(new FormData(this._form), this._pointType, this._startFlatpickr.selectedDates[0].valueOf(), this._endFlatpickr.selectedDates[0].valueOf());
+    return new FormData(this._form);
   }
 
+
   getTemplate() {
-    return createTripPointEditTemplate(this._point, this._pointType, this._offers, this._cities);
+    return createTripPointEditTemplate(this._point, this._pointType, this._offers, this._destination);
   }
 
   removeElement() {
@@ -311,7 +315,7 @@ export default class PointEdit extends AbstractSmartComponent {
     if (selectTypesList) {
       selectTypesList.addEventListener(`change`, (evt) => {
 
-        this._pointType = evt.target.value;
+        this._pointType = evt.target.value.toLowerCase();
 
         this.rerender();
       });
@@ -341,7 +345,10 @@ export default class PointEdit extends AbstractSmartComponent {
       inputText = `${inputText.charAt(0).toUpperCase()}${inputText.slice(1)}`;
     }
 
-    const city = this._cities.includes(inputText);
+    const cities = [];
+    this._destination.map((item) => cities.push(item.name));
+
+    const city = cities.includes(inputText);
 
     if (city) {
       this._inputDestination.value = inputText;
@@ -356,6 +363,7 @@ export default class PointEdit extends AbstractSmartComponent {
   setSubmitHandler(handler) {
     if (!this._submitHandler) {
       this._submitHandler = (evt) => {
+        evt.preventDefault();
         this._isFormDirty = true;
         this._validateForm();
         handler(evt);
@@ -381,6 +389,5 @@ export default class PointEdit extends AbstractSmartComponent {
     if (!this._favoriteButtonClickHandler) {
       this._favoriteButtonClickHandler = handler;
     }
-
   }
 }

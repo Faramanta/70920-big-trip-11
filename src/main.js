@@ -8,12 +8,11 @@ import MenuComponent from "./components/menu.js";
 import StatsComponent from "./components/stats.js";
 import PointModel from "./models/points.js";
 import {render, RenderPosition} from "./utils/render.js";
-import {DefaultOffers} from "./mock/trip-event.js";
-import {CITIES, MenuItem} from "./const.js";
+import {MenuItem, END_POINT} from "./const.js";
 
 const AUTHORIZATION = `Basic eo0w590ik29889b`;
 
-const api = new API(AUTHORIZATION);
+const api = new API(END_POINT, AUTHORIZATION);
 
 const pointsModel = new PointModel();
 
@@ -65,8 +64,10 @@ siteMenu.setOnChange((menuItem) => {
   }
 });
 
-api.getPoints()
-  .then((points) => {
+Promise.all([api.getPoints(), api.getOffers(), api.getDestinations()])
+  .then(([points, offers, destinations]) => {
     pointsModel.setPoints(points);
-    tripController.render(DefaultOffers, CITIES);
+    pointsModel.setOffers(offers);
+    pointsModel.setDestinations(destinations);
+    tripController.render(offers, destinations);
   });

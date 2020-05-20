@@ -108,16 +108,16 @@ export const ChartTitle = {
 };
 
 export const typeIcons = {
-  'Taxi': `🚕`,
-  'Bus': `🚌`,
-  'Train': `🚂`,
-  'Ship': `🛳`,
-  'Transport': `🚊`,
-  'Drive': `🚗`,
-  'Flight': `✈️`,
-  'Check-in': `🏨`,
-  'Sightseeing': `🏛️`,
-  'Restaurant': `🍴`
+  'taxi': `🚕`,
+  'bus': `🚌`,
+  'train': `🚂`,
+  'ship': `🛳`,
+  'transport': `🚊`,
+  'drive': `🚗`,
+  'flight': `✈️`,
+  'check-in': `🏨`,
+  'sightseeing': `🏛️`,
+  'restaurant': `🍴`
 };
 
 export const chartOptions = {
@@ -138,3 +138,12 @@ export const chartOptions = {
   'barThickness': 44,
   'minBarLength': 50,
 };
+
+export const Method = {
+  GET: `GET`,
+  POST: `POST`,
+  PUT: `PUT`,
+  DELETE: `DELETE`
+};
+
+export const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;

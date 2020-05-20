@@ -23,6 +23,14 @@ export default class Points {
     this._callHandlers(this._dataChangeHandlers);
   }
 
+  setDestinations(destinations) {
+    this._destinations = destinations;
+  }
+
+  setOffers(offers) {
+    this._offers = offers;
+  }
+
   setFilter(filterType) {
     this._activeFilterType = filterType;
     this._callHandlers(this._filterChangeHandlers);

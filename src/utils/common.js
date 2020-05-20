@@ -111,3 +111,15 @@ export const calculateTypeDuration = (points, type) => {
   const chartDurationPointsTimestamp = chartDurationPoints.reduce((accumulator, item) => accumulator + getPointDuration(item.startTimestamp, item.endTimestamp), 0);
   return moment.duration(chartDurationPointsTimestamp).asMilliseconds();
 };
+
+export const capitalizeFirstLetter = (str) => {
+  if (str.length === 0) {
+    return ``;
+  }
+  return `${str[0].toUpperCase()}${str.slice(1)}`;
+};
+
+// выбрать все офферы одного типа
+export const getTypeOffers = (offers, typeName) => {
+  return offers.filter((offer) => offer.type === typeName);
+};

@@ -5,9 +5,21 @@ export default class Point {
     this.pointType = data[`type`];
     this.startTimestamp = new Date(data[`date_from`]).getTime();
     this.endTimestamp = new Date(data[`date_to`]).getTime();
-    this.destination = data[`destination`];
+    this.pointCity = data[`destination`][`name`];
+    this.pointDestination = data[`destination`];
     this.isFavorite = Boolean(data[`is_favorite`]);
     this.pointOffers = data[`offers`] || {};
+  }
+
+  toRAW() {
+    return {
+      "base_price": this.price,
+      "type": this.pointType,
+      "date_from": this.startTimestamp,
+      "date_to": this.endTimestamp,
+      "destination": {},
+      "is_favorite": this.isFavorite,
+    };
   }
 
   static parsePoint(data) {
@@ -16,5 +28,9 @@ export default class Point {
 
   static parsePoints(data) {
     return data.map(Point.parsePoint);
+  }
+
+  static clone(data) {
+    return new Point(data.toRAW());
   }
 }

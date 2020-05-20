@@ -1,6 +1,5 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {POINT_TYPES_TRANSPORT,
-  typeIcons,
+import {typeIcons,
   ChartTitle,
   chartOptions} from "../const.js";
 import {getPointsType,
@@ -52,7 +51,7 @@ const getChartConfig = (types, data, title, formatter) => {
             padding: chartOptions.ticksPadding,
             fontSize: chartOptions.ticksFontSize,
             callback: (type) => {
-              return `${typeIcons[type]} ${type}`;
+              return `${typeIcons[type]} ${type.toUpperCase()}`;
             },
           },
           gridLines: {
@@ -96,7 +95,7 @@ const renderMoneyChart = (chart, points) => {
 
 const renderTransportChart = (chart, points) => {
 
-  const pointTypes = getPointsType(points).filter((type) => type.indexOf() !== POINT_TYPES_TRANSPORT.indexOf(type));
+  const pointTypes = getPointsType(points).filter((type) => (type !== `restaurant` || type !== `sightseeing` || type !== `check-in`));
   const data = pointTypes.map((type) => calculateTypeCount(points, type));
   const formatter = (val) => `${val}x`;
 
