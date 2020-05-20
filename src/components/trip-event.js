@@ -70,7 +70,7 @@ ${isOffersShowing ?
 export default class Point extends AbstractComponent {
   constructor(point) {
     super();
-    
+
     this._point = point;
   }
 
