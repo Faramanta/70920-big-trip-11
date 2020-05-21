@@ -123,3 +123,18 @@ export const capitalizeFirstLetter = (str) => {
 export const getTypeOffers = (offers, typeName) => {
   return offers.filter((offer) => offer.type === typeName);
 };
+
+// выбрать destinations по городу
+export const getDestination = (destinations, pointCity) => {
+  // const pointDestination = destinations.find((destination) => destination.name === pointCity);
+  // return Array.from(pointDestination);
+  // return Object.assign({}, destinations, {
+  return destinations.find((destination) => destination.name === pointCity);
+};
+
+export const formatDateToRAW = (date) => {
+  return moment(date).toJSON();
+};
+export const formatDateToDefault = (date) => {
+  return moment(date).unix();
+};

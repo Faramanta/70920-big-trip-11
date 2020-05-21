@@ -1,21 +1,24 @@
+import {formatDateToRAW} from "../utils/common.js";
+
 export default class Point {
   constructor(data) {
     this.id = data[`id`];
     this.price = data[`base_price`];
     this.pointType = data[`type`];
-    this.startTimestamp = new Date(data[`date_from`]).getTime();
-    this.endTimestamp = new Date(data[`date_to`]).getTime();
     this.pointCity = data[`destination`][`name`];
-    this.pointDestination = data[`destination`];
+    this.startTimestamp = new Date(data[`date_from`]);
+    this.endTimestamp = new Date(data[`date_to`]);
     this.isFavorite = Boolean(data[`is_favorite`]);
+    this.pointDestination = data[`destination`];
     this.pointOffers = data[`offers`] || {};
   }
 
   toRAW() {
     return {
+      "id": this.id,
       "base_price": this.price,
       "type": this.pointType,
-      "date_from": this.startTimestamp,
+      "date_from": formatDateToRAW(this.startTimestamp),
       "date_to": this.endTimestamp,
       "destination": {},
       "is_favorite": this.isFavorite,

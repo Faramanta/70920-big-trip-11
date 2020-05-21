@@ -104,6 +104,7 @@ export default class TripController {
   }
 
   createNewPoint() {
+
     if (this._createController) {
       return;
     }
@@ -132,6 +133,7 @@ export default class TripController {
   }
 
   _onDataChange(pointController, oldData, newData) {
+
     if (oldData.id === -1) {
 
       this._pointsModel.addPoint(newData);

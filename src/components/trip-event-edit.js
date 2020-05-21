@@ -1,11 +1,12 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {POINT_TYPES_ACTIVITY, POINT_TYPES_TRANSPORT} from "../const.js";
-import {capitalizeFirstLetter, getTypeOffers} from "../utils/common.js";
+import {capitalizeFirstLetter, getTypeOffers, getDestination, pointTime} from "../utils/common.js";
 import flatpickr from "flatpickr";
-import {encode} from "he";
+// import {encode} from "he";
 import "flatpickr/dist/flatpickr.min.css";
 
-const createPointTypesMarkup = (pointTypes, id) => {
+const createPointTypesMarkup = (pointTypes, id, type) => {
+
   return pointTypes
     .map((pointType) => {
 
@@ -18,7 +19,9 @@ const createPointTypesMarkup = (pointTypes, id) => {
             class="event__type-input  visually-hidden"
             type="radio"
             name="event-type"
-            value="${pointType}">
+            value="${pointTypeValue}"
+            ${(type === pointTypeValue) ? `checked` : ``}
+            >
           <label
             class="event__type-label  event__type-label--${pointTypeValue}"
             for="event-type-${pointTypeValue}-${id}">
@@ -70,10 +73,11 @@ const createDestinationMarkup = (pointDestination) => {
 
 // полученные офферы, сравниваем всеь список офферов типа с офферами точки маршрута, совпавшие - чекнутые
 const createOffersSelectorMarkup = (offersTypeAllOnly, pointOffers, id) => {
+
   return offersTypeAllOnly
     .map((offerTypeAllOnly) => {
 
-      const isOfferExist = pointOffers.some((pointOffer) => (offerTypeAllOnly.title === pointOffer.title) || (offerTypeAllOnly.price === pointOffer.price));
+      const isOfferExist = pointOffers.some((offer) => (offerTypeAllOnly.title === offer.title) || (offerTypeAllOnly.price === offer.price));
 
       const isChecked = isOfferExist ? true : ``;
 
@@ -83,7 +87,7 @@ const createOffersSelectorMarkup = (offersTypeAllOnly, pointOffers, id) => {
             class="event__offer-checkbox  visually-hidden" 
             id="event-offer-${offerTypeAllOnly.title}-${offerTypeAllOnly.price}-${id}" 
             type="checkbox" 
-            name="event-offer-${offerTypeAllOnly}"
+            name="event-offer"
             ${isChecked ? `checked` : ``} 
             />
           <label 
@@ -100,18 +104,18 @@ const createOffersSelectorMarkup = (offersTypeAllOnly, pointOffers, id) => {
     .join(`\n`);
 };
 
-const createTripPointEditTemplate = (point, pointType, offers, destinations) => {
-  const {id, pointCity: notSanitizedCity, pointDestination, price, isFavorite, pointOffers} = point;
+const createTripPointEditTemplate = (point, pointType, pointCity, pointDestination, offers, destinations) => {
+  const {id, price, isFavorite, pointOffers, startTimestamp, endTimestamp} = point;
 
-  const offersTypeAll = getTypeOffers(offers, pointType);
+  const offersTypeAll = getTypeOffers(offers, pointType); // все офферы типа
   const offersTypeAllOnly = [];
-  offersTypeAll.map((offerTypeAll) => offersTypeAllOnly.push(...offerTypeAll.offers));
+  offersTypeAll.map((offerTypeAll) => offersTypeAllOnly.push(...offerTypeAll.offers)); // получаю только список офферов без типа
 
-  const pointCity = encode(notSanitizedCity);
   const pointTypeName = capitalizeFirstLetter(pointType);
-
-  const pointTypesTransferMarkup = createPointTypesMarkup(POINT_TYPES_TRANSPORT.slice(), id);
-  const pointTypesActivityMarkup = createPointTypesMarkup(POINT_TYPES_ACTIVITY.slice(), id);
+  const pointStart = pointTime(startTimestamp); // время старта
+  const pointEnd = pointTime(endTimestamp); // время финиша
+  const pointTypesTransferMarkup = createPointTypesMarkup(POINT_TYPES_TRANSPORT.slice(), id, pointType);
+  const pointTypesActivityMarkup = createPointTypesMarkup(POINT_TYPES_ACTIVITY.slice(), id, pointType);
   const pointCityMarkup = createCityMarkup(destinations);
   const isOffersShowing = offersTypeAll.length > 0; // есть лиs offers
   const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersTypeAllOnly, pointOffers, id) : ``;
@@ -159,12 +163,12 @@ const createTripPointEditTemplate = (point, pointType, offers, destinations) => 
             <label class="visually-hidden" for="event-start-time-1">
               From
             </label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 12:25">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${pointStart}">
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">
               To
             </label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 13:35">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${pointEnd}">
           </div>
   
           <div class="event__field-group  event__field-group--price">
@@ -205,6 +209,7 @@ const createTripPointEditTemplate = (point, pointType, offers, destinations) => 
     
     ${pointDestination ?
       `${destinationMarkup}` : ``}
+      
      ${isOffersShowing && pointDestination ? `</section>` : ``}
     </form>
   </li>`
@@ -212,12 +217,14 @@ const createTripPointEditTemplate = (point, pointType, offers, destinations) => 
 };
 
 export default class PointEdit extends AbstractSmartComponent {
-  constructor(point, offers, destination) {
+  constructor(point, offers, destinations) {
     super();
     this._point = point;
     this._offers = offers;
-    this._destination = destination;
+    this._destinations = destinations;
 
+    this._pointCity = this._point.pointDestination.name;
+    this._pointDestination = this._point.pointDestination;
     this._pointType = this._point.pointType;
 
     this._isFormDirty = false;
@@ -239,12 +246,14 @@ export default class PointEdit extends AbstractSmartComponent {
   }
 
   getData() {
-    return new FormData(this._form);
+    const form = new FormData(this._form);
+
+    return form;
   }
 
 
   getTemplate() {
-    return createTripPointEditTemplate(this._point, this._pointType, this._offers, this._destination);
+    return createTripPointEditTemplate(this._point, this._pointType, this._pointCity, this._pointDestination, this._offers, this._destinations);
   }
 
   removeElement() {
@@ -290,8 +299,11 @@ export default class PointEdit extends AbstractSmartComponent {
 
   _createFlatpickr(inputField, date) {
     return flatpickr(inputField, {
+      altInput: true,
+      allowInput: true,
       enableTime: true,
-      dateFormat: `d/m/y H:i`,
+      altFormat: `d/m/y H:i`,
+      dateFormat: `U`,
       defaultDate: date || ``,
     });
   }
@@ -330,11 +342,29 @@ export default class PointEdit extends AbstractSmartComponent {
       if (this._isFormDirty) {
         this._validatedDestination();
       }
+
+      let inputText = this._inputDestination.value;
+
+      if (inputText) {
+        inputText = `${inputText.charAt(0).toUpperCase()}${inputText.slice(1)}`;
+      }
+      const cities = [];
+
+      this._destinations.map((item) => cities.push(item.name));
+
+      const city = cities.includes(inputText);
+
+      if (city) {
+        this._pointCity = inputText;
+        this._pointDestination = getDestination(this._destinations, this._pointCity);
+
+        this.rerender();
+      }
     });
   }
 
   _validateForm() {
-    this._validatedDestination(this._inputDestination);
+    this._validatedDestination();
     this._form.reportValidity();
   }
 
@@ -346,11 +376,11 @@ export default class PointEdit extends AbstractSmartComponent {
     }
 
     const cities = [];
-    this._destination.map((item) => cities.push(item.name));
+    this._destinations.map((item) => cities.push(item.name));
 
     const city = cities.includes(inputText);
 
-    if (city) {
+    if (city && this._isFormDirty) {
       this._inputDestination.value = inputText;
       this._inputDestination.setCustomValidity(``);
       this._inputDestination.style.backgroundColor = `transparent`;
