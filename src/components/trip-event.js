@@ -19,7 +19,7 @@ const createOffersMarkup = (offers) => {
 };
 
 const createTripPointTemplate = (point) => {
-  const {pointType, pointCity, startTimestamp, endTimestamp, price, pointOffers} = point;
+  const {pointType, pointDestination, startTimestamp, endTimestamp, price, pointOffers} = point;
 
   const pointTypeName = capitalizeFirstLetter(pointType);
   const pointStart = pointTime(startTimestamp); // время старта
@@ -38,7 +38,7 @@ const createTripPointTemplate = (point) => {
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${pointType}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${pointTypeName} to ${pointCity}</h3>
+        <h3 class="event__title">${pointTypeName} to ${pointDestination.name}</h3>
   
         <div class="event__schedule">
           <p class="event__time">

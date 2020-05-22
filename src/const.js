@@ -148,3 +148,5 @@ export const Method = {
 };
 
 export const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
+
+export const OFFERS_IF_PREFIX = `event-offer-`;

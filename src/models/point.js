@@ -5,17 +5,12 @@ export default class Point {
     this.id = data[`id`];
     this.price = data[`base_price`];
     this.pointType = data[`type`];
-    this.pointCity = data[`destination`][`name`];
     this.startTimestamp = new Date(data[`date_from`]);
     this.endTimestamp = new Date(data[`date_to`]);
     this.isFavorite = Boolean(data[`is_favorite`]);
     this.pointDestination = data[`destination`];
-    this.pointOffers = data[`offers`];
-    // this.pointOffers = data[`offers`].map((offer) => {
-    //   return Object.assign({}, offer, {
-    //     // id:
-    //   })
-    // })
+    this.pointOffers = data[`offers`] || [];
+
   }
 
   toRAW() {
@@ -25,8 +20,9 @@ export default class Point {
       "type": this.pointType,
       "date_from": formatDateToRAW(this.startTimestamp),
       "date_to": this.endTimestamp,
-      "destination": {},
+      "destination": this.pointDestination,
       "is_favorite": this.isFavorite,
+      "offers": this.pointOffers,
     };
   }
 

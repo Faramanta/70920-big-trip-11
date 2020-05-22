@@ -133,12 +133,11 @@ export default class TripController {
   }
 
   _onDataChange(pointController, oldData, newData) {
-
-    if (oldData.id === -1) {
-
+    if (oldData.id === `-1`) {
       this._api.createPoint(newData)
         .then((pointModel) => {
           this._pointsModel.addPoint(pointModel);
+
           this._destroyCreateController();
           this.renderContent();
         });
@@ -147,7 +146,9 @@ export default class TripController {
     } else if (newData === null) {
       this._api.deletePoint(oldData.id)
         .then(() => {
-          pointController.destroy();
+          this._pointsModel.removePoint(oldData.id);
+          // pointController.destroy();
+          this.renderContent();
         });
     } else {
       this._api.updatePoint(oldData.id, newData)

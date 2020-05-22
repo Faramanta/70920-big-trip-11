@@ -1,6 +1,6 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {POINT_TYPES_ACTIVITY, POINT_TYPES_TRANSPORT} from "../const.js";
-import {capitalizeFirstLetter, getTypeOffers, getDestination, pointTime} from "../utils/common.js";
+import {capitalizeFirstLetter, getTypeOffers, pointTime, getUID} from "../utils/common.js";
 import flatpickr from "flatpickr";
 // import {encode} from "he";
 import "flatpickr/dist/flatpickr.min.css";
@@ -81,18 +81,20 @@ const createOffersSelectorMarkup = (offersTypeAllOnly, pointOffers, id) => {
 
       const isChecked = isOfferExist ? true : ``;
 
+      const offerUID = getUID(offerTypeAllOnly.title, offerTypeAllOnly.price, id);
+
       return (
         `<div class="event__offer-selector">
           <input 
             class="event__offer-checkbox  visually-hidden" 
-            id="event-offer-${offerTypeAllOnly.title}-${offerTypeAllOnly.price}-${id}" 
+            id="event-offer-${offerUID}" 
             type="checkbox" 
             name="event-offer"
             ${isChecked ? `checked` : ``} 
             />
           <label 
             class="event__offer-label" 
-            for="event-offer-${offerTypeAllOnly.title}-${offerTypeAllOnly.price}-${id}"
+            for="event-offer-${offerUID}"
           >
             <span class="event__offer-title">${offerTypeAllOnly.title}</span>
             &plus;
@@ -104,8 +106,10 @@ const createOffersSelectorMarkup = (offersTypeAllOnly, pointOffers, id) => {
     .join(`\n`);
 };
 
-const createTripPointEditTemplate = (point, pointType, pointCity, pointDestination, offers, destinations) => {
+const createTripPointEditTemplate = (point, pointType, pointDestination, offers, destinations) => {
   const {id, price, isFavorite, pointOffers, startTimestamp, endTimestamp} = point;
+
+  const pointDestinationFromServer = destinations.find((destination) => destination.name === pointDestination.name);
 
   const offersTypeAll = getTypeOffers(offers, pointType); // все офферы типа
   const offersTypeAllOnly = [];
@@ -119,7 +123,7 @@ const createTripPointEditTemplate = (point, pointType, pointCity, pointDestinati
   const pointCityMarkup = createCityMarkup(destinations);
   const isOffersShowing = offersTypeAllOnly.length > 0; // есть лиs offers
   const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersTypeAllOnly, pointOffers, id) : ``;
-  const destinationMarkup = pointDestination ? createDestinationMarkup(pointDestination) : ``;
+  const destinationMarkup = pointDestination ? createDestinationMarkup(pointDestinationFromServer) : ``;
 
   return (
     `<li class="trip-events__item">
@@ -153,7 +157,7 @@ const createTripPointEditTemplate = (point, pointType, pointCity, pointDestinati
             <label class="event__label  event__type-output" for="event-destination-${id}">
               ${pointTypeName} to
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${pointCity ? pointCity : ``}" list="destination-list-${id}">
+            <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${pointDestination ? pointDestination.name : ``}" list="destination-list-${id}">
             <datalist id="destination-list-${id}">
               ${pointCityMarkup}
             </datalist>
@@ -223,7 +227,6 @@ export default class PointEdit extends AbstractSmartComponent {
     this._offers = offers;
     this._destinations = destinations;
 
-    this._pointCity = this._point.pointDestination.name;
     this._pointDestination = this._point.pointDestination;
     this._pointType = this._point.pointType;
 
@@ -253,7 +256,7 @@ export default class PointEdit extends AbstractSmartComponent {
 
 
   getTemplate() {
-    return createTripPointEditTemplate(this._point, this._pointType, this._pointCity, this._pointDestination, this._offers, this._destinations);
+    return createTripPointEditTemplate(this._point, this._pointType, this._pointDestination, this._offers, this._destinations);
   }
 
   removeElement() {
@@ -339,24 +342,16 @@ export default class PointEdit extends AbstractSmartComponent {
     this._inputDestination = this._form.querySelector(`.event__input--destination`);
 
     this._inputDestination.addEventListener(`input`, (_evt) => {
+
+      const selectedDestination = this._getSelectedDestination();
+
       if (this._isFormDirty) {
-        this._validatedDestination();
+        this._validatedDestination(selectedDestination);
       }
 
-      let inputText = this._inputDestination.value;
-
-      if (inputText) {
-        inputText = `${inputText.charAt(0).toUpperCase()}${inputText.slice(1)}`;
-      }
-      const cities = [];
-
-      this._destinations.map((item) => cities.push(item.name));
-
-      const city = cities.includes(inputText);
-
-      if (city) {
-        this._pointCity = inputText;
-        this._pointDestination = getDestination(this._destinations, this._pointCity);
+      if (selectedDestination) {
+        this._pointDestination = selectedDestination;
+        this._inputDestination.value = selectedDestination.name;
 
         this.rerender();
       }
@@ -364,24 +359,24 @@ export default class PointEdit extends AbstractSmartComponent {
   }
 
   _validateForm() {
-    this._validatedDestination();
+    const selectedDestination = this._getSelectedDestination();
+    this._validatedDestination(selectedDestination);
+
     this._form.reportValidity();
   }
 
-  _validatedDestination() {
+  _getSelectedDestination() {
     let inputText = this._inputDestination.value;
 
     if (inputText) {
       inputText = `${inputText.charAt(0).toUpperCase()}${inputText.slice(1)}`;
     }
 
-    const cities = [];
-    this._destinations.map((item) => cities.push(item.name));
+    return this._destinations.find((item) => item.name === inputText);
+  }
 
-    const city = cities.includes(inputText);
-
-    if (city && this._isFormDirty) {
-      this._inputDestination.value = inputText;
+  _validatedDestination(selectedDestination) {
+    if (selectedDestination) {
       this._inputDestination.setCustomValidity(``);
       this._inputDestination.style.backgroundColor = `transparent`;
     } else {
