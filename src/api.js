@@ -59,6 +59,10 @@ export default class API {
       .then(Point.parsePoint);
   }
 
+  deletePoint(id) {
+    return this._load({url: `points/${id}`, method: Method.DELETE});
+  }
+
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
     headers.append(`Authorization`, this._authorization);
 

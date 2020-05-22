@@ -12,7 +12,7 @@ const EMPTY_POINT = {
   pointCity: ``,
   endTimestamp: new Date().getTime(),
   isFavorite: false,
-  pointDestination: null,
+  pointDestination: ``,
   pointOffers: [],
 };
 
@@ -23,7 +23,7 @@ const parseFormData = (formData, id, destinations) => {
   const startTimestamp = formData.get(`event-start-time`) * ONE_SECOND;
   const endTimestamp = formData.get(`event-end-time`) * ONE_SECOND;
   const isFavorite = formData.get(`event-favorite`);
-  // const eventOffers = formData.getAll(`event-offer`);
+  // const pointOffers = formData.getAll(`event-offer`);
 
   const destination = destinations.find((item) => {
     return pointCity === item.name;

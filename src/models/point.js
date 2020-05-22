@@ -10,7 +10,12 @@ export default class Point {
     this.endTimestamp = new Date(data[`date_to`]);
     this.isFavorite = Boolean(data[`is_favorite`]);
     this.pointDestination = data[`destination`];
-    this.pointOffers = data[`offers`] || {};
+    this.pointOffers = data[`offers`];
+    // this.pointOffers = data[`offers`].map((offer) => {
+    //   return Object.assign({}, offer, {
+    //     // id:
+    //   })
+    // })
   }
 
   toRAW() {

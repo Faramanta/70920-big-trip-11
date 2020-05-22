@@ -117,7 +117,7 @@ const createTripPointEditTemplate = (point, pointType, pointCity, pointDestinati
   const pointTypesTransferMarkup = createPointTypesMarkup(POINT_TYPES_TRANSPORT.slice(), id, pointType);
   const pointTypesActivityMarkup = createPointTypesMarkup(POINT_TYPES_ACTIVITY.slice(), id, pointType);
   const pointCityMarkup = createCityMarkup(destinations);
-  const isOffersShowing = offersTypeAll.length > 0; // есть лиs offers
+  const isOffersShowing = offersTypeAllOnly.length > 0; // есть лиs offers
   const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersTypeAllOnly, pointOffers, id) : ``;
   const destinationMarkup = pointDestination ? createDestinationMarkup(pointDestination) : ``;
 
@@ -153,7 +153,7 @@ const createTripPointEditTemplate = (point, pointType, pointCity, pointDestinati
             <label class="event__label  event__type-output" for="event-destination-${id}">
               ${pointTypeName} to
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${pointCity}" list="destination-list-${id}">
+            <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${pointCity ? pointCity : ``}" list="destination-list-${id}">
             <datalist id="destination-list-${id}">
               ${pointCityMarkup}
             </datalist>
