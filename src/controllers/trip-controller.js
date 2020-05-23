@@ -125,11 +125,14 @@ export default class TripController {
   }
 
   _onFavoriteChange(pointController, oldData, newData) {
-    const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+    this._api.updatePoint(oldData.id, newData)
+      .then((pointModel) => {
+        const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
 
-    if (isSuccess) {
-      pointController.render(newData, this._offers, this._destinations, Mode.EDIT);
-    }
+        if (isSuccess) {
+          this.renderContent();
+        }
+      });
   }
 
   _onDataChange(pointController, oldData, newData) {

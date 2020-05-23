@@ -1,6 +1,6 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {POINT_TYPES_ACTIVITY, POINT_TYPES_TRANSPORT} from "../const.js";
-import {capitalizeFirstLetter, getTypeOffers, pointTime, getUID} from "../utils/common.js";
+import {POINT_TYPES_ACTIVITY, POINT_TYPES_TRANSPORT, Mode} from "../const.js";
+import {capitalizeFirstLetter, getTypeOffers, pointTime, getOfferUID} from "../utils/common.js";
 import flatpickr from "flatpickr";
 // import {encode} from "he";
 import "flatpickr/dist/flatpickr.min.css";
@@ -81,20 +81,21 @@ const createOffersSelectorMarkup = (offersTypeAllOnly, pointOffers, id) => {
 
       const isChecked = isOfferExist ? true : ``;
 
-      const offerUID = getUID(offerTypeAllOnly.title, offerTypeAllOnly.price, id);
+      const offerUID = getOfferUID(offerTypeAllOnly.title, offerTypeAllOnly.price, id);
 
       return (
         `<div class="event__offer-selector">
           <input 
             class="event__offer-checkbox  visually-hidden" 
-            id="event-offer-${offerUID}" 
+            id="${offerUID}" 
+            value="${offerUID}" 
             type="checkbox" 
             name="event-offer"
             ${isChecked ? `checked` : ``} 
             />
           <label 
             class="event__offer-label" 
-            for="event-offer-${offerUID}"
+            for="${offerUID}"
           >
             <span class="event__offer-title">${offerTypeAllOnly.title}</span>
             &plus;
@@ -106,14 +107,27 @@ const createOffersSelectorMarkup = (offersTypeAllOnly, pointOffers, id) => {
     .join(`\n`);
 };
 
-const createTripPointEditTemplate = (point, pointType, pointDestination, offers, destinations) => {
+// отрисовка кнопок в зависимости от mode
+const createButtonsMarkup = (mode, id, isFavorite) => {
+  return mode !== Mode.ADDING ? (
+    `<button class="event__reset-btn" type="reset">Delete</button>
+
+      <input id="event-favorite-${id}" value="event-favorite-${id}" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
+      <label class="event__favorite-btn" for="event-favorite-${id}">
+        <span class="visually-hidden">Add to favorite</span>
+        <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+          <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+        </svg>
+      </label>
+      <button class="event__rollup-btn" type="button">`) : (`<button class="event__reset-btn" type="reset">Cansel</button>`);
+};
+
+const createTripPointEditTemplate = (point, pointType, pointDestination, offers, destinations, mode) => {
   const {id, price, isFavorite, pointOffers, startTimestamp, endTimestamp} = point;
 
   const pointDestinationFromServer = destinations.find((destination) => destination.name === pointDestination.name);
 
   const offersTypeAll = getTypeOffers(offers, pointType); // все офферы типа
-  const offersTypeAllOnly = [];
-  offersTypeAll.map((offerTypeAll) => offersTypeAllOnly.push(...offerTypeAll.offers)); // получаю только список офферов без типа
 
   const pointTypeName = capitalizeFirstLetter(pointType);
   const pointStart = pointTime(startTimestamp); // время старта
@@ -121,9 +135,10 @@ const createTripPointEditTemplate = (point, pointType, pointDestination, offers,
   const pointTypesTransferMarkup = createPointTypesMarkup(POINT_TYPES_TRANSPORT.slice(), id, pointType);
   const pointTypesActivityMarkup = createPointTypesMarkup(POINT_TYPES_ACTIVITY.slice(), id, pointType);
   const pointCityMarkup = createCityMarkup(destinations);
-  const isOffersShowing = offersTypeAllOnly.length > 0; // есть лиs offers
-  const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersTypeAllOnly, pointOffers, id) : ``;
+  const isOffersShowing = offersTypeAll.length > 0; // есть лиs offers
+  const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersTypeAll, pointOffers, id) : ``;
   const destinationMarkup = pointDestination ? createDestinationMarkup(pointDestinationFromServer) : ``;
+  const buttonsMarkup = createButtonsMarkup(mode, id, isFavorite);
 
   return (
     `<li class="trip-events__item">
@@ -184,17 +199,9 @@ const createTripPointEditTemplate = (point, pointType, pointDestination, offers,
           </div>
   
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
-  
-          <input id="event-favorite-${id}" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
-          <label class="event__favorite-btn" for="event-favorite-${id}">
-            <span class="visually-hidden">Add to favorite</span>
-            <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
-              <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
-            </svg>
-          </label>
-  
-          <button class="event__rollup-btn" type="button">
+          ${buttonsMarkup}
+ 
+          
             <span class="visually-hidden">Open event</span>
           </button>
         </header>
@@ -221,11 +228,12 @@ const createTripPointEditTemplate = (point, pointType, pointDestination, offers,
 };
 
 export default class PointEdit extends AbstractSmartComponent {
-  constructor(point, offers, destinations) {
+  constructor(point, offers, destinations, mode) {
     super();
     this._point = point;
     this._offers = offers;
     this._destinations = destinations;
+    this._mode = mode;
 
     this._pointDestination = this._point.pointDestination;
     this._pointType = this._point.pointType;
@@ -236,6 +244,7 @@ export default class PointEdit extends AbstractSmartComponent {
     this._endFlatpickr = null;
     this._submitHandler = null;
     this._deleteButtonClickHandler = null;
+    this._canselButtonClickHandler = null;
     this._favoriteButtonClickHandler = null;
     this._inputDestination = null;
     this._form = null;
@@ -244,19 +253,8 @@ export default class PointEdit extends AbstractSmartComponent {
     this._initFormValidation();
   }
 
-  get isFormValid() {
-    return this._form.checkValidity();
-  }
-
-  getData() {
-    const form = new FormData(this._form);
-
-    return form;
-  }
-
-
   getTemplate() {
-    return createTripPointEditTemplate(this._point, this._pointType, this._pointDestination, this._offers, this._destinations);
+    return createTripPointEditTemplate(this._point, this._pointType, this._pointDestination, this._offers, this._destinations, this._mode);
   }
 
   removeElement() {
@@ -268,7 +266,10 @@ export default class PointEdit extends AbstractSmartComponent {
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
     this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
-    this.setFavoritesButtonClickHandler(this._favoriteButtonClickHandler);
+    this.setCanselButtonClickHandler(this._canselButtonClickHandler);
+    if (this._favoriteButtonClickHandler) {
+      this.setFavoritesButtonClickHandler(this._favoriteButtonClickHandler);
+    }
     this._subscribeOnEvents();
     this._initFormValidation();
   }
@@ -391,7 +392,10 @@ export default class PointEdit extends AbstractSmartComponent {
         evt.preventDefault();
         this._isFormDirty = true;
         this._validateForm();
-        handler(evt);
+        if (this._form.checkValidity()) {
+          const formData = new FormData(this._form);
+          handler(evt, formData);
+        }
       };
     }
 
@@ -404,6 +408,15 @@ export default class PointEdit extends AbstractSmartComponent {
 
     if (!this._deleteButtonClickHandler) {
       this._deleteButtonClickHandler = handler;
+    }
+  }
+
+  setCanselButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`)
+      .addEventListener(`click`, handler);
+
+    if (!this._canselButtonClickHandler) {
+      this._canselButtonClickHandler = handler;
     }
   }
 

@@ -1,5 +1,5 @@
 import moment from "moment";
-import {SortType} from "../const.js";
+import {SortType, OFFERS_IF_PREFIX} from "../const.js";
 
 export const castTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
@@ -121,7 +121,12 @@ export const capitalizeFirstLetter = (str) => {
 
 // выбрать все офферы одного типа
 export const getTypeOffers = (offers, typeName) => {
-  return offers.filter((offer) => offer.type === typeName);
+  const groupedOffers = offers.find((offer) => offer.type === typeName);
+
+  if (groupedOffers) {
+    return groupedOffers.offers;
+  }
+  return [];
 };
 
 // выбрать destinations по городу
@@ -137,6 +142,6 @@ export const formatDateToDefault = (date) => {
   return moment(date).unix();
 };
 
-export const getUID = (title, price, id) => {
-  return `${title}-${price}-${id}`;
+export const getOfferUID = (title, price, id) => {
+  return `${OFFERS_IF_PREFIX}-${title}-${price}-${id}`;
 };

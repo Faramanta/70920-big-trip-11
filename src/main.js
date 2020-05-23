@@ -43,23 +43,27 @@ if (pointsModel.size !== 0) {
   render(tripInfo.getElement(), new RouteComponent(), RenderPosition.AFTERBEGIN); // отрисовка информации о маршруте
 }
 
-// tripController.render(DefaultOffers, CITIES);
-
 const statisticComponent = new StatsComponent(pointsModel);
 
 render(sitePageBodyContainerElement, statisticComponent, RenderPosition.BEFOREEND); // отрисовка статистики
 
 siteMenu.setOnChange((menuItem) => {
+
   siteMenu.setActiveItem(menuItem);
+  const newPointBtn = document.querySelector(`.trip-main__event-add-btn`);
   switch (menuItem) {
     case MenuItem.TABLE:
       statisticComponent.hide();
       tripController.show();
       tripController.renderContent();
+      newPointBtn.disabled = false;
+      filterController.setActiveView(menuItem);
       break;
     case MenuItem.STATS:
       statisticComponent.show();
       tripController.hide();
+      filterController.setActiveView(menuItem);
+      newPointBtn.disabled = true;
       break;
   }
 });

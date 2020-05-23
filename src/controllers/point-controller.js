@@ -1,9 +1,9 @@
 import PointComponent from "../components/trip-event.js";
 import PointEditComponent from "../components/trip-event-edit.js";
 import PointModel from "../models/point.js";
-import {getUID, getTypeOffers} from "../utils/common.js";
+import {getOfferUID, getTypeOffers} from "../utils/common.js";
 import {render, remove, replace, RenderPosition} from "../utils/render.js";
-import {KeyCode, Mode, PointType, ONE_SECOND, OFFERS_IF_PREFIX} from "../const.js";
+import {KeyCode, Mode, PointType, ONE_SECOND} from "../const.js";
 
 const EMPTY_POINT = {
   id: `-1`,
@@ -17,13 +17,14 @@ const EMPTY_POINT = {
   pointOffers: [],
 };
 
-const parseFormData = (formData, id, destinations, offers, checkboxesIDs) => {
+const parseFormData = (formData, id, destinations, offers) => {
   const price = parseInt(formData.get(`event-price`), 10);
   const pointType = formData.get(`event-type`);
   const pointCity = formData.get(`event-destination`);
   const startTimestamp = parseInt(formData.get(`event-start-time`), 10) * ONE_SECOND;
   const endTimestamp = parseInt(formData.get(`event-end-time`), 10) * ONE_SECOND;
   const isFavorite = formData.get(`event-favorite`);
+  const checkedOffersValues = formData.getAll(`event-offer`);
 
   const destination = destinations.find((item) => {
     return pointCity === item.name;
@@ -31,15 +32,7 @@ const parseFormData = (formData, id, destinations, offers, checkboxesIDs) => {
 
   const offersTypeAll = getTypeOffers(offers, pointType); // все офферы типа
 
-  const offersTypeAllOnly = [];
-  offersTypeAll.map((offerTypeAll) => offersTypeAllOnly.push(...offerTypeAll.offers)); // только офферы типа без типа, массив
-
-  const selectedOffers = [];
-  offersTypeAllOnly.filter((offer) => {
-    if (checkboxesIDs.includes(getUID(offer.title, offer.price, id))) {
-      selectedOffers.push(offer);
-    }
-  });
+  const selectedOffers = offersTypeAll.filter((offer) => checkedOffersValues.includes(getOfferUID(offer.title, offer.price, id)));
 
   return new PointModel({
     id,
@@ -49,7 +42,7 @@ const parseFormData = (formData, id, destinations, offers, checkboxesIDs) => {
     "date_to": endTimestamp,
     "destination": destination,
     "offers": selectedOffers,
-    "is_favorite": isFavorite,
+    "is_favorite": !!isFavorite,
   });
 };
 
@@ -69,14 +62,13 @@ export default class PointController {
     this._pointEditComponent = null;
 
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
-    this._findCheckedOffers = this._findCheckedOffers.bind(this);
   }
 
   render(point, offers, destinations, mode) {
     this._mode = mode;
 
     if (this._mode === Mode.ADDING) {
-      this._renderAddMode(EMPTY_POINT, offers, destinations);
+      this._renderAddMode(EMPTY_POINT, offers, destinations, this._mode);
     } else {
       this._renderDefaultOrEditMode(point, offers, destinations);
     }
@@ -120,7 +112,7 @@ export default class PointController {
       if (this._pointEditComponent.isFormValid) {
 
         const formData = this._pointEditComponent.getData();
-        const data = parseFormData(formData, point.id, destinations, offers, this._findCheckedOffers(this._pointEditComponent));
+        const data = parseFormData(formData, point.id, destinations, offers);
 
         this._onDataChange(this, point, data);
       }
@@ -151,39 +143,17 @@ export default class PointController {
 
   _renderAddMode(point, offers, destinations) {
 
-    this._pointEditComponent = new PointEditComponent(point, offers, destinations);
+    this._pointEditComponent = new PointEditComponent(point, offers, destinations, this._mode);
 
-    this._pointEditComponent.setFavoritesButtonClickHandler(() => {
-      this._onFavoriteChange(this, point, Object.assign({}, point, {
-        isFavorite: !point.isFavorite,
-      }));
+    this._pointEditComponent.setSubmitHandler((formData) => {
+      const data = parseFormData(formData, point.id, destinations, offers);
+      this._onDataChange(this, point, data);
     });
 
-    this._pointEditComponent.setSubmitHandler((evt) => {
-      evt.preventDefault();
-      if (this._pointEditComponent.isFormValid) {
-
-        const formData = this._pointEditComponent.getData();
-        const data = parseFormData(formData, point.id, destinations, offers, this._findCheckedOffers(this._pointEditComponent));
-
-        this._onDataChange(this, point, data);
-      }
-    });
-
-    this._pointEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, point, null));
+    this._pointEditComponent.setCanselButtonClickHandler(() => this._onCloseCreateForm());
 
     document.addEventListener(`keydown`, this._onEscKeyDown);
     render(this._container, this._pointEditComponent, RenderPosition.AFTERBEGIN);
-  }
-
-  _findCheckedOffers(element) {
-    const checkboxes = element.getElement().querySelectorAll(`input[name=event-offer]:checked`);
-    const checkboxesIDs = [];
-    checkboxes.forEach((checkbox) => {
-      const checkboxID = checkbox.id;
-      checkboxesIDs.push(checkboxID.replace(OFFERS_IF_PREFIX, ``));
-    });
-    return checkboxesIDs;
   }
 
   _replacePointToEdit() {

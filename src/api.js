@@ -19,22 +19,22 @@ export default class API {
     return this._load({
       url: `points`
     })
-      .then((response) => response.json())
-      .then(Point.parsePoints);
+    .then((response) => response.json())
+    .then(Point.parsePoints);
   }
 
   getDestinations() {
     return this._load({
       url: `destinations`
     })
-      .then((response) => response.json());
+    .then((response) => response.json());
   }
 
   getOffers() {
     return this._load({
       url: `offers `
     })
-      .then((response) => response.json());
+    .then((response) => response.json());
   }
 
   createPoint(point) {
@@ -44,19 +44,19 @@ export default class API {
       body: JSON.stringify(point.toRAW()),
       headers: new Headers({"Content-Type": `application/json`})
     })
-      .then((response) => response.json())
-      .then(Point.parsePoint);
+    .then((response) => response.json())
+    .then(Point.parsePoint);
   }
 
-  updatePoint(id, data) {
+  updatePoint(id, point) {
     return this._load({
       url: `points/${id}`,
       method: Method.PUT,
-      body: JSON.stringify(data.toRAW()),
+      body: JSON.stringify(point.toRAW()),
       headers: new Headers({"Content-Type": `application/json`})
     })
-      .then((response) => response.json())
-      .then(Point.parsePoint);
+    .then((response) => response.json())
+    .then(Point.parsePoint);
   }
 
   deletePoint(id) {
