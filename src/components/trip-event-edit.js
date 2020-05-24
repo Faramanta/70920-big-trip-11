@@ -195,7 +195,7 @@ const createTripPointEditTemplate = (point, pointType, pointDestination, offers,
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-${id}" type="number" name="event-price" value="${price}">
+            <input class="event__input  event__input--price" id="event-price-${id}" type="number" min="0" name="event-price" value="${price}">
           </div>
   
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -250,10 +250,15 @@ export default class PointEdit extends AbstractSmartComponent {
     this._inputDestination = null;
     this._inputDateStart = null;
     this._inputDateEnd = null;
+    this._inputPrice = null;
     this._form = null;
     this._applyFlatpickr();
     this._subscribeOnEvents(offers);
     this._initFormValidation();
+  }
+
+  getData() {
+    return new FormData(this._form);
   }
 
   getTemplate() {
@@ -379,12 +384,17 @@ export default class PointEdit extends AbstractSmartComponent {
 
   _validateForm() {
     const selectedDestination = this._getSelectedDestination();
+
+    // валидация города
     this._validatedDestination(selectedDestination);
 
-    this._inputDateStart = this._form.querySelector(`#event-start-time-1`);
-    this._inputDateEnd = this._form.querySelector(`#event-end-time-1`);
+    // валидация дат начала и окончания
+    this._validateDateInputs();
 
-    this._validateDateInputs(this._inputDateStart, this._inputDateEnd);
+    // валидация цены
+    this._inputPrice = this._form.querySelector(`.event__input--price`);
+    const inputPriceValue = this._inputPrice.value;
+    this._validatePrice(inputPriceValue);
 
     this._form.reportValidity();
   }
@@ -409,22 +419,32 @@ export default class PointEdit extends AbstractSmartComponent {
     }
   }
 
-  _validateDateInputs(inputDateStart, inputDateEnd) {
+  _validateDateInputs() {
     const inputDateStartValue = this._inputDateStart.value;
     const inputDateEndValue = this._inputDateEnd.value;
     const inputs = this._form.querySelectorAll(`.event__input--time.form-control`);
 
     inputs.forEach(
-      (input) => {
-        if (inputDateStartValue < inputDateEndValue) {
-          input.setCustomValidity(``);
-          input.style.backgroundColor = `transparent`;
-        } else {
-          input.setCustomValidity(`Дата начала должна быть меньше даты окончания`);
-          input.style.backgroundColor = `rgba(255, 0, 0, .5)`;
+        (input) => {
+          if (inputDateStartValue < inputDateEndValue) {
+            input.setCustomValidity(``);
+            input.style.backgroundColor = `transparent`;
+          } else {
+            input.setCustomValidity(`Дата начала должна быть меньше даты окончания`);
+            input.style.backgroundColor = `rgba(255, 0, 0, .5)`;
+          }
         }
-      }
     );
+  }
+
+  _validatePrice(inputPriceValue) {
+    if (inputPriceValue > 0) {
+      this._inputPrice.setCustomValidity(``);
+      this._inputPrice.style.backgroundColor = `transparent`;
+    } else {
+      this._inputPrice.setCustomValidity(`Цена должна быть больше 0`);
+      this._inputPrice.style.backgroundColor = `rgba(255, 0, 0, .5)`;
+    }
   }
 
   setSubmitHandler(handler) {
@@ -433,11 +453,11 @@ export default class PointEdit extends AbstractSmartComponent {
         evt.preventDefault();
 
         this._isFormDirty = true;
+
         this._validateForm();
+
         if (this._form.checkValidity()) {
-          const formData = new FormData(this._form);
-          console.log(formData);
-          handler(evt, formData);
+          handler(evt);
         }
       };
     }

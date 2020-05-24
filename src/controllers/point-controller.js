@@ -109,13 +109,10 @@ export default class PointController {
 
     this._pointEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      if (this._pointEditComponent.isFormValid) {
+      const formData = this._pointEditComponent.getData();
+      const data = parseFormData(formData, point.id, destinations, offers);
 
-        const formData = this._pointEditComponent.getData();
-        const data = parseFormData(formData, point.id, destinations, offers);
-
-        this._onDataChange(this, point, data);
-      }
+      this._onDataChange(this, point, data);
     });
 
     this._pointEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, point, null));
@@ -145,8 +142,12 @@ export default class PointController {
 
     this._pointEditComponent = new PointEditComponent(point, offers, destinations, this._mode);
 
-    this._pointEditComponent.setSubmitHandler((formData) => {
+    this._pointEditComponent.setSubmitHandler((evt) => {
+      evt.preventDefault();
+
+      const formData = this._pointEditComponent.getData();
       const data = parseFormData(formData, point.id, destinations, offers);
+
       this._onDataChange(this, point, data);
     });
 

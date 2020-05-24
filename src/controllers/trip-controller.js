@@ -125,12 +125,13 @@ export default class TripController {
   }
 
   _onFavoriteChange(pointController, oldData, newData) {
+
     this._api.updatePoint(oldData.id, newData)
       .then((pointModel) => {
         const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
 
         if (isSuccess) {
-          this.renderContent();
+          pointController.render(pointModel, this._offers, this._destinations, Mode.EDIT);
         }
       });
   }
@@ -140,17 +141,13 @@ export default class TripController {
       this._api.createPoint(newData)
         .then((pointModel) => {
           this._pointsModel.addPoint(pointModel);
-
           this._destroyCreateController();
           this.renderContent();
         });
-
-
     } else if (newData === null) {
       this._api.deletePoint(oldData.id)
         .then(() => {
           this._pointsModel.removePoint(oldData.id);
-          // pointController.destroy();
           this.renderContent();
         });
     } else {
