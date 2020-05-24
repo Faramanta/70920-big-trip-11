@@ -3,19 +3,7 @@ import PointEditComponent from "../components/trip-event-edit.js";
 import PointModel from "../models/point.js";
 import {getOfferUID, getTypeOffers} from "../utils/common.js";
 import {render, remove, replace, RenderPosition} from "../utils/render.js";
-import {KeyCode, Mode, PointType, ONE_SECOND} from "../const.js";
-
-const EMPTY_POINT = {
-  id: `-1`,
-  price: 0,
-  pointType: PointType.TAXI.toLowerCase(),
-  startTimestamp: new Date().getTime(),
-  pointCity: ``,
-  endTimestamp: new Date().getTime(),
-  isFavorite: false,
-  pointDestination: ``,
-  pointOffers: [],
-};
+import {KeyCode, Mode, ONE_SECOND, EMPTY_POINT} from "../const.js";
 
 const parseFormData = (formData, id, destinations, offers) => {
   const price = parseInt(formData.get(`event-price`), 10);

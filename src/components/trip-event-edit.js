@@ -2,7 +2,8 @@ import AbstractSmartComponent from "./abstract-smart-component.js";
 import {POINT_TYPES_ACTIVITY, POINT_TYPES_TRANSPORT, Mode} from "../const.js";
 import {capitalizeFirstLetter, getTypeOffers, pointTime, getOfferUID} from "../utils/common.js";
 import flatpickr from "flatpickr";
-// import {encode} from "he";
+import {encode} from "he";
+// import he from 'he';
 import "flatpickr/dist/flatpickr.min.css";
 
 const createPointTypesMarkup = (pointTypes, id, type) => {
@@ -123,7 +124,13 @@ const createButtonsMarkup = (mode, id, isFavorite) => {
 };
 
 const createTripPointEditTemplate = (point, pointType, pointDestination, offers, destinations, mode) => {
-  const {id, price, isFavorite, pointOffers, startTimestamp, endTimestamp} = point;
+  const {id, price: notSanitizedPrice, isFavorite, pointOffers, startTimestamp, endTimestamp} = point;
+
+  const price = encode(notSanitizedPrice.toString());
+
+  // if (pointDestination) {
+  //   const cityDisplayText = he.encode(pointDestination.name);
+  // }
 
   const pointDestinationFromServer = destinations.find((destination) => destination.name === pointDestination.name);
 
@@ -422,7 +429,7 @@ export default class PointEdit extends AbstractSmartComponent {
   _validateDateInputs() {
     const inputDateStartValue = this._inputDateStart.value;
     const inputDateEndValue = this._inputDateEnd.value;
-    const inputs = this._form.querySelectorAll(`.event__input--time.form-control`);
+    const inputs = this._form.querySelectorAll(`.event__input--time`);
 
     inputs.forEach(
         (input) => {
@@ -438,7 +445,7 @@ export default class PointEdit extends AbstractSmartComponent {
   }
 
   _validatePrice(inputPriceValue) {
-    if (inputPriceValue > 0) {
+    if (inputPriceValue > -1) {
       this._inputPrice.setCustomValidity(``);
       this._inputPrice.style.backgroundColor = `transparent`;
     } else {
@@ -467,11 +474,12 @@ export default class PointEdit extends AbstractSmartComponent {
 
   setDeleteButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__reset-btn`)
-      .addEventListener(`click`, handler);
-
-    if (!this._deleteButtonClickHandler) {
-      this._deleteButtonClickHandler = handler;
-    }
+      .addEventListener(`click`, (evt) => {
+        evt.preventDefault();
+        if (!this._deleteButtonClickHandler) {
+          this._deleteButtonClickHandler = handler(evt);
+        }
+      });
   }
 
   setCanselButtonClickHandler(handler) {

@@ -150,3 +150,14 @@ export const Method = {
 export const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
 
 export const OFFERS_IF_PREFIX = `event-offer`;
+
+export const EMPTY_POINT = {
+  id: `-1`,
+  price: 0,
+  pointType: PointType.TAXI.toLowerCase(),
+  startTimestamp: new Date().getTime(),
+  endTimestamp: new Date().getTime(),
+  isFavorite: false,
+  pointDestination: ``,
+  pointOffers: [],
+};

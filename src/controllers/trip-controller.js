@@ -6,7 +6,7 @@ import NoPointsComponent from "../components/no-events.js";
 import PointController from "./point-controller.js";
 import {render, RenderPosition} from "../utils/render.js";
 import {getPreparedPoints, getSortedPoints} from "../utils/common.js";
-import {SortType, HIDDEN_CLASS} from "../const.js";
+import {SortType, HIDDEN_CLASS, EMPTY_POINT} from "../const.js";
 
 import {Mode} from "../const.js";
 
@@ -137,7 +137,7 @@ export default class TripController {
   }
 
   _onDataChange(pointController, oldData, newData) {
-    if (oldData.id === `-1`) {
+    if (oldData.id === EMPTY_POINT.id) {
       this._api.createPoint(newData)
         .then((pointModel) => {
           this._pointsModel.addPoint(pointModel);
