@@ -3,7 +3,7 @@ import PointEditComponent from "../components/trip-event-edit.js";
 import PointModel from "../models/point.js";
 import {getOfferUID, getTypeOffers} from "../utils/common.js";
 import {render, remove, replace, RenderPosition} from "../utils/render.js";
-import {KeyCode, Mode, ONE_SECOND, EMPTY_POINT} from "../const.js";
+import {KeyCode, Mode, ONE_SECOND, EMPTY_POINT, SHAKE_ANIMATION_TIMEOUT} from "../const.js";
 
 const parseFormData = (formData, id, destinations, offers) => {
   const price = parseInt(formData.get(`event-price`), 10);
@@ -100,10 +100,25 @@ export default class PointController {
       const formData = this._pointEditComponent.getData();
       const data = parseFormData(formData, point.id, destinations, offers);
 
+      this._pointEditComponent.setData({
+        saveButtonText: `Saving...`,
+      });
+      this._pointEditComponent.setDisableFormInput();
+      this._pointEditComponent.removeErrorBorder();
+
       this._onDataChange(this, point, data);
     });
 
-    this._pointEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, point, null));
+    this._pointEditComponent.setDeleteButtonClickHandler(() => {
+
+      this._pointEditComponent.setData({
+        deleteButtonText: `Deleting...`,
+      });
+      this._pointEditComponent.setDisableFormInput();
+      this._pointEditComponent.removeErrorBorder();
+
+      this._onDataChange(this, point, null);
+    });
 
     switch (this._mode) {
       case Mode.DEFAULT:
@@ -136,6 +151,12 @@ export default class PointController {
       const formData = this._pointEditComponent.getData();
       const data = parseFormData(formData, point.id, destinations, offers);
 
+      this._pointEditComponent.setData({
+        saveButtonText: `Saving...`,
+      });
+      this._pointEditComponent.setDisableFormInput();
+      this._pointEditComponent.removeErrorBorder();
+
       this._onDataChange(this, point, data);
     });
 
@@ -156,6 +177,23 @@ export default class PointController {
     this._pointEditComponent.reset();
     replace(this._pointComponent, this._pointEditComponent);
     this._mode = Mode.DEFAULT;
+  }
+
+  shake() {
+    this._pointEditComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / ONE_SECOND}s`;
+
+    setTimeout(() => {
+      this._pointEditComponent.getElement().style.animation = ``;
+      this._pointEditComponent.setEnableFormInput();
+
+      this._pointEditComponent.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`,
+      });
+
+    }, SHAKE_ANIMATION_TIMEOUT);
+
+    setTimeout(() => this._pointEditComponent.setErrorBorder(), SHAKE_ANIMATION_TIMEOUT);
   }
 
   _onEscKeyDown(evt) {

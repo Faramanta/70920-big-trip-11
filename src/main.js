@@ -10,7 +10,7 @@ import PointModel from "./models/points.js";
 import {render, RenderPosition} from "./utils/render.js";
 import {MenuItem, END_POINT} from "./const.js";
 
-const AUTHORIZATION = `Basic e01w590wk27189b`;
+const AUTHORIZATION = `Basic e02w590wk27189b`;
 
 const api = new API(END_POINT, AUTHORIZATION);
 

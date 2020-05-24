@@ -1,5 +1,5 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {POINT_TYPES_ACTIVITY, POINT_TYPES_TRANSPORT, Mode} from "../const.js";
+import {POINT_TYPES_ACTIVITY, POINT_TYPES_TRANSPORT, Mode, DefaultData} from "../const.js";
 import {capitalizeFirstLetter, getTypeOffers, pointTime, getOfferUID} from "../utils/common.js";
 import flatpickr from "flatpickr";
 import {encode} from "he";
@@ -109,9 +109,9 @@ const createOffersSelectorMarkup = (offersTypeAllOnly, pointOffers, id) => {
 };
 
 // отрисовка кнопок в зависимости от mode
-const createButtonsMarkup = (mode, id, isFavorite) => {
+const createButtonsMarkup = (mode, id, isFavorite, deleteButtonText) => {
   return mode !== Mode.ADDING ? (
-    `<button class="event__reset-btn" type="reset">Delete</button>
+    `<button class="event__reset-btn" type="reset">${deleteButtonText}</button>
 
       <input id="event-favorite-${id}" value="event-favorite-${id}" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
       <label class="event__favorite-btn" for="event-favorite-${id}">
@@ -123,7 +123,7 @@ const createButtonsMarkup = (mode, id, isFavorite) => {
       <button class="event__rollup-btn" type="button">`) : (`<button class="event__reset-btn" type="reset">Cansel</button>`);
 };
 
-const createTripPointEditTemplate = (point, pointType, pointDestination, offers, destinations, mode) => {
+const createTripPointEditTemplate = (point, pointType, pointDestination, offers, destinations, mode, externalData) => {
   const {id, price: notSanitizedPrice, isFavorite, pointOffers, startTimestamp, endTimestamp} = point;
 
   const price = encode(notSanitizedPrice.toString());
@@ -131,6 +131,9 @@ const createTripPointEditTemplate = (point, pointType, pointDestination, offers,
   // if (pointDestination) {
   //   const cityDisplayText = he.encode(pointDestination.name);
   // }
+
+  const deleteButtonText = externalData.deleteButtonText;
+  const saveButtonText = externalData.saveButtonText;
 
   const pointDestinationFromServer = destinations.find((destination) => destination.name === pointDestination.name);
 
@@ -145,7 +148,7 @@ const createTripPointEditTemplate = (point, pointType, pointDestination, offers,
   const isOffersShowing = offersTypeAll.length > 0; // есть лиs offers
   const offersSelectorMarkup = isOffersShowing ? createOffersSelectorMarkup(offersTypeAll, pointOffers, id) : ``;
   const destinationMarkup = pointDestination ? createDestinationMarkup(pointDestinationFromServer) : ``;
-  const buttonsMarkup = createButtonsMarkup(mode, id, isFavorite);
+  const buttonsMarkup = createButtonsMarkup(mode, id, isFavorite, deleteButtonText);
 
   return (
     `<li class="trip-events__item">
@@ -205,7 +208,7 @@ const createTripPointEditTemplate = (point, pointType, pointDestination, offers,
             <input class="event__input  event__input--price" id="event-price-${id}" type="number" min="0" name="event-price" value="${price}">
           </div>
   
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+          <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
           ${buttonsMarkup}
  
           
@@ -241,9 +244,11 @@ export default class PointEdit extends AbstractSmartComponent {
     this._offers = offers;
     this._destinations = destinations;
     this._mode = mode;
+    this._externalData = DefaultData;
 
     this._pointDestination = this._point.pointDestination;
     this._pointType = this._point.pointType;
+
 
     this._isFormDirty = false;
     this._isWaiting = false;
@@ -269,7 +274,7 @@ export default class PointEdit extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createTripPointEditTemplate(this._point, this._pointType, this._pointDestination, this._offers, this._destinations, this._mode);
+    return createTripPointEditTemplate(this._point, this._pointType, this._pointDestination, this._offers, this._destinations, this._mode, this._externalData);
   }
 
   removeElement() {
@@ -452,6 +457,29 @@ export default class PointEdit extends AbstractSmartComponent {
       this._inputPrice.setCustomValidity(`Цена должна быть больше 0`);
       this._inputPrice.style.backgroundColor = `rgba(255, 0, 0, .5)`;
     }
+  }
+
+  setData(data) {
+    this._externalData = Object.assign({}, DefaultData, data);
+    this.rerender();
+  }
+
+  setDisableFormInput() {
+    this.getElement().querySelectorAll(`input`)
+      .forEach((input) => input.setAttribute(`disabled`, `true`));
+  }
+
+  setEnableFormInput() {
+    this.getElement().querySelectorAll(`input`)
+      .forEach((input) => input.removeAttribute(`disabled`));
+  }
+
+  setErrorBorder() {
+    this.getElement().querySelector(`form`).style.boxShadow = `0 1px 26px -4px rgba(157, 28, 28)`;
+  }
+
+  removeErrorBorder() {
+    this.getElement().querySelector(`form`).style.boxShadow = `0 11px 20px rgba(0, 0, 0, 0.043)`;
   }
 
   setSubmitHandler(handler) {
