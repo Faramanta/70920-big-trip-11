@@ -36,6 +36,16 @@ export default class Filter extends AbstractComponent {
     return createFiltersTemplate(this._filters);
   }
 
+  setDisableInputs() {
+    this.getElement().querySelectorAll(`.trip-filters__filter-input`)
+      .forEach((input) => input.setAttribute(`disabled`, `disabled`));
+  }
+
+  setEnableInputs() {
+    this.getElement().querySelectorAll(`.trip-filters__filter-input`)
+      .forEach((input) => input.removeAttribute(`disabled`));
+  }
+
   setFilterChangeHandler(handler) {
     this.getElement().addEventListener(`change`, (evt) => {
       const filterType = evt.target.value;

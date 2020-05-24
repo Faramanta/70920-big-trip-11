@@ -1,11 +1,11 @@
 import FilterComponent from "../components/filter.js";
-import {FilterType} from "../const.js";
+import {FilterType, MenuItem} from "../const.js";
 import {render, replace, RenderPosition} from "../utils/render.js";
 
 export default class FilterController {
-  constructor(container, eventsModel) {
+  constructor(container, pointsModel) {
     this._container = container;
-    this._eventsModel = eventsModel;
+    this._pointsModel = pointsModel;
 
     this._filterComponent = null;
     this._activeFilterType = FilterType.EVERYTHING;
@@ -13,7 +13,7 @@ export default class FilterController {
     this._onFilterTypeChange = this._onFilterTypeChange.bind(this);
     this._onDataChange = this._onDataChange.bind(this);
 
-    this._eventsModel.setDataChangeHandler(this._onDataChange);
+    this._pointsModel.setDataChangeHandler(this._onDataChange);
   }
 
   render() {
@@ -42,8 +42,12 @@ export default class FilterController {
     this.render();
   }
 
+  setActiveView(menuItem) {
+    return menuItem === MenuItem.STATS ? this._filterComponent.setDisableInputs() : this._filterComponent.setEnableInputs();
+  }
+
   _onFilterTypeChange(filterType) {
-    this._eventsModel.setFilter(filterType);
+    this._pointsModel.setFilter(filterType);
     this._activeFilterType = filterType;
   }
 

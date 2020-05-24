@@ -1,43 +1,44 @@
-import {EventType, EVENT_TYPES, CITIES} from "../const.js";
+import {PointType, POINT_TYPES, CITIES} from "../const.js";
+import {getTypeOffers} from "../utils/common.js";
 
 export const DefaultOffers = [{
-  type: EventType.FLIGHT,
+  type: PointType.FLIGHT,
   title: `Add meal`,
   price: 50,
 }, {
-  type: EventType.CHECKIN,
+  type: PointType.CHECKIN,
   title: `Add breakfast`,
   price: 50,
 }, {
-  type: EventType.FLIGHT,
+  type: PointType.FLIGHT,
   title: `Add luggage`,
   price: 50,
 }, {
-  type: EventType.SIGHTSEEING,
+  type: PointType.SIGHTSEEING,
   title: `Book tickets`,
   price: 40,
 }, {
-  type: EventType.SIGHTSEEING,
+  type: PointType.SIGHTSEEING,
   title: `Lunch in city`,
   price: 30,
 }, {
-  type: EventType.TAXI,
+  type: PointType.TAXI,
   title: `Order Uber`,
   price: 20,
 }, {
-  type: EventType.DRIVE,
+  type: PointType.DRIVE,
   title: `Rent a car`,
   price: 200,
 }, {
-  type: EventType.FLIGHT,
+  type: PointType.FLIGHT,
   title: `Switch to comfort`,
   price: 80,
 }, {
-  type: EventType.FLIGHT,
+  type: PointType.FLIGHT,
   title: `Choose seats`,
   price: 5,
 }, {
-  type: EventType.FLIGHT,
+  type: PointType.FLIGHT,
   title: `Travel by train`,
   price: 40,
 }];
@@ -54,11 +55,6 @@ const getRandomIntegerNumber = (min, max) => {
   return min + Math.floor(Math.random() * (max - min));
 };
 
-// выбрать все офферы одного типа
-export const getTypeOffers = (offers, typeName) => {
-  return offers.filter((offer) => offer.type === typeName);
-};
-
 // получение списка рандомных offers в количестве от 1 до длины массива
 export const getRandomOffers = (offers) => {
   const countOffers = getRandomIntegerNumber(1, offers.length);
@@ -71,9 +67,9 @@ export const getRandomOffers = (offers) => {
 
 let globalIndex = 0;
 
-const generateTripEvent = () => {
+const generateTripPoint = () => {
 
-  const type = getRandomArrayItem(EVENT_TYPES);
+  const type = getRandomArrayItem(POINT_TYPES);
   const offersTypeAll = getTypeOffers(DefaultOffers, type); // Все офферы нужного типа для генерации чекнутых офферов, которые потом будут приходить с сервера
   const timestamp = new Date().getTime();
   const startTimestamp = timestamp + getRandomIntegerNumber(0, 86400000);
@@ -81,23 +77,23 @@ const generateTripEvent = () => {
 
   return {
     id: ++globalIndex,
-    eventType: type,
-    eventCity: getRandomArrayItem(CITIES),
+    pointType: type,
+    pointCity: getRandomArrayItem(CITIES),
     timestamp,
     startTimestamp,
     endTimestamp,
     price: getRandomIntegerNumber(10, 100),
-    eventOffers: offersTypeAll ? getRandomOffers(offersTypeAll) : ``, // чекнутые офферы
+    pointOffers: offersTypeAll ? getRandomOffers(offersTypeAll) : ``, // чекнутые офферы
     isFavorite: Math.random() > 0.5,
     destination: null
   };
 };
 
-const generateTripEvents = (count) => {
+const generateTripPoints = (count) => {
   return new Array(count)
     .fill(``)
-    .map(generateTripEvent);
+    .map(generateTripPoint);
 };
 
 
-export {getRandomIntegerNumber, generateTripEvent, generateTripEvents};
+export {getRandomIntegerNumber, generateTripPoint, generateTripPoints};
