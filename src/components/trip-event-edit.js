@@ -460,8 +460,18 @@ export default class PointEdit extends AbstractSmartComponent {
   }
 
   setData(data) {
-    this._renderOptions = Object.assign({}, DefaultData, data);
-    this.rerender();
+    if (data.saveButtonText) {
+      this.getElement().querySelector(`.event__save-btn`).textContent = data.saveButtonText;
+    }
+
+    if (data.deleteButtonText) {
+      this.getElement().querySelector(`.event__reset-btn`).textContent = data.deleteButtonText;
+    }
+    // const inputs = this._form.querySelectorAll(`input`);
+    this.getElement().querySelectorAll(`input`)
+    .forEach((input) => {
+      input.style.backgroundColor = `rgba(180, 180, 180, 0.33)`;
+    });
   }
 
   setDisableFormInput() {
