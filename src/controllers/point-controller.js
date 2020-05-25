@@ -94,7 +94,6 @@ export default class PointController {
       const newPoint = PointModel.clone(point);
       newPoint.isFavorite = !newPoint.isFavorite;
       this._onFavoriteChange(this, point, newPoint);
-      this._newPointBtn.disabled = true;
     });
 
     this._pointEditComponent.setSubmitHandler((evt) => {
@@ -105,7 +104,6 @@ export default class PointController {
       this._pointEditComponent.setData({
         saveButtonText: `Saving...`,
       });
-      this._newPointBtn.disabled = true;
       this._pointEditComponent.setDisableFormInput();
       this._pointEditComponent.removeErrorBorder();
 
@@ -116,7 +114,6 @@ export default class PointController {
       this._pointEditComponent.setData({
         deleteButtonText: `Deleting...`,
       });
-      this._newPointBtn.disabled = true;
       this._pointEditComponent.setDisableFormInput();
       this._pointEditComponent.removeErrorBorder();
 

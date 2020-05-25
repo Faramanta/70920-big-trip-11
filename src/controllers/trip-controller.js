@@ -125,7 +125,7 @@ export default class TripController {
   }
 
   _onFavoriteChange(pointController, oldData, newData) {
-
+    this._newPointBtn.disabled = true;
     this._api.updatePoint(oldData.id, newData)
       .then((pointModel) => {
         const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
@@ -154,6 +154,7 @@ export default class TripController {
           pointController.shake();
         });
     } else if (newData === null) {
+      this._newPointBtn.disabled = true;
       this._api.deletePoint(oldData.id)
         .then(() => {
           this._pointsModel.removePoint(oldData.id);
@@ -164,6 +165,7 @@ export default class TripController {
           pointController.shake();
         });
     } else {
+      this._newPointBtn.disabled = true;
       this._api.updatePoint(oldData.id, newData)
         .then((pointModel) => {
           const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
