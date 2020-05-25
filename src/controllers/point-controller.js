@@ -42,6 +42,7 @@ export default class PointController {
     this._onFavoriteChange = onFavoriteChange;
     this._onViewChange = onViewChange;
     this._mode = Mode.DEFAULT;
+    this._newPointBtn = document.querySelector(`.trip-main__event-add-btn`);
 
     this._offers = offers;
     this._destinations = destinations;
@@ -93,6 +94,7 @@ export default class PointController {
       const newPoint = PointModel.clone(point);
       newPoint.isFavorite = !newPoint.isFavorite;
       this._onFavoriteChange(this, point, newPoint);
+      this._newPointBtn.disabled = true;
     });
 
     this._pointEditComponent.setSubmitHandler((evt) => {
@@ -103,6 +105,7 @@ export default class PointController {
       this._pointEditComponent.setData({
         saveButtonText: `Saving...`,
       });
+      this._newPointBtn.disabled = true;
       this._pointEditComponent.setDisableFormInput();
       this._pointEditComponent.removeErrorBorder();
 
@@ -110,10 +113,10 @@ export default class PointController {
     });
 
     this._pointEditComponent.setDeleteButtonClickHandler(() => {
-
       this._pointEditComponent.setData({
         deleteButtonText: `Deleting...`,
       });
+      this._newPointBtn.disabled = true;
       this._pointEditComponent.setDisableFormInput();
       this._pointEditComponent.removeErrorBorder();
 
@@ -185,6 +188,7 @@ export default class PointController {
     setTimeout(() => {
       this._pointEditComponent.getElement().style.animation = ``;
       this._pointEditComponent.setEnableFormInput();
+
 
       this._pointEditComponent.setData({
         saveButtonText: `Save`,

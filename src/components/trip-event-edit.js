@@ -123,7 +123,7 @@ const createButtonsMarkup = (mode, id, isFavorite, deleteButtonText) => {
       <button class="event__rollup-btn" type="button">`) : (`<button class="event__reset-btn" type="reset">Cansel</button>`);
 };
 
-const createTripPointEditTemplate = (point, pointType, pointDestination, offers, destinations, mode, externalData) => {
+const createTripPointEditTemplate = (point, pointType, pointDestination, offers, destinations, mode, renderOptions) => {
   const {id, price: notSanitizedPrice, isFavorite, pointOffers, startTimestamp, endTimestamp} = point;
 
   const price = encode(notSanitizedPrice.toString());
@@ -132,8 +132,8 @@ const createTripPointEditTemplate = (point, pointType, pointDestination, offers,
   //   const cityDisplayText = he.encode(pointDestination.name);
   // }
 
-  const deleteButtonText = externalData.deleteButtonText;
-  const saveButtonText = externalData.saveButtonText;
+  const deleteButtonText = renderOptions.deleteButtonText;
+  const saveButtonText = renderOptions.saveButtonText;
 
   const pointDestinationFromServer = destinations.find((destination) => destination.name === pointDestination.name);
 
@@ -244,7 +244,7 @@ export default class PointEdit extends AbstractSmartComponent {
     this._offers = offers;
     this._destinations = destinations;
     this._mode = mode;
-    this._externalData = DefaultData;
+    this._renderOptions = DefaultData;
 
     this._pointDestination = this._point.pointDestination;
     this._pointType = this._point.pointType;
@@ -274,7 +274,7 @@ export default class PointEdit extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createTripPointEditTemplate(this._point, this._pointType, this._pointDestination, this._offers, this._destinations, this._mode, this._externalData);
+    return createTripPointEditTemplate(this._point, this._pointType, this._pointDestination, this._offers, this._destinations, this._mode, this._renderOptions);
   }
 
   removeElement() {
@@ -460,7 +460,7 @@ export default class PointEdit extends AbstractSmartComponent {
   }
 
   setData(data) {
-    this._externalData = Object.assign({}, DefaultData, data);
+    this._renderOptions = Object.assign({}, DefaultData, data);
     this.rerender();
   }
 
@@ -501,13 +501,15 @@ export default class PointEdit extends AbstractSmartComponent {
   }
 
   setDeleteButtonClickHandler(handler) {
-    this.getElement().querySelector(`.event__reset-btn`)
-      .addEventListener(`click`, (evt) => {
+    if (!this._deleteButtonClickHandler) {
+      this._deleteButtonClickHandler = (evt) => {
         evt.preventDefault();
-        if (!this._deleteButtonClickHandler) {
-          this._deleteButtonClickHandler = handler(evt);
-        }
-      });
+        handler();
+      };
+    }
+
+    this.getElement().querySelector(`.event__reset-btn`)
+      .addEventListener(`click`, this._deleteButtonClickHandler);
   }
 
   setCanselButtonClickHandler(handler) {
