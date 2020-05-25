@@ -125,39 +125,58 @@ export default class TripController {
   }
 
   _onFavoriteChange(pointController, oldData, newData) {
-
+    this._newPointBtn.disabled = true;
     this._api.updatePoint(oldData.id, newData)
       .then((pointModel) => {
         const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
 
         if (isSuccess) {
+          this._newPointBtn.disabled = false;
           pointController.render(pointModel, this._offers, this._destinations, Mode.EDIT);
         }
+      })
+      .catch(() => {
+        pointController.shake();
       });
   }
 
   _onDataChange(pointController, oldData, newData) {
+
     if (oldData.id === EMPTY_POINT.id) {
       this._api.createPoint(newData)
         .then((pointModel) => {
+
           this._pointsModel.addPoint(pointModel);
           this._destroyCreateController();
           this.renderContent();
+        })
+        .catch(() => {
+          pointController.shake();
         });
     } else if (newData === null) {
+      this._newPointBtn.disabled = true;
       this._api.deletePoint(oldData.id)
         .then(() => {
           this._pointsModel.removePoint(oldData.id);
+          this._newPointBtn.disabled = false;
           this.renderContent();
+        })
+        .catch(() => {
+          pointController.shake();
         });
     } else {
+      this._newPointBtn.disabled = true;
       this._api.updatePoint(oldData.id, newData)
         .then((pointModel) => {
           const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
 
           if (isSuccess) {
+            this._newPointBtn.disabled = false;
             this.renderContent();
           }
+        })
+        .catch(() => {
+          pointController.shake();
         });
     }
   }
