@@ -1,5 +1,5 @@
-import Point from "./models/point.js";
-import {Method} from "./const.js";
+import Point from "../models/point.js";
+import {Method, URL} from "../const.js";
 
 const checkStatus = (response) => {
   if (response.status >= 200 && response.status < 300) {
@@ -17,7 +17,7 @@ export default class API {
 
   getPoints() {
     return this._load({
-      url: `points`
+      url: URL.POINTS
     })
     .then((response) => response.json())
     .then(Point.parsePoints);
@@ -25,21 +25,21 @@ export default class API {
 
   getDestinations() {
     return this._load({
-      url: `destinations`
+      url: URL.DESTINATIONS
     })
     .then((response) => response.json());
   }
 
   getOffers() {
     return this._load({
-      url: `offers `
+      url: URL.OFFERS
     })
     .then((response) => response.json());
   }
 
   createPoint(point) {
     return this._load({
-      url: `points`,
+      url: URL.POINTS,
       method: Method.POST,
       body: JSON.stringify(point.toRAW()),
       headers: new Headers({"Content-Type": `application/json`})
@@ -50,7 +50,7 @@ export default class API {
 
   updatePoint(id, point) {
     return this._load({
-      url: `points/${id}`,
+      url: `${URL.POINTS}/${id}`,
       method: Method.PUT,
       body: JSON.stringify(point.toRAW()),
       headers: new Headers({"Content-Type": `application/json`})
@@ -60,7 +60,17 @@ export default class API {
   }
 
   deletePoint(id) {
-    return this._load({url: `points/${id}`, method: Method.DELETE});
+    return this._load({url: `${URL.POINTS}/${id}`, method: Method.DELETE});
+  }
+
+  sync(data) {
+    return this._load({
+      url: `${URL.POINTS}/sync`,
+      method: Method.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({"Content-Type": `application/json`})
+    })
+      .then((response) => response.json());
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {

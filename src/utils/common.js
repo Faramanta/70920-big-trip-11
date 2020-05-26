@@ -44,7 +44,7 @@ export const getSortedPoints = (points, sortType) => {
 
   switch (sortType) {
     case SortType.DEFAULT:
-      sortedPoints = showingPoints.sort((a, b) => a.startTimestamp > b.startTimestamp);
+      sortedPoints = showingPoints.sort((a, b) => a.startTimestamp - b.startTimestamp);
       break;
     case SortType.TIME:
       sortedPoints = showingPoints.sort((a, b) => {
