@@ -156,7 +156,6 @@ export default class Stats extends AbstractSmartComponent {
 
   show() {
     super.show();
-
     this.rerender(this._points);
   }
 
@@ -164,7 +163,6 @@ export default class Stats extends AbstractSmartComponent {
 
   rerender(points) {
     this._points = points;
-
     this._renderCharts();
   }
 

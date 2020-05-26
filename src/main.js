@@ -6,14 +6,13 @@ import FilterController from "./controllers/filter-controller.js";
 import LoadingComponent from "./components/loading.js";
 import TripInfoComponent from "./components/trip-information.js";
 import RouteComponent from "./components/route-information.js";
-import CostComponent from "./components/cost-information.js";
 import MenuComponent from "./components/menu.js";
 import StatsComponent from "./components/stats.js";
 import PointModel from "./models/points.js";
 import {render, remove, RenderPosition} from "./utils/render.js";
 import {MenuItem, END_POINT, STORE_NAME} from "./const.js";
 
-const AUTHORIZATION = `Basic e02w590wk271810`;
+const AUTHORIZATION = `Basic e92w590wk271810`;
 
 const api = new API(END_POINT, AUTHORIZATION);
 const store = new Store(STORE_NAME, window.localStorage);
@@ -32,7 +31,6 @@ const tripInfo = new TripInfoComponent();
 const siteMenu = new MenuComponent();
 
 render(siteTripInformationElement, tripInfo, RenderPosition.AFTERBEGIN); // контейнер для маршрута и стоимости .trip-main__trip-info
-render(tripInfo.getElement(), new CostComponent(), RenderPosition.BEFOREEND); // отрисовка стоимости маршрута
 render(sitePageBodyContainerElement, loadingComponent, RenderPosition.BEFOREEND); // отрисовка loading...
 
 const siteControlsElement = siteHeaderElement.querySelector(`.trip-main__trip-controls`); // контейнер для меню и фильтра
