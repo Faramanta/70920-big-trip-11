@@ -2,6 +2,7 @@ import AbstractComponent from "./abstract-component.js";
 
 // маршрут
 const createRouteInformationTemplate = () => {
+
   return (
     `<div class="trip-info__main">
       <h1 class="trip-info__title">Amsterdam &mdash; Chamonix &mdash; Geneva</h1>

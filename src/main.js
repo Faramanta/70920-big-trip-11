@@ -1,4 +1,4 @@
-import API from "./api/index.js";
+import API from "./api/api.js";
 import Provider from "./api/provider.js";
 import Store from "./api/store.js";
 import TripController from "./controllers/trip-controller.js";
@@ -13,7 +13,7 @@ import PointModel from "./models/points.js";
 import {render, remove, RenderPosition} from "./utils/render.js";
 import {MenuItem, END_POINT, STORE_NAME} from "./const.js";
 
-const AUTHORIZATION = `Basic e02w590wk271893`;
+const AUTHORIZATION = `Basic e02w590wk271810`;
 
 const api = new API(END_POINT, AUTHORIZATION);
 const store = new Store(STORE_NAME, window.localStorage);
@@ -33,7 +33,7 @@ const siteMenu = new MenuComponent();
 
 render(siteTripInformationElement, tripInfo, RenderPosition.AFTERBEGIN); // контейнер для маршрута и стоимости .trip-main__trip-info
 render(tripInfo.getElement(), new CostComponent(), RenderPosition.BEFOREEND); // отрисовка стоимости маршрута
-render(sitePageBodyContainerElement, loadingComponent, RenderPosition.BEFOREEND); // отрисовка стоимости маршрута
+render(sitePageBodyContainerElement, loadingComponent, RenderPosition.BEFOREEND); // отрисовка loading...
 
 const siteControlsElement = siteHeaderElement.querySelector(`.trip-main__trip-controls`); // контейнер для меню и фильтра
 
@@ -46,8 +46,10 @@ const sitePointContainerElement = siteContentElement.querySelector(`.trip-events
 
 const tripController = new TripController(sitePointContainerElement, pointsModel, apiWithProvider);
 
+const routeComponent = new RouteComponent(pointsModel);
+
 if (pointsModel.size !== 0) {
-  render(tripInfo.getElement(), new RouteComponent(), RenderPosition.AFTERBEGIN); // отрисовка информации о маршруте
+  render(tripInfo.getElement(), routeComponent, RenderPosition.AFTERBEGIN); // отрисовка информации о маршруте
 }
 
 const statisticComponent = new StatsComponent(pointsModel);
@@ -83,7 +85,6 @@ Promise.all([apiWithProvider.getPoints(), apiWithProvider.getOffers(), apiWithPr
     remove(loadingComponent);
     tripController.render(offers, destinations);
   });
-
 
 window.addEventListener(`load`, () => {
   navigator.serviceWorker.register(`/sw.js`)

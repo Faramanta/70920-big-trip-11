@@ -1,6 +1,7 @@
 import FilterComponent from "../components/filter.js";
 import {FilterType, MenuItem} from "../const.js";
 import {render, replace, RenderPosition} from "../utils/render.js";
+import {getPointsByFilter} from "../utils/filter.js";
 
 export default class FilterController {
   constructor(container, pointsModel) {
@@ -23,6 +24,7 @@ export default class FilterController {
       return {
         name: filterType,
         checked: filterType === this._activeFilterType,
+        disabled: !this._isDisabled(filterType)
       };
     });
     const oldComponent = this._filterComponent;
@@ -35,6 +37,10 @@ export default class FilterController {
     } else {
       render(container, this._filterComponent, RenderPosition.BEFOREEND);
     }
+  }
+
+  _isDisabled(type) {
+    return getPointsByFilter(this._pointsModel.getPoints(), type).length > 0;
   }
 
   setDefaultView() {
