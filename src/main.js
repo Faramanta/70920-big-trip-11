@@ -5,14 +5,13 @@ import TripController from "./controllers/trip-controller.js";
 import FilterController from "./controllers/filter-controller.js";
 import LoadingComponent from "./components/loading.js";
 import TripInfoComponent from "./components/trip-information.js";
-import RouteComponent from "./components/route-information.js";
 import MenuComponent from "./components/menu.js";
 import StatsComponent from "./components/stats.js";
 import PointModel from "./models/points.js";
 import {render, remove, RenderPosition} from "./utils/render.js";
 import {MenuItem, END_POINT, STORE_NAME} from "./const.js";
 
-const AUTHORIZATION = `Basic e92w590wk271810`;
+const AUTHORIZATION = `Basic e10w590wk271810`;
 
 const api = new API(END_POINT, AUTHORIZATION);
 const store = new Store(STORE_NAME, window.localStorage);
@@ -27,10 +26,10 @@ const siteContentElement = siteMainElement.querySelector(`.page-main`);
 const sitePageBodyContainerElement = siteContentElement.querySelector(`.page-body__container`);
 const siteTripInformationElement = siteHeaderElement.querySelector(`.trip-main`);
 
-const tripInfo = new TripInfoComponent();
+const tripInfoComponent = new TripInfoComponent(pointsModel);
 const siteMenu = new MenuComponent();
 
-render(siteTripInformationElement, tripInfo, RenderPosition.AFTERBEGIN); // контейнер для маршрута и стоимости .trip-main__trip-info
+render(siteTripInformationElement, tripInfoComponent, RenderPosition.AFTERBEGIN); // контейнер для маршрута и стоимости .trip-main__trip-info
 render(sitePageBodyContainerElement, loadingComponent, RenderPosition.BEFOREEND); // отрисовка loading...
 
 const siteControlsElement = siteHeaderElement.querySelector(`.trip-main__trip-controls`); // контейнер для меню и фильтра
@@ -43,12 +42,6 @@ filterController.render();
 const sitePointContainerElement = siteContentElement.querySelector(`.trip-events`);
 
 const tripController = new TripController(sitePointContainerElement, pointsModel, apiWithProvider);
-
-const routeComponent = new RouteComponent(pointsModel);
-
-if (pointsModel.size !== 0) {
-  render(tripInfo.getElement(), routeComponent, RenderPosition.AFTERBEGIN); // отрисовка информации о маршруте
-}
 
 const statisticComponent = new StatsComponent(pointsModel);
 
