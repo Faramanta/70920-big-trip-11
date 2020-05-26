@@ -1,4 +1,10 @@
 export const POINT_COUNT = 5;
+export const OFFERS_SHOWING = 3;
+export const ONE_SECOND = 1000;
+export const ONE_MINUTE = 1000 * 60;
+export const ONE_HOUR = ONE_MINUTE * 60; // 1000 * 60 * 60
+export const ONE_DAY = ONE_HOUR * 24; // 1000 * 60 * 60 * 24
+export const SHAKE_ANIMATION_TIMEOUT = 600;
 
 export const HIDDEN_CLASS = `visually-hidden`;
 
@@ -27,6 +33,7 @@ export const POINT_TYPES = [
   PointType.SIGHTSEEING,
   PointType.RESTAURANT,
 ];
+
 export const POINT_TYPES_TRANSPORT = [
   PointType.TAXI,
   PointType.BUS,
@@ -36,6 +43,7 @@ export const POINT_TYPES_TRANSPORT = [
   PointType.DRIVE,
   PointType.FLIGHT,
 ];
+
 export const POINT_TYPES_ACTIVITY = [
   PointType.CHECKIN,
   PointType.SIGHTSEEING,
@@ -74,11 +82,6 @@ export const MONTHS = [
   `Nov`,
   `Dec`,
 ];
-
-export const ONE_SECOND = 1000;
-export const ONE_MINUTE = 1000 * 60;
-export const ONE_HOUR = ONE_MINUTE * 60; // 1000 * 60 * 60
-export const ONE_DAY = ONE_HOUR * 24; // 1000 * 60 * 60 * 24
 
 export const KeyCode = {
   ESC: `Esc`,
@@ -147,10 +150,6 @@ export const Method = {
   DELETE: `DELETE`
 };
 
-export const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
-
-export const OFFERS_IF_PREFIX = `event-offer`;
-
 export const EMPTY_POINT = {
   id: `-1`,
   price: 0,
@@ -162,9 +161,19 @@ export const EMPTY_POINT = {
   pointOffers: [],
 };
 
-export const SHAKE_ANIMATION_TIMEOUT = 600;
-
 export const DefaultData = {
   deleteButtonText: `Delete`,
   saveButtonText: `Save`,
 };
+
+export const URL = {
+  POINTS: `points`,
+  DESTINATIONS: `destinations`,
+  OFFERS: `offers`
+};
+
+export const END_POINT = `https://11.ecmascript.pages.academy/big-trip`;
+export const OFFERS_IF_PREFIX = `event-offer`;
+export const STORE_PREFIX = `bigtrip-localstorage`;
+export const STORE_VER = `v1`;
+export const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;

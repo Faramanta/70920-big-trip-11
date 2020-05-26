@@ -1,11 +1,12 @@
 import AbstractComponent from "./abstract-component.js";
 import {pointTime, pointISOTime, pointDuration, capitalizeFirstLetter} from "../utils/common.js";
+import {OFFERS_SHOWING} from "../const.js";
 
 // Точка маршрута
 
 // рендер offer'а
 const createOffersMarkup = (offers) => {
-  return offers
+  return offers ? offers.slice(0, OFFERS_SHOWING)
     .map((offer) => {
       return (
         `<li class="event__offer">
@@ -15,7 +16,7 @@ const createOffersMarkup = (offers) => {
         </li>`
       );
     })
-    .join(`\n`);
+    .join(`\n`) : ``;
 };
 
 const createTripPointTemplate = (point) => {
