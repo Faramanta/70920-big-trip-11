@@ -43,7 +43,7 @@ export default class Store {
     this._storage.setItem(
         this._storeKey,
         JSON.stringify(
-            Object.assign([], store, {
+            Object.assign({}, store, {
               [key]: value
             })
         )
