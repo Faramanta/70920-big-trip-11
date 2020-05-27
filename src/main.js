@@ -11,7 +11,7 @@ import PointModel from "./models/points.js";
 import {render, remove, RenderPosition} from "./utils/render.js";
 import {MenuItem, END_POINT, STORE_NAME} from "./const.js";
 
-const AUTHORIZATION = `Basic e11w590wk271810`;
+const AUTHORIZATION = `Basic e15w590wk271810`;
 
 const api = new API(END_POINT, AUTHORIZATION);
 const store = new Store(STORE_NAME, window.localStorage);

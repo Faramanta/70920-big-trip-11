@@ -70,7 +70,9 @@ export default class PointController {
   }
 
   destroy() {
-    remove(this._pointEditComponent);
+    if (this._pointEditComponent) {
+      remove(this._pointEditComponent);
+    }
     if (this._pointComponent) {
       remove(this._pointComponent);
     }

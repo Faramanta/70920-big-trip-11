@@ -1,5 +1,10 @@
 import moment from "moment";
-import {SortType, OFFERS_IF_PREFIX} from "../const.js";
+import {SortType,
+  OFFERS_IF_PREFIX,
+  START_DAY_TIME,
+  END_DAY_HOUR,
+  END_DAY_MINUTE,
+  END_DAY_MSEC} from "../const.js";
 
 export const castTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
@@ -64,17 +69,17 @@ export const getGroupedPoints = (points) => {
   points.forEach((point) => {
     const startPointDate = new Date(point.startTimestamp);
 
-    const startDay = new Date(startPointDate.getFullYear(), startPointDate.getMonth(), startPointDate.getDate(), 0, 0, 0, 0);
-    const endDay = new Date(startPointDate.getFullYear(), startPointDate.getMonth(), startPointDate.getDate(), 23, 59, 59, 999);
+    const startDay = new Date(startPointDate.getFullYear(), startPointDate.getMonth(), startPointDate.getDate(), START_DAY_TIME, START_DAY_TIME, START_DAY_TIME, START_DAY_TIME);
+    const endDay = new Date(startPointDate.getFullYear(), startPointDate.getMonth(), startPointDate.getDate(), END_DAY_HOUR, END_DAY_MINUTE, END_DAY_MINUTE, END_DAY_MSEC);
 
     const startTimestampDay = startDay.getTime();
     const endTimestampDay = endDay.getTime();
 
 
     if (!pointsGroups.has(startTimestampDay)) {
-      const dayPoints = points.filter((point1) => {
+      const dayPoints = points.filter((pointDay) => {
 
-        return startTimestampDay <= point1.startTimestamp && point1.startTimestamp <= endTimestampDay;
+        return startTimestampDay <= pointDay.startTimestamp && pointDay.startTimestamp <= endTimestampDay;
 
       });
 

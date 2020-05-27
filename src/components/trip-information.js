@@ -1,5 +1,6 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {COUNT_CITY_SHOWING} from "../const.js";
+import {COUNT_CITY_SHOWING, SortType} from "../const.js";
+import {getSortedPoints} from "../utils/common.js";
 import moment from "moment";
 
 const createTitle = (points) => {
@@ -26,17 +27,24 @@ const createTitle = (points) => {
 };
 
 const createDates = (points) => {
-  const pointsC0unt = points.length;
+  const pointsCount = points.length;
 
-  if (pointsC0unt === 0) {
+  if (pointsCount === 0) {
     return ``;
   }
 
-  const firstPoint = points[1];
-  const lastPoint = points[pointsC0unt - 1];
+  const firstPoint = points[0];
+  const lastPoint = points[pointsCount - 1];
 
-  const startDate = moment(firstPoint.startTimestamp).format(`MMMM D`);
-  const endDate = moment(lastPoint.endTimestamp).format(`MMMM D`);
+  const startDate = moment(firstPoint.startTimestamp).format(`MMM D`);
+  const endDate = moment(lastPoint.endTimestamp).format(`MMM D`);
+
+  if (pointsCount === 1) {
+    if (startDate < endDate) {
+      return `${startDate} &mdash; ${endDate}`;
+    }
+    return `${startDate}`;
+  }
 
   return `${startDate} &mdash; ${endDate}`;
 };
@@ -93,7 +101,7 @@ export default class TripInfo extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    const points = this._pointsModel.getPoints();
+    const points = getSortedPoints(this._pointsModel.getPoints(), SortType.DEFAULT);
     return createRouteInformationTemplate(points);
   }
 

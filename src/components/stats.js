@@ -77,6 +77,14 @@ const getChartConfig = (types, data, title, formatter) => {
       },
       tooltips: {
         enabled: false,
+      },
+      layout: {
+        padding: {
+          left: 40,
+          right: 0,
+          top: 0,
+          bottom: 0
+        }
       }
     }
   };
