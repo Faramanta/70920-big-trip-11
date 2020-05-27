@@ -103,7 +103,7 @@ const renderMoneyChart = (chart, points) => {
 
 const renderTransportChart = (chart, points) => {
 
-  const pointTypes = getPointsType(points).filter((type) => (type !== `restaurant` || type !== `sightseeing` || type !== `check-in`));
+  const pointTypes = getPointsType(points).filter((type) => (type !== `restaurant` && type !== `sightseeing` && type !== `check-in`));
   const data = pointTypes.map((type) => calculateTypeCount(points, type));
   const setFormat = (val) => `${val}x`;
 
