@@ -1,9 +1,7 @@
-export const POINT_COUNT = 5;
 export const OFFERS_SHOWING = 3;
 export const ONE_SECOND = 1000;
 export const ONE_MINUTE = 1000 * 60;
 export const ONE_HOUR = ONE_MINUTE * 60; // 1000 * 60 * 60
-export const ONE_DAY = ONE_HOUR * 24; // 1000 * 60 * 60 * 24
 export const SHAKE_ANIMATION_TIMEOUT = 600;
 export const COUNT_CITY_SHOWING = 3;
 export const START_DAY_TIME = 0;
@@ -26,19 +24,6 @@ export const PointType = {
   RESTAURANT: `Restaurant`,
 };
 
-export const POINT_TYPES = [
-  PointType.TAXI,
-  PointType.BUS,
-  PointType.TRAIN,
-  PointType.SHIP,
-  PointType.TRANSPORT,
-  PointType.DRIVE,
-  PointType.FLIGHT,
-  PointType.CHECKIN,
-  PointType.SIGHTSEEING,
-  PointType.RESTAURANT,
-];
-
 export const POINT_TYPES_TRANSPORT = [
   PointType.TAXI,
   PointType.BUS,
@@ -60,12 +45,6 @@ export const FilterType = {
   FUTURE: `future`,
   PAST: `past`
 };
-
-export const FILTER_TYPES = [
-  FilterType.EVERYTHING,
-  FilterType.FUTURE,
-  FilterType.PAST
-];
 
 export const MONTHS = [
   `Jan`,

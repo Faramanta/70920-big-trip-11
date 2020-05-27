@@ -1,9 +1,8 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {POINT_TYPES_ACTIVITY, POINT_TYPES_TRANSPORT, Mode, DefaultData} from "../const.js";
-import {capitalizeFirstLetter, getTypeOffers, pointTime, getOfferUID} from "../utils/common.js";
+import {capitalizeFirstLetter, getTypeOffers, getPointTime, getOfferUID} from "../utils/common.js";
 import flatpickr from "flatpickr";
 import {encode} from "he";
-// import he from 'he';
 import "flatpickr/dist/flatpickr.min.css";
 
 const createPointTypesMarkup = (pointTypes, id, type) => {
@@ -128,10 +127,6 @@ const createTripPointEditTemplate = (point, pointType, pointDestination, offers,
 
   const price = encode(notSanitizedPrice.toString());
 
-  // if (pointDestination) {
-  //   const cityDisplayText = he.encode(pointDestination.name);
-  // }
-
   const deleteButtonText = renderOptions.deleteButtonText;
   const saveButtonText = renderOptions.saveButtonText;
 
@@ -140,8 +135,8 @@ const createTripPointEditTemplate = (point, pointType, pointDestination, offers,
   const offersTypeAll = getTypeOffers(offers, pointType); // все офферы типа
 
   const pointTypeName = capitalizeFirstLetter(pointType);
-  const pointStart = pointTime(startTimestamp); // время старта
-  const pointEnd = pointTime(endTimestamp); // время финиша
+  const pointStart = getPointTime(startTimestamp); // время старта
+  const pointEnd = getPointTime(endTimestamp); // время финиша
   const pointTypesTransferMarkup = createPointTypesMarkup(POINT_TYPES_TRANSPORT.slice(), id, pointType);
   const pointTypesActivityMarkup = createPointTypesMarkup(POINT_TYPES_ACTIVITY.slice(), id, pointType);
   const pointCityMarkup = createCityMarkup(destinations);
@@ -211,7 +206,6 @@ const createTripPointEditTemplate = (point, pointType, pointDestination, offers,
           <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
           ${buttonsMarkup}
  
-          
             <span class="visually-hidden">Open event</span>
           </button>
         </header>
@@ -248,7 +242,6 @@ export default class PointEdit extends AbstractSmartComponent {
 
     this._pointDestination = this._point.pointDestination;
     this._pointType = this._point.pointType;
-
 
     this._isFormDirty = false;
     this._isWaiting = false;
@@ -467,7 +460,7 @@ export default class PointEdit extends AbstractSmartComponent {
     if (data.deleteButtonText) {
       this.getElement().querySelector(`.event__reset-btn`).textContent = data.deleteButtonText;
     }
-    // const inputs = this._form.querySelectorAll(`input`);
+
     this.getElement().querySelectorAll(`input`)
     .forEach((input) => {
       input.style.backgroundColor = `rgba(180, 180, 180, 0.33)`;

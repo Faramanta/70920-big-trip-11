@@ -1,5 +1,5 @@
-import PointComponent from "../components/trip-event.js";
-import PointEditComponent from "../components/trip-event-edit.js";
+import PointComponent from "../components/point.js";
+import PointEditComponent from "../components/point-edit.js";
 import PointModel from "../models/point.js";
 import {getOfferUID, getTypeOffers} from "../utils/common.js";
 import {render, remove, replace, RenderPosition} from "../utils/render.js";

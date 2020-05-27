@@ -6,7 +6,7 @@ import {getPointsType,
   calculateTypeCount,
   calculateTypePrice,
   calculateTypeDuration,
-  pointDurationFormat} from "../utils/common.js";
+  setPointDurationFormat} from "../utils/common.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
@@ -94,22 +94,22 @@ const renderMoneyChart = (chart, points) => {
 
   const pointTypes = getPointsType(points);
   const data = pointTypes.map((type) => calculateTypePrice(points, type));
-  const formatter = (val) => `€ ${val}`;
+  const setFormat = (val) => `€ ${val}`;
 
   chart.height = BAR_HEIGHT * pointTypes.length;
 
-  return new Chart(chart, getChartConfig(pointTypes, data, ChartTitle.MONEY, formatter));
+  return new Chart(chart, getChartConfig(pointTypes, data, ChartTitle.MONEY, setFormat));
 };
 
 const renderTransportChart = (chart, points) => {
 
   const pointTypes = getPointsType(points).filter((type) => (type !== `restaurant` || type !== `sightseeing` || type !== `check-in`));
   const data = pointTypes.map((type) => calculateTypeCount(points, type));
-  const formatter = (val) => `${val}x`;
+  const setFormat = (val) => `${val}x`;
 
   chart.height = BAR_HEIGHT * pointTypes.length;
 
-  return new Chart(chart, getChartConfig(pointTypes, data, ChartTitle.TRANSPORT, formatter));
+  return new Chart(chart, getChartConfig(pointTypes, data, ChartTitle.TRANSPORT, setFormat));
 };
 
 const renderTimeSpendChart = (chart, points) => {
@@ -117,13 +117,13 @@ const renderTimeSpendChart = (chart, points) => {
   const pointTypes = getPointsType(points);
   const data = pointTypes.map((type) => calculateTypeDuration(points, type));
 
-  const formatter = (val) => {
-    return pointDurationFormat(val);
+  const setFormat = (val) => {
+    return setPointDurationFormat(val);
   };
 
   chart.height = BAR_HEIGHT * pointTypes.length;
 
-  return new Chart(chart, getChartConfig(pointTypes, data, ChartTitle.TIME_SPEND, formatter));
+  return new Chart(chart, getChartConfig(pointTypes, data, ChartTitle.TIME_SPEND, setFormat));
 };
 
 const createStatsTemplate = () => {

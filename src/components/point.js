@@ -1,8 +1,6 @@
 import AbstractComponent from "./abstract-component.js";
-import {pointTime, pointISOTime, pointDuration, capitalizeFirstLetter} from "../utils/common.js";
+import {getPointTime, getPointISOTime, getPointDurationFormat, capitalizeFirstLetter} from "../utils/common.js";
 import {OFFERS_SHOWING} from "../const.js";
-
-// Точка маршрута
 
 // рендер offer'а
 const createOffersMarkup = (offers) => {
@@ -23,12 +21,12 @@ const createTripPointTemplate = (point) => {
   const {pointType, pointDestination, startTimestamp, endTimestamp, price, pointOffers} = point;
 
   const pointTypeName = capitalizeFirstLetter(pointType);
-  const pointStart = pointTime(startTimestamp); // время старта
-  const pointEnd = pointTime(endTimestamp); // время финиша
-  const pointISOStart = pointISOTime(startTimestamp);
-  const pointISOEnd = pointISOTime(endTimestamp);
+  const pointStart = getPointTime(startTimestamp); // время старта
+  const pointEnd = getPointTime(endTimestamp); // время финиша
+  const pointISOStart = getPointISOTime(startTimestamp);
+  const pointISOEnd = getPointISOTime(endTimestamp);
 
-  const pointDur = pointDuration(startTimestamp, endTimestamp);
+  const pointDur = getPointDurationFormat(startTimestamp, endTimestamp);
 
   const isOffersShowing = !!pointOffers; // есть ли выбранные offers
   const offersMarkup = isOffersShowing ? createOffersMarkup(pointOffers) : ``;

@@ -10,22 +10,23 @@ export const castTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
 };
 
-export const pointTime = (timestamp) => {
+export const getPointTime = (timestamp) => {
   return moment(timestamp).format(`HH:mm`);
 };
-export const pointISOTime = (timestamp) => {
+
+export const getPointISOTime = (timestamp) => {
   return moment(timestamp).format(`YYYY-mm-DTHH:mm`);
 };
 
-export const pointDuration = (start, end) => {
+export const getPointDurationFormat = (start, end) => {
   const pointStart = moment(start);
   const pointEnd = moment(end);
   const duration = pointEnd.diff(pointStart); // продолжительность точки
 
-  return pointDurationFormat(duration);
+  return setPointDurationFormat(duration);
 };
 
-export const pointDurationFormat = (duration) => {
+export const setPointDurationFormat = (duration) => {
   const pointDurDay = moment.duration(duration).days(); // количество дней
   const pointDurHour = moment.duration(duration).hours(); // количество часов
   const pointDurMin = moment.duration(duration).minutes(); // количество минут
@@ -134,17 +135,8 @@ export const getTypeOffers = (offers, typeName) => {
   return [];
 };
 
-// выбрать destinations по городу
-export const getDestination = (destinations, pointCity) => {
-  return destinations.find((destination) => destination.name === pointCity);
-};
-
-export const formatDateToRAW = (date) => {
+export const getDateToRAW = (date) => {
   return moment(date).toJSON();
-};
-
-export const formatDateToDefault = (date) => {
-  return moment(date).unix();
 };
 
 export const getOfferUID = (title, price, id) => {

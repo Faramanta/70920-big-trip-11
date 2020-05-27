@@ -1,8 +1,8 @@
 import SortComponent from "../components/sort.js";
-import DaysComponent from "../components/trip-day-list.js";
-import DayComponent from "../components/trip-day-item.js";
-import PointsComponent from "../components/trip-event-list.js";
-import NoPointsComponent from "../components/no-events.js";
+import DaysComponent from "../components/days.js";
+import DayComponent from "../components/day.js";
+import PointsComponent from "../components/points.js";
+import NoPointsComponent from "../components/no-points.js";
 import PointController from "./point-controller.js";
 import {render, RenderPosition} from "../utils/render.js";
 import {getPreparedPoints, getSortedPoints} from "../utils/common.js";
@@ -82,7 +82,6 @@ export default class TripController {
     this._offers = offers;
     this._destinations = destinations;
 
-
     if (points.size === 0) {
       render(this._container, this._noPointsComponent, RenderPosition.BEFOREEND); // отрисовка сообщения оо отсутствии точек
       return;
@@ -93,7 +92,6 @@ export default class TripController {
 
     this.renderContent();
   }
-
 
   hide() {
     this._container.classList.add(HIDDEN_CLASS);

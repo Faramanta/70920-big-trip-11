@@ -4,7 +4,7 @@ import Store from "./api/store.js";
 import TripController from "./controllers/trip-controller.js";
 import FilterController from "./controllers/filter-controller.js";
 import LoadingComponent from "./components/loading.js";
-import TripInfoComponent from "./components/trip-information.js";
+import TripInfoComponent from "./components/trip-info.js";
 import MenuComponent from "./components/menu.js";
 import StatsComponent from "./components/stats.js";
 import PointModel from "./models/points.js";

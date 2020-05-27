@@ -100,7 +100,6 @@ export default class TripInfo extends AbstractSmartComponent {
 
   recoveryListeners() {}
 
-
   _rerender() {
     super.rerender();
   }
