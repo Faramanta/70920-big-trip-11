@@ -4,22 +4,22 @@ import {getSortedPoints} from "../utils/common.js";
 import moment from "moment";
 
 const createTitle = (points) => {
-  const pointsC0unt = points.length;
+  const pointsCount = points.length;
 
-  if (pointsC0unt === 0) {
+  if (pointsCount === 0) {
     return ``;
   }
 
   const titles = points.map((point) => point.pointDestination.name);
 
-  if (pointsC0unt === 1) {
+  if (pointsCount === 1) {
     return titles;
   }
 
   const firstCity = titles[0];
   const lastCity = titles[titles.length - 1];
 
-  if (pointsC0unt <= COUNT_CITY_SHOWING) {
+  if (pointsCount <= COUNT_CITY_SHOWING) {
     return titles.join(` &mdash; `);
   }
 
