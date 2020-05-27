@@ -5,6 +5,8 @@ export const ONE_MINUTE = 1000 * 60;
 export const ONE_HOUR = ONE_MINUTE * 60; // 1000 * 60 * 60
 export const ONE_DAY = ONE_HOUR * 24; // 1000 * 60 * 60 * 24
 export const SHAKE_ANIMATION_TIMEOUT = 600;
+export const COUNT_CITY_SHOWING = 3;
+
 
 export const HIDDEN_CLASS = `visually-hidden`;
 

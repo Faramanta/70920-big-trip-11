@@ -1,21 +1,24 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
+import {COUNT_CITY_SHOWING} from "../const.js";
 import moment from "moment";
 
 const createTitle = (points) => {
-  if (points.length === 0) {
+  const pointsC0unt = points.length;
+
+  if (pointsC0unt === 0) {
     return ``;
   }
 
   const titles = points.map((point) => point.pointDestination.name);
 
-  if (points.length === 1) {
+  if (pointsC0unt === 1) {
     return titles;
   }
 
   const firstCity = titles[0];
   const lastCity = titles[titles.length - 1];
 
-  if (points.length <= 3) {
+  if (pointsC0unt <= COUNT_CITY_SHOWING) {
     return titles.join(` &mdash; `);
   }
 
@@ -23,12 +26,14 @@ const createTitle = (points) => {
 };
 
 const createDates = (points) => {
-  if (points.length === 0) {
+  const pointsC0unt = points.length;
+
+  if (pointsC0unt === 0) {
     return ``;
   }
 
   const firstPoint = points[1];
-  const lastPoint = points[points.length - 1];
+  const lastPoint = points[pointsC0unt - 1];
 
   const startDate = moment(firstPoint.startTimestamp).format(`MMMM D`);
   const endDate = moment(lastPoint.endTimestamp).format(`MMMM D`);
