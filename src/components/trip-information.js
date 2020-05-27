@@ -39,13 +39,6 @@ const createDates = (points) => {
   const startDate = moment(firstPoint.startTimestamp).format(`MMM D`);
   const endDate = moment(lastPoint.endTimestamp).format(`MMM D`);
 
-  if (pointsCount === 1) {
-    if (startDate < endDate) {
-      return `${startDate} &mdash; ${endDate}`;
-    }
-    return `${startDate}`;
-  }
-
   return `${startDate} &mdash; ${endDate}`;
 };
 
