@@ -77,6 +77,14 @@ const getChartConfig = (types, data, title, formatter) => {
       },
       tooltips: {
         enabled: false,
+      },
+      layout: {
+        padding: {
+          left: 40,
+          right: 0,
+          top: 0,
+          bottom: 0
+        }
       }
     }
   };
@@ -156,7 +164,6 @@ export default class Stats extends AbstractSmartComponent {
 
   show() {
     super.show();
-
     this.rerender(this._points);
   }
 
@@ -164,7 +171,6 @@ export default class Stats extends AbstractSmartComponent {
 
   rerender(points) {
     this._points = points;
-
     this._renderCharts();
   }
 

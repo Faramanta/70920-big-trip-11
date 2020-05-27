@@ -8,7 +8,7 @@ export default class Store {
 
   getItems() {
     try {
-      return JSON.parse(this._storage.getItem(this._storeKey)) || [];
+      return JSON.parse(this._storage.getItem(this._storeKey)) || {};
     } catch (err) {
       return {};
     }
@@ -16,7 +16,7 @@ export default class Store {
 
   getDestinations() {
     try {
-      return JSON.parse(this._storage.getItem(this._storeDestinationKey)) || [];
+      return JSON.parse(this._storage.getItem(this._storeDestinationKey)) || {};
     } catch (err) {
       return {};
     }

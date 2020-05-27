@@ -5,6 +5,11 @@ export const ONE_MINUTE = 1000 * 60;
 export const ONE_HOUR = ONE_MINUTE * 60; // 1000 * 60 * 60
 export const ONE_DAY = ONE_HOUR * 24; // 1000 * 60 * 60 * 24
 export const SHAKE_ANIMATION_TIMEOUT = 600;
+export const COUNT_CITY_SHOWING = 3;
+export const START_DAY_TIME = 0;
+export const END_DAY_HOUR = 23;
+export const END_DAY_MINUTE = 59;
+export const END_DAY_MSEC = 999;
 
 export const HIDDEN_CLASS = `visually-hidden`;
 
@@ -48,12 +53,6 @@ export const POINT_TYPES_ACTIVITY = [
   PointType.CHECKIN,
   PointType.SIGHTSEEING,
   PointType.RESTAURANT,
-];
-
-export const CITIES = [
-  `Amsterdam`,
-  `Chamonix`,
-  `Geneva`
 ];
 
 export const FilterType = {

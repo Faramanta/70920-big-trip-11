@@ -1,4 +1,4 @@
-import Point from "../models/point";
+import Point from "../models/point.js";
 import {nanoid} from "nanoid";
 
 const isOnline = () => {
@@ -25,7 +25,7 @@ export default class Provider {
   }
 
   getPoints() {
-    if (isOnline) {
+    if (isOnline()) {
       return this._api.getPoints()
         .then((points) => {
           const items = createStoreStructure(points.map((point) => point.toRAW()));
@@ -36,9 +36,9 @@ export default class Provider {
         });
     }
 
-    const storePoints = Object.values(this._store.getItems());
+    const storePoints = Array.from(Object.values(this._store.getItems()));
 
-    return Promise.resolve(Point.parsePoint(storePoints));
+    return Promise.resolve(Point.parsePoints(storePoints));
   }
 
   getDestinations() {
@@ -117,7 +117,7 @@ export default class Provider {
 
   sync() {
     if (isOnline()) {
-      const storePoints = Object.values(this._store.getItems());
+      const storePoints = Array.from(Object.values(this._store.getItems()));
 
       return this._api.sync(storePoints)
         .then((response) => {

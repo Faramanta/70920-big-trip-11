@@ -3,10 +3,15 @@ import AbstractComponent from "./abstract-component.js";
 const createFiltersMarkup = (filters) => {
   return filters
     .map((filter) => {
-
       return (
         `<div class="trip-filters__filter">
-          <input id="filter-${filter.name}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${filter.name}" ${filter.checked ? `checked` : ``}>
+          <input id="filter-${filter.name}" 
+          class="trip-filters__filter-input  visually-hidden" 
+          type="radio" 
+          name="trip-filter" 
+          value="${filter.name}" 
+          ${filter.checked ? `checked` : ``}
+          ${filter.disabled ? `disabled` : ``}>
           <label class="trip-filters__filter-label" for="filter-${filter.name}">${filter.name}</label>
         </div>`
       );
@@ -38,7 +43,7 @@ export default class Filter extends AbstractComponent {
 
   setDisableInputs() {
     this.getElement().querySelectorAll(`.trip-filters__filter-input`)
-      .forEach((input) => input.setAttribute(`disabled`, `disabled`));
+      .forEach((input) => input.setAttribute(`disabled`, `true`));
   }
 
   setEnableInputs() {
